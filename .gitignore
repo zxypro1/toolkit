@@ -1,0 +1,9 @@
+node_modules/
+packages/*/node_modules/
+packages/*/__tests__/_temp/
+.DS_Store
+logs/
+coverage/
+*.log
+.env
+lib
