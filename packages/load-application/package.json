@@ -9,5 +9,18 @@
     "prepublishOnly": "npm run build"
   },
   "author": "xsahxl",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@serverless-devs/download": "workspace:^0.0.1",
+    "art-template": "^4.13.2",
+    "fs-extra": "^11.1.0",
+    "lodash": "^4.17.21",
+    "node-fetch": "2.x",
+    "yaml": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
+    "@types/lodash": "^4.14.191",
+    "@types/node-fetch": "2.x"
+  }
 }

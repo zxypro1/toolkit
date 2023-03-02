@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-devs/request",
+  "name": "@serverless-devs/demo",
   "version": "0.0.1",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
