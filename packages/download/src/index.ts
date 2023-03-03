@@ -3,6 +3,7 @@ import https from 'https';
 import http, { IncomingMessage } from 'http';
 import fs from 'fs-extra';
 import decompress from 'decompress';
+import chalk from 'chalk';
 import path from 'path';
 import { IOptions } from './types';
 import { DEFAULT_FILENAME } from './constants';
@@ -25,7 +26,8 @@ class Download {
 
   async run() {
     const { logger } = this.options;
-    logger.log('Downloading...');
+    const uri = new URL(this.url);
+    logger.log(`Downloading[${chalk.green(decodeURIComponent(uri.pathname))}]...`);
     try {
       const filePath = await this.doDownload(this.url);
       await this.doDecompress(filePath);

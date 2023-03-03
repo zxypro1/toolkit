@@ -11,6 +11,7 @@
   "author": "xsahxl",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.2",
     "decompress": "^4.2.1",
     "fs-extra": "^11.1.0"
   },
