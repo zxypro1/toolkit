@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
-import download from '@serverless-devs/download';
+import download from '@serverless-devs/downloads';
 import artTemplate from 'art-template';
 import { isEmpty, includes, split, get, find, has, set } from 'lodash';
 import parse from './parse';

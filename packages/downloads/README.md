@@ -1,25 +1,25 @@
 
-# 下载(@serverless-devs/download)
+# 下载(@serverless-devs/downloads)
 
 ## 安装
 
 ```bash
-$ npm install @serverless-devs/download --save
+$ npm install @serverless-devs/downloads --save
 ```
 
 ## 基本使用
 
 ```ts
-import download from '@serverless-devs/download';
+import downloads from '@serverless-devs/downloads';
 
-download('https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54')
+downloads('https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54')
 ```
 
 ## 参数解析
 
 ```ts
-import download from '@serverless-devs/download';
-download(url, options)
+import downloads from '@serverless-devs/downloads';
+downloads(url, options)
 ```
 
 | 参数    | 说明            | 类型    | 必填 | 默认值 |

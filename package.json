@@ -11,12 +11,14 @@
     "build": "pnpm run -r build",
     "test": "jest --testTimeout 10000",
     "test:download": "jest --testTimeout 10000 packages/download --watchAll",
-    "test:load-application": "jest --testTimeout 10000 packages/load-application"
+    "test:load-application": "jest --testTimeout 10000 packages/load-application",
+    "test:utils": "jest --testTimeout 10000 packages/utils --watchAll"
   },
   "author": "xsahxl",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.4.0",
+    "@types/node": "^18.15.1",
     "jest": "^29.4.3",
     "prettier": "^2.8.4",
     "rimraf": "^4.1.2",

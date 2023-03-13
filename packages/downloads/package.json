@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-devs/download",
+  "name": "@serverless-devs/downloads",
   "version": "0.0.1",
   "description": "download for serverless-devs",
   "main": "lib/index.js",
@@ -18,5 +18,9 @@
   "devDependencies": {
     "@types/decompress": "^4.2.4",
     "@types/fs-extra": "^11.0.1"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   }
 }

@@ -1,0 +1,13 @@
+{
+  "name": "@serverless-devs/utils",
+  "version": "0.0.1",
+  "description": "utils for serverless-devs",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib node_modules",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "xsahxl",
+  "license": "MIT"
+}
