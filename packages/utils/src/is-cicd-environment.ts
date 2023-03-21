@@ -1,8 +1,6 @@
 import getCurrentEnvironment from './get-current-environment';
+import { Environment } from './constants';
 
-const isCiCdEnvironment = () =>
-  ['app_center', 'cloud_shell', 'yunxiao', 'github', 'gitlab', 'jenkins'].includes(
-    getCurrentEnvironment(),
-  );
+const isCiCdEnvironment = () => Object.values(Environment).includes(getCurrentEnvironment());
 
 export default isCiCdEnvironment;

@@ -1,11 +1,12 @@
 {
   "name": "@serverless-devs/utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "utils for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
+    "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "author": "xsahxl",
@@ -13,5 +14,11 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"
+  },
+  "dependencies": {
+    "minimist": "^1.2.8"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.2"
   }
 }
