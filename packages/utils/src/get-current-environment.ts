@@ -7,6 +7,7 @@ const getCurrentEnvironment = () => {
 
   for (const key in process.env) {
     if (key === 'SERVERLESS_CD') return Environment.ServerlessCD;
+    if (key === 'SERVERLESS_DEVS_CICD') return Environment.ServerlessDevsCICD;
     if (key.startsWith('CLOUDSHELL')) return Environment.CloudShell;
     if (key.startsWith('PIPELINE')) return Environment.Yunxiao;
     if (key.startsWith('GITHUB')) return Environment.Github;
