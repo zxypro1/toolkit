@@ -1,0 +1,15 @@
+# 忽略所有的文件或者文件夹
+ignore-all/
+
+# 忽略非根目录: 先忽略所有的文件，然后声明不忽略根目录文件
+ignore-non-root-dir
+!/ignore-non-root-dir
+
+# 忽略根目录下的文件
+/.hide-dir
+
+# 忽略指定文件
+dir-2/file
+
+# TODO: 仅忽略根目录下的所有文件,但不忽略文件夹
+keep-empty-dir/**

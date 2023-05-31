@@ -1,0 +1,24 @@
+{
+  "name": "@serverless-devs/progress-bar",
+  "version": "0.0.1",
+  "description": "progress-bar for serverless-devs",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib node_modules",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "wss-git",
+  "license": "MIT",
+  "dependencies": {
+    "progress": "^2.0.3",
+    "chalk": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/progress": "^2.0.3"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
