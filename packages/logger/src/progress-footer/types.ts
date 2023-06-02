@@ -15,5 +15,10 @@ export interface IOptions {
   /**
    * 自定义格式化输出
    */
-  format?: (showList: Map<number | string, string>) => string[];
+  format?: (showList: Map<string, IMateValue>) => string[];
+}
+
+export interface IMateValue {
+  message: string;
+  timer: number;
 }

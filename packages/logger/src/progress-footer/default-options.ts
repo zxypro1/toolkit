@@ -1,9 +1,18 @@
+import { IMateValue } from "./types";
+import { blackBright, green, greenBright } from 'chalk';
+
 export default {
-  format: (showList: Map<number | string, string>): string[] => {
+  format: (showList: Map<string, IMateValue>): string[] => {
     const show: string[] = [];
 
-    showList.forEach((value, key) => {
-      show.push(`${key}\n\t${value}`);
+    showList.forEach((value: IMateValue, key: string) => {
+      const { timer, message } = value;
+      const runTime = Math.floor((new Date().getTime() - timer) / 1000);
+
+      const showMessage = `${blackBright(key)} ${green(`${runTime}s`)}
+    ${greenBright(message)}`;
+  
+      show.push(showMessage);
     });
 
     return show;

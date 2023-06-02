@@ -1,13 +1,13 @@
 // @ts-ignore
 import CliProgressFooter from 'cli-progress-footer';
 import ee from 'event-emitter';
-import { IOptions } from './types';
+import { IOptions, IMateValue } from './types';
 import defaultOptions from './default-options';
 
 export default class ProgressFooter {
   private progress: CliProgressFooter;
   private intervalId: NodeJS.Timer | undefined;
-  private showList: Map<number | string, string>;
+  private showList: Map<string, IMateValue>;
   private fps: number;
   private openRefresh: boolean;
 
@@ -16,7 +16,7 @@ export default class ProgressFooter {
   /**
    * 自定义渲染内容
    */
-  public format: (showList: Map<number | string, string>) => string[];
+  public format: (showList: Map<string, IMateValue>) => string[];
 
   constructor(options: IOptions = {}) {
     this.progress = CliProgressFooter();
@@ -96,11 +96,23 @@ export default class ProgressFooter {
    * @param id 
    * @param message 
    */
-  public upsert(id: number | string, message: string) {
-    this.showList.set(id, message);
+  public upsert(id: string, message: string) {
+    if (this.showList.has(id)) {
+      const config = this.showList.get(id) as IMateValue;
+      this.showList.set(id, {
+        ...config,
+        message,
+      });
+    } else {
+      this.showList.set(id, {
+        timer: new Date().getTime(),
+        message,
+      });
+    }
+
     this.reader();
 
-    // 新增输入时，如果不存在定时器则输出
+    // 新增输入时，如果不存在定时器则开启定时器
     if (!this.intervalId && this.openRefresh) {
       this.intervalId = setInterval(this.reader, this.fps);
     }
@@ -110,7 +122,7 @@ export default class ProgressFooter {
    * 删除指定ID的动态输出
    * @param id 
    */
-  public removeItem(id: number | string) {
+  public removeItem(id: string) {
     this.showList.delete(id);
   }
 }
