@@ -39,14 +39,16 @@ async function run() {
   const yamlConfig: any = {
     'deploy-a': {
       component: 'fc',
+      runTime: 25,
     },
     'deploy-b': {
       component: 'fc',
       addCustom: true,
+      runTime: 15,
     },
-    'deploy-c': {
-      component: 'hang',
-    },
+    // 'deploy-c': {
+    //   component: 'hang',
+    // },
   };
   const uuid = Math.random().toString(16).slice(2);
 

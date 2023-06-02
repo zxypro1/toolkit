@@ -1,5 +1,7 @@
 import chalk from "chalk";
+import spinners from 'cli-spinners';
 
+console.log(spinners);
 
 console.log(
 chalk.black('black'),

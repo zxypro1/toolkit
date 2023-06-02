@@ -19,11 +19,11 @@ export default class Fc {
       const intervalId = setInterval(() => {
         this.logger.progress(`aaa ${i++}`); // 自定义
 
-        if (i === 50) {
+        if (i === (inputs.runTime || 20)) {
           clearInterval(intervalId);
           r('');
         }
-      }, 50);
+      }, 800);
     });
 
     this.logger.progress.removeItem('test');

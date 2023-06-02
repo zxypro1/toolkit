@@ -1,14 +1,16 @@
 // @ts-ignore
 import CliProgressFooter from 'cli-progress-footer';
+import cliSpinners from 'cli-spinners';
 import ee from 'event-emitter';
-import { IOptions, IMateValue } from './types';
+import { isString, get } from 'lodash';
+import { IPropsOptions, IMateValue, IShowList, IFormatOptions } from './types';
 import defaultOptions from './default-options';
 
 export default class ProgressFooter {
   private progress: CliProgressFooter;
   private intervalId: NodeJS.Timer | undefined;
-  private showList: Map<string, IMateValue>;
-  private fps: number;
+  private showList: IShowList;
+  private spinner: cliSpinners.Spinner;
   private openRefresh: boolean;
 
   public emitter: ee.Emitter;
@@ -16,15 +18,21 @@ export default class ProgressFooter {
   /**
    * 自定义渲染内容
    */
-  public format: (showList: Map<string, IMateValue>) => string[];
+  public format: (showList: IShowList, frames: IFormatOptions) => string[];
 
-  constructor(options: IOptions = {}) {
+  // /**
+  //  * 刷新的频率，ms 为单位
+  //  * 
+  //  * @default 100
+  //  */
+  // fps?: number;
+  constructor(options: IPropsOptions = {}) {
     this.progress = CliProgressFooter();
     this.showList = new Map();
 
     const o = { ...defaultOptions, ...options };
+    this.spinner = isString(o.spinner) ? get(cliSpinners, o.spinner, defaultOptions.spinner) : o.spinner;
     this.format = o.format;
-    this.fps = o.fps;
     this.openRefresh = o.openRefresh;
 
     // 确保 this 指向
@@ -56,7 +64,7 @@ export default class ProgressFooter {
       return;
     }
     // 存在输出时再处理显示
-    const show = this.format(this.showList);
+    const show = this.format(this.showList, { frames: this.spinner.frames });
     this.progress.updateProgress(show);
   }
 
@@ -66,7 +74,7 @@ export default class ProgressFooter {
    */
   public start(flag?: boolean): void {
     if (flag || (this.openRefresh && this.showList.size)) {
-      this.intervalId = setInterval(this.reader, this.fps);
+      this.intervalId = setInterval(this.reader, this.spinner.interval);
     }
   }
 
@@ -114,7 +122,7 @@ export default class ProgressFooter {
 
     // 新增输入时，如果不存在定时器则开启定时器
     if (!this.intervalId && this.openRefresh) {
-      this.intervalId = setInterval(this.reader, this.fps);
+      this.intervalId = setInterval(this.reader, this.spinner.interval);
     }
   }
 

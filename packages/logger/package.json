@@ -14,6 +14,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "cli-progress-footer": "^2.3.2",
+    "cli-spinners": "^2.9.0",
     "egg-logger": "^3.3.0",
     "event-emitter": "^0.3.5",
     "lodash": "^4.17.21"
