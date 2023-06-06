@@ -17,7 +17,7 @@ export default class EngineLogger extends Logger {
 
     const key = get(props, 'key');
     const file = get(props, 'file');
-    const consoleLogPath = get(props, 'consoleLogPath');
+    // const consoleLogPath = get(props, 'consoleLogPath');
     const secrets = get(props, 'secrets', []);
     const eol = get(props, 'eol', os.EOL);
 

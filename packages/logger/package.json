@@ -1,5 +1,5 @@
 {
-  "name": "cli-progress-footer",
+  "name": "@serverless-devs/logger",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

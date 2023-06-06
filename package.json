@@ -10,7 +10,7 @@
     "clean": "pnpm run -r clean && rimraf node_modules",
     "build": "pnpm run -r build",
     "test": "jest --testTimeout 10000",
-    "test:logger": "jest --testTimeout 10000 packages/logger --watchAll",
+    "test:logger": "ts-node packages/logger/__tests__/fixtures/engine/test",
     "test:zip": "jest --testTimeout 10000 packages/zip --watchAll",
     "test:download": "jest --testTimeout 10000 packages/download --watchAll",
     "test:ignore-walk": "jest --testTimeout 10000 packages/ignore-walk --watchAll",

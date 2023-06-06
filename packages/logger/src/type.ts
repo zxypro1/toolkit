@@ -2,7 +2,7 @@ import { LoggerLevel } from 'egg-logger';
 
 export interface IOptions {
   /**
-   * 目录输出目录
+   * 程序运行关键字
    */
   traceId: string;
   /**
@@ -14,7 +14,7 @@ export interface IOptions {
    */
   level?: LoggerLevel;
   /**
-   * 控制台日志输出级别
+   * 需加密字符
    */
   secrets?: string[];
   /**
