@@ -28,6 +28,7 @@ async function run() {
     traceId,
     logDir: path.join(__dirname, '..', 'logs'),
     secrets: ['abc'],
+    level: 'INFO',
   });
 
   // 模拟 engine

@@ -59,6 +59,10 @@ const loggers = await getLogger(keys, options);
 | --------- | ------------ | ----------------------------- | ---- | ------------- |
 | traceId    | 程序运行关键字   |  string     | 是   |  - |
 | logDir    | 日志输出目录   |  string     | 是   |  - |
-| level    | 终端日志输出级别   |  `ALL` | `DEBUG` | `INFO` | `WARN` | `ERROR` | `NONE`  | 否   |  `INFO` |
+| level    | 终端日志输出级别   |  `ALL`、`DEBUG`、`INFO`、`WARN`、`ERROR`、`NONE`  | 否   | 终端输出默认为：`INFO`；输出到文件默认为：`DEBUG` |
 | secrets    | 需加密字符   |  string[]     | 否   |  - |
 | eol    | 自定义文件结尾   |  string  | 否   |  `os.EOL` |
+
+## 控制输出级别
+
+可以通过环境变量 NODE_CONSOLE_LOGGRE_LEVEL=`ALL`、`DEBUG`、`INFO`、`WARN`、`ERROR`、`NONE` 控制输出级别，权重大于 options.level

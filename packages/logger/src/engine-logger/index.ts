@@ -20,11 +20,12 @@ export default class EngineLogger extends Logger {
     // const consoleLogPath = get(props, 'consoleLogPath');
     const secrets = get(props, 'secrets', []);
     const eol = get(props, 'eol', os.EOL);
+    const level = process.env.NODE_CONSOLE_LOGGRE_LEVEL as LoggerLevel;
 
     this.eol = eol;
 
     const consoleTransport = new ConsoleTransport({
-      level: get(props, 'level', 'INFO'),
+      level: level || get(props, 'level', 'INFO'),
       eol,
       // file: consoleLogPath,
       key,
@@ -33,7 +34,7 @@ export default class EngineLogger extends Logger {
     this.set('console', consoleTransport);
 
     const fileTransport = new FileTransport({
-      level: get(props, 'level', 'DEBUG'),
+      level: level || get(props, 'level', 'DEBUG'),
       secrets,
       file,
       eol,
