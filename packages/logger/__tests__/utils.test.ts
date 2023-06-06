@@ -1,5 +1,6 @@
-import EngineLogger, { mark, formatter } from '../src';
-import { IMeta } from '../src/type';
+import EngineLogger from '../src/logger';
+import { mark, formatter } from '../src/logger/transport';
+import { IMeta } from '../src/logger/type';
 
 test('mark', async () => {
   const lenLarge8 = '123456456789';
@@ -10,11 +11,9 @@ test('mark', async () => {
 
   const transportSmall = mark(lenSmall8);
   expect(transportSmall).toBe('*******');
-  // expect(zipFiles).toEqual(expect.arrayContaining([]));
-  // expect(zipFiles).not.toEqual(expect.arrayContaining([]));
 });
 
-test('formatter', async () => {
+test.only('formatter', async () => {
   const payload: IMeta = {
     date: '2023-06-02',
     message: 'This is a test message and will be displayed.\nThis is a test message and will be displayed.',

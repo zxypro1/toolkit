@@ -17,6 +17,7 @@ export default class Fc {
     
     await new Promise(r => {
       const intervalId = setInterval(() => {
+        // this.logger.warn('Test');
         this.logger.progress(`aaa ${i++}`); // 自定义
 
         if (i === (inputs.runTime || 20)) {

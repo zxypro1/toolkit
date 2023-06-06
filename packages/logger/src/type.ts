@@ -1,27 +1,24 @@
-import {
-  LoggerLevel,
-  ConsoleTransportOptions,
-  FileTransportOptions,
-} from 'egg-logger';
+import { LoggerLevel } from 'egg-logger';
 
-export interface IMeta {
-  date: string;
-  message: string;
+export interface IOptions {
+  /**
+   * 目录输出目录
+   */
+  traceId: string;
+  /**
+   * 目录输出目录
+   */
+  logDir: string;
+  /**
+   * 终端日志输出级别
+   */
   level?: LoggerLevel;
+  /**
+   * 控制台日志输出级别
+   */
   secrets?: string[];
-}
-
-export interface MyConsoleTransportOptions extends ConsoleTransportOptions {
-  secrets?: string[];
-}
-
-export interface MyFileTransportOptions extends FileTransportOptions {
-  secrets?: string[];
-}
-
-export interface IProps {
-  file?: string;
-  level?: LoggerLevel;
-  secrets?: string[];
-  eol?: string; // 文件结尾
+  /**
+   * 自定义文件结尾
+   */
+  eol?: string;
 }
