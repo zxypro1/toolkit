@@ -1,6 +1,6 @@
 import {
   LoggerLevel,
-  FileTransport,
+  ConsoleTransport as _ConsoleTransport,
   LoggerMeta,
 } from 'egg-logger';
 import chalk from 'chalk';
@@ -8,7 +8,7 @@ import { get } from 'lodash';
 import { transportSecrets, sliceFormatterSlice } from './utils';
 import { ConsoleTransportOptions } from './type';
 
-export default class ConsoleTransport extends FileTransport {
+export default class ConsoleTransport extends _ConsoleTransport {
   constructor(options: ConsoleTransportOptions) {
     const key = options?.key || '';
 
@@ -41,8 +41,8 @@ export default class ConsoleTransport extends FileTransport {
 
         return msg;
       },
-
-      ...options,
+      level: options.level,
+      eol: options.eol,
     });
   }
 }

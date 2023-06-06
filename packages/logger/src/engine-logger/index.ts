@@ -25,13 +25,13 @@ export default class EngineLogger extends Logger {
 
     const consoleTransport = new ConsoleTransport({
       level: get(props, 'level', 'INFO'),
-      file: consoleLogPath,
+      eol,
+      // file: consoleLogPath,
       key,
       secrets,
-      eol,
     });
     this.set('console', consoleTransport);
-    
+
     const fileTransport = new FileTransport({
       level: get(props, 'level', 'DEBUG'),
       secrets,
