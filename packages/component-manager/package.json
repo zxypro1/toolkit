@@ -1,0 +1,21 @@
+{
+  "name": "@serverless-devs/ignore-walk",
+  "version": "0.0.1",
+  "description": "ignore-walk for serverless-devs",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib node_modules",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "wss-git",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.6"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}

@@ -16,6 +16,9 @@ importers:
       '@types/lodash':
         specifier: ^4.14.195
         version: 4.14.195
+      '@types/minimist':
+        specifier: ^1.2.2
+        version: 1.2.2
       '@types/node':
         specifier: ^18.15.1
         version: 18.15.1
@@ -107,6 +110,9 @@ importers:
       cli-progress-footer:
         specifier: ^2.3.2
         version: 2.3.2
+      cli-spinners:
+        specifier: ^2.9.0
+        version: 2.9.0
       egg-logger:
         specifier: ^3.3.0
         version: 3.3.0
@@ -120,6 +126,15 @@ importers:
       '@types/event-emitter':
         specifier: ^0.3.3
         version: 0.3.3
+
+  packages/parse-commands:
+    dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      minimist:
+        specifier: ^1.2.6
+        version: 1.2.8
 
   packages/progress-bar:
     dependencies:
@@ -148,7 +163,7 @@ importers:
     dependencies:
       '@serverless-devs/ignore-walk':
         specifier: ^0.0.1
-        version: link:../ignore-walk
+        version: link:../parse-commands
       '@serverless-devs/progress-bar':
         specifier: ^0.0.1
         version: link:../progress-bar
@@ -1350,7 +1365,6 @@ packages:
   /cli-spinners@2.9.0:
     resolution: {integrity: sha512-4/aL9X3Wh0yiMQlE+eeRhWP6vclO3QRtw1JHKIT0FFUs5FjpFmESqtMvYZ0+lbzBw900b95mS0hohy+qn2VK/g==}
     engines: {node: '>=6'}
-    dev: true
 
   /cli-width@3.0.0:
     resolution: {integrity: sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==}
