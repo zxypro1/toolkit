@@ -1,4 +1,4 @@
-import ProgressFooter from '../../../src/progress-footer';
+import ProgressFooter from '../src/progress-footer';
 
 // engine log 开发时，不可以将所有的日志都暴露出来，所以选择性的暴露给用户
 function getFunctionProgress(key: string, progressFooter: ProgressFooter) {

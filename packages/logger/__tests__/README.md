@@ -7,5 +7,5 @@ ts-node fixtures/engine/test
 ## 测试 progress-footer
 
 ```shell
-ts-node fixtures/progress-footer/test
+ts-node progress-footer.test
 ```

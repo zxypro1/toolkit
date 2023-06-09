@@ -3,7 +3,7 @@ import {
   LoggerMeta,
 } from 'egg-logger';
 import { get } from 'lodash';
-import { transportSecrets, sliceFormatterSlice } from './utils';
+import { transportSecrets, sliceEggLoggerFormatterTime } from '../utils';
 import { FileTransportOptions } from './type';
 
 
@@ -14,7 +14,7 @@ export default class FileTransport extends _FileTransport {
         const secrets = get(meta, 'secrets', []);
         const message = get(meta, 'message', '');
         const level = get(meta, 'level', 'INFO');
-        const time = sliceFormatterSlice(get(meta, 'date', ''));
+        const time = sliceEggLoggerFormatterTime(get(meta, 'date', ''));
 
         const msg = transportSecrets(message, secrets);
 

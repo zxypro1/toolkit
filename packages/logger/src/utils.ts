@@ -1,7 +1,6 @@
 import { each, filter, includes, isString, isEmpty, replace } from 'lodash';
 
-
-export const sliceFormatterSlice = (value: string) => value.slice(0, -4);
+export const sliceEggLoggerFormatterTime = (value: string) => value.slice(0, -4);
 
 export const mark = (val: string): string => {
   if (isEmpty(val) || !isString(val)) {

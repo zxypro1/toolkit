@@ -1,4 +1,4 @@
-import getLogger from '../../../src';
+import getLogger from '../src';
 import path from 'path';
 
 /**

@@ -20,12 +20,6 @@ export default class ProgressFooter {
    */
   public format: (showList: IShowList, frames: IFormatOptions) => string[];
 
-  // /**
-  //  * 刷新的频率，ms 为单位
-  //  * 
-  //  * @default 100
-  //  */
-  // fps?: number;
   constructor(options: IPropsOptions = {}) {
     this.progress = CliProgressFooter();
     this.showList = new Map();
