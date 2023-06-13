@@ -39,10 +39,19 @@ importers:
         version: 4.1.2
       ts-jest:
         specifier: ^29.0.5
-        version: 29.0.5(@babel/core@7.21.0)(jest@29.4.3)(typescript@4.9.5)
+        version: 29.0.5(jest@29.4.3)(typescript@4.9.5)
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
+
+  packages/component-manager:
+    dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      minimist:
+        specifier: ^1.2.6
+        version: 1.2.8
 
   packages/demo: {}
 
@@ -127,14 +136,21 @@ importers:
         specifier: ^0.3.3
         version: 0.3.3
 
-  packages/parse-commands:
+  packages/parse-spec:
     dependencies:
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      minimist:
-        specifier: ^1.2.6
-        version: 1.2.8
+      '@serverless-devs/art-template':
+        specifier: ^4.13.2
+        version: 4.13.2
+      fs-extra:
+        specifier: ^11.1.0
+        version: 11.1.0
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
+    devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.5
+        version: 4.0.5
 
   packages/progress-bar:
     dependencies:
@@ -163,7 +179,7 @@ importers:
     dependencies:
       '@serverless-devs/ignore-walk':
         specifier: ^0.0.1
-        version: link:../parse-commands
+        version: link:../ignore-walk
       '@serverless-devs/progress-bar':
         specifier: ^0.0.1
         version: link:../progress-bar
@@ -809,6 +825,20 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
+  /@serverless-devs/art-template@4.13.2:
+    resolution: {integrity: sha512-yPJ7UTdLB6mzLRmJyiB85ePrVTY177aVyBNVy2c2V/65UgRdk1q9yBt8sbZZmASE23bR7MtbU88rhdtPosJSIA==}
+    engines: {node: '>= 1.0.0'}
+    dependencies:
+      acorn: 5.7.4
+      escodegen: 1.14.3
+      estraverse: 4.3.0
+      html-minifier: 3.5.21
+      is-keyword-js: 1.0.3
+      js-tokens: 3.0.2
+      merge-source-map: 1.1.0
+      source-map: 0.5.7
+    dev: false
+
   /@serverless-devs/s-progress-bar@0.0.23(chalk@4.1.2):
     resolution: {integrity: sha512-gHHFy75frOQwUeO/amN19mD9Ew0kJqYoSJYXeyOx0Msda39vwSXghXIqtzhR5Mrxp5OQ74SIkI8PhDBNBzCnTw==}
     peerDependencies:
@@ -920,6 +950,10 @@ packages:
     dependencies:
       expect: 29.4.3
       pretty-format: 29.4.3
+    dev: true
+
+  /@types/js-yaml@4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
     dev: true
 
   /@types/jsonfile@6.1.1:
@@ -1073,6 +1107,10 @@ packages:
     dependencies:
       sprintf-js: 1.0.3
     dev: true
+
+  /argparse@2.0.1:
+    resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
+    dev: false
 
   /art-template@4.13.2:
     resolution: {integrity: sha512-04ws5k+ndA5DghfheY4c8F1304XJKeTcaXqZCLpxFkNMSkaR3ChW1pX2i9d3sEEOZuLy7de8lFriRaik1jEeOQ==}
@@ -2592,6 +2630,13 @@ packages:
       esprima: 4.0.1
     dev: true
 
+  /js-yaml@4.1.0:
+    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
+    hasBin: true
+    dependencies:
+      argparse: 2.0.1
+    dev: false
+
   /jsesc@2.5.2:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}
     engines: {node: '>=4'}
@@ -3420,7 +3465,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
 
-  /ts-jest@29.0.5(@babel/core@7.21.0)(jest@29.4.3)(typescript@4.9.5):
+  /ts-jest@29.0.5(jest@29.4.3)(typescript@4.9.5):
     resolution: {integrity: sha512-PL3UciSgIpQ7f6XjVOmbi96vmDHUqAyqDr8YxzopDqX3kfgYtX1cuNeBjP+L9sFXi6nzsGGA6R3fP3DDDJyrxA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -3441,7 +3486,6 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.21.0
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 29.4.3(@types/node@18.15.1)

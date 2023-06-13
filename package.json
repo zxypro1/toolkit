@@ -17,6 +17,7 @@
     "test:ignore-walk": "jest --testTimeout 10000 packages/ignore-walk --watchAll",
     "test:progress-bar": "jest --testTimeout 10000 packages/progress-bar --watchAll",
     "test:load-application": "jest --testTimeout 10000 packages/load-application",
+    "test:parse-spec": "jest --testTimeout 10000 packages/parse-spec --watchAll",
     "test:utils": "jest --testTimeout 10000 packages/utils --watchAll"
   },
   "author": "xsahxl",
