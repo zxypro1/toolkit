@@ -16,9 +16,12 @@
     "access": "public"
   },
   "dependencies": {
-    "minimist": "^1.2.8"
+    "fs-extra": "^11.1.0",
+    "minimist": "^1.2.8",
+    "yaml": "^2.2.1"
   },
   "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
     "@types/minimist": "^1.2.2"
   }
 }
