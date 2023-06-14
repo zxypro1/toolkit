@@ -74,6 +74,31 @@ importers:
         specifier: ^11.0.1
         version: 11.0.1
 
+  packages/engine:
+    dependencies:
+      '@serverless-cd/debug':
+        specifier: ^4.3.4
+        version: 4.3.4
+      flatted:
+        specifier: ^3.2.7
+        version: 3.2.7
+      fs-extra:
+        specifier: ^11.1.0
+        version: 11.1.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      xstate:
+        specifier: ^4.37.2
+        version: 4.37.2
+    devDependencies:
+      '@types/fs-extra':
+        specifier: ^11.0.1
+        version: 11.0.1
+      '@types/lodash':
+        specifier: ^4.14.195
+        version: 4.14.195
+
   packages/ignore-walk:
     dependencies:
       minimatch:
@@ -824,6 +849,18 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
+
+  /@serverless-cd/debug@4.3.4:
+    resolution: {integrity: sha512-epSwSSu2mEZ+hw5Uj81mc2juaMpUjbHd5s+aQ2oVvwnitEyJzfqPVs6Y9k5qh7UfOc8CxRYIhDmUbzPYZxt4VA==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.2
+    dev: false
 
   /@serverless-devs/art-template@4.13.2:
     resolution: {integrity: sha512-yPJ7UTdLB6mzLRmJyiB85ePrVTY177aVyBNVy2c2V/65UgRdk1q9yBt8sbZZmASE23bR7MtbU88rhdtPosJSIA==}
@@ -1883,6 +1920,10 @@ packages:
       path-exists: 4.0.0
     dev: true
 
+  /flatted@3.2.7:
+    resolution: {integrity: sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==}
+    dev: false
+
   /form-data@3.0.1:
     resolution: {integrity: sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==}
     engines: {node: '>= 6'}
@@ -2865,7 +2906,6 @@ packages:
 
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
-    dev: true
 
   /mute-stream@0.0.8:
     resolution: {integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==}
@@ -3653,6 +3693,10 @@ packages:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
     dev: true
+
+  /xstate@4.37.2:
+    resolution: {integrity: sha512-Qm337O49CRTZ3PRyRuK6b+kvI+D3JGxXIZCTul+xEsyFCVkTFDt5jixaL1nBWcUBcaTQ9um/5CRGVItPi7fveg==}
+    dev: false
 
   /xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
