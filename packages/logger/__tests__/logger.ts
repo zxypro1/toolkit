@@ -38,7 +38,7 @@ async function run() {
     const logger = loggers[key];
     logger.progress(`Start command ${key}`);
 
-    const Component = require(`./${inputs.component}`).default;
+    const Component = require(`./fixtures/engine/${inputs.component}`).default;
     const fc = new Component({ logger });
     
     return await fc.deploy(inputs).then((res: any) => {
