@@ -2,6 +2,7 @@ import { createMachine, interpret } from 'xstate';
 import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId } from 'lodash';
 import { IInnerStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
 import { getProcessTime, stringify } from './utils';
+import ParseSpec from '@serverless-devs/parse-spec';
 
 export { IEngineOptions, IContext } from './types';
 
@@ -15,13 +16,21 @@ class Engine {
     debug('engine start',);
     debug(`engine options: ${stringify(options)}`);
 
-    const { inputs, cwd = process.cwd(), logConfig = {} } = options;
-    this.options.logConfig = logConfig;
-    // 记录上下文信息
-    this.context.cwd = cwd;
-    this.context.inputs = inputs as {};
-    // logger
-    this.logger = this.getLogger();
+    // const { inputs, cwd = process.cwd(), logConfig = {} } = options;
+    // this.options.logConfig = logConfig;
+    // // 记录上下文信息
+    // this.context.cwd = cwd;
+    // this.context.inputs = inputs as {};
+    // // logger
+    // this.logger = this.getLogger();
+  }
+  async start() {
+    const { yamlPath } = this.options;
+    const parse = new ParseSpec(yamlPath);
+    await parse.start();
+
+
+
   }
   private async doInit() {
     const { events } = this.options;
@@ -33,7 +42,7 @@ class Engine {
       }
     }
   }
-  async start(): Promise<IContext> {
+  async parse(): Promise<IContext> {
     this.doInit();
     const { steps } = this.options;
     this.context.steps = map(steps, (item) => {
@@ -66,7 +75,7 @@ class Engine {
       };
 
       each(this.context.steps, (item, index) => {
-        const target = steps[index + 1] ? get(this.context.steps, `[${index + 1}].stepCount`) : 'final';
+        const target = this.context.steps[index + 1] ? get(this.context.steps, `[${index + 1}].stepCount`) : 'final';
         states[item.stepCount as string] = {
           invoke: {
             id: item.stepCount,

@@ -1,9 +1,32 @@
 export interface IEngineOptions {
-  steps: IStepOptions[];
+  method: string;
+  yamlPath?: string;
+  projectName?: string;
+  args?: string[];
+  env?: Record<string, string>;
+  globalArgs?: IGlobalArgs;
+  cwd?: string; // 当前工作目录
+
+  // TODO: 
+  steps?: IStepOptions[];
   inputs?: Record<string, any>;
   logConfig?: ILogConfig;
-  cwd?: string; // 当前工作目录
   events?: IEvent;
+}
+
+export interface IGlobalArgs {
+  debug?: boolean;
+  help?: boolean;
+  skipActions?: boolean;
+  access?: string;
+  output?: `${IOutputType}`;
+}
+
+export enum IOutputType {
+  DEFAULT = 'default',
+  JSON = 'json',
+  YAML = 'yaml',
+  RAW = 'raw',
 }
 
 interface IEvent {

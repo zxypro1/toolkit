@@ -15,6 +15,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@serverless-devs/parse-spec": "workspace:^",
     "@serverless-cd/debug": "^4.3.4",
     "flatted": "^3.2.7",
     "fs-extra": "^11.1.0",

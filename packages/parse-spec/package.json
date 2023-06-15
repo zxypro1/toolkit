@@ -6,6 +6,7 @@
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
+    "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "author": "xsahxl",
@@ -15,8 +16,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@serverless-devs/utils": "workspace:^",
+    "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/art-template": "^4.13.2",
+    "@serverless-devs/utils": "workspace:^",
+    "chalk": "^4.1.2",
     "fs-extra": "^11.1.0",
     "js-yaml": "^4.1.0"
   },
