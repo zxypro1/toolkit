@@ -1,5 +1,5 @@
-import yaml from 'yaml';
-import fs from 'fs-extra';
+import yaml from 'js-yaml';
+import fs from 'fs';
 import path from 'path';
 
 
@@ -17,6 +17,6 @@ export function getYamlPath(filePath: string) {
 export default function getYamlContent(filePath: string) {
     const yamlPath = getYamlPath(filePath);
     if (yamlPath) {
-        return yaml.parse(fs.readFileSync(filePath, 'utf8'));
+        return yaml.load(fs.readFileSync(filePath, 'utf8'));
     }
 }
