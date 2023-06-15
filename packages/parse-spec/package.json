@@ -15,6 +15,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@serverless-devs/utils": "workspace:^",
     "@serverless-devs/art-template": "^4.13.2",
     "fs-extra": "^11.1.0",
     "js-yaml": "^4.1.0"

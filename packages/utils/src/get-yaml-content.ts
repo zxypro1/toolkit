@@ -14,9 +14,10 @@ export function getYamlPath(filePath: string) {
     if (fs.existsSync(ymlPath)) return ymlPath;
 }
 
-export default function getYamlContent(filePath: string) {
+export default function getYamlContent(filePath: string): Record<string, any> {
     const yamlPath = getYamlPath(filePath);
     if (yamlPath) {
-        return yaml.load(fs.readFileSync(filePath, 'utf8'));
+        return yaml.load(fs.readFileSync(filePath, 'utf8')) as Record<string, any>;
     }
+    return {}
 }

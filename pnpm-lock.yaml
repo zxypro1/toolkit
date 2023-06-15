@@ -150,11 +150,13 @@ importers:
   packages/parse-spec:
     specifiers:
       '@serverless-devs/art-template': ^4.13.2
+      '@serverless-devs/utils': workspace:^
       '@types/js-yaml': ^4.0.5
       fs-extra: ^11.1.0
       js-yaml: ^4.1.0
     dependencies:
       '@serverless-devs/art-template': 4.13.2
+      '@serverless-devs/utils': link:../utils
       fs-extra: 11.1.1
       js-yaml: 4.1.0
     devDependencies:
