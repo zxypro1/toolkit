@@ -31,8 +31,9 @@ const result = await credential.set(options);
 | --------- | ------------ | ----------------------------- | ---- | ------------- |
 | access | 新增密钥别名 | string | 否 | - |
 | force | 如果配置密钥别名已经存在，是否强制覆盖 | boolean | 否 | - |
-| 其他参数 | 如果希望通过参数指定直接新增密钥（注意⚠️：**需要成对指定支持厂商的密钥**）。如果不满足可以使用 keyList 和 infoList 参数自定义，具体使用参考示例 | - | 否 | - |
+| 其他参数 | 如果希望通过参数指定直接新增密钥（注意⚠️：**需要成对指定支持厂商的密钥**）。如果不满足可以使用 keyList 和 infoList 参数自定义，具体参考[使用示例](#使用方式) | - | 否 | - |
 
+> 参数缺少出现交互，CiCd 环境下则报错
 
 > 厂商密钥 Key：  
 > **Alibaba Cloud (alibaba)**: AccessKeyID、AccessKeySecret // AccountID 和 SecurityToken 选填  
@@ -208,7 +209,7 @@ await credential.getAll();
 import Credential from '@serverless-devs/credential';
 
 const credential = new Credential();
-await credential.remove(access);
+await credential.remove(access); // 如果不传入参数则出现交互，CiCd 环境下则报错
 ```
 
 
@@ -220,7 +221,7 @@ await credential.remove(access);
 import Credential from '@serverless-devs/credential';
 
 const credential = new Credential();
-await credential.rename({ source, target });
+await credential.rename({ source, target }); // 如果不传入或者缺少参数则出现交互，CiCd 环境下则报错
 ```
 
 ### 配置默认密钥 default
@@ -231,7 +232,7 @@ await credential.rename({ source, target });
 import Credential from '@serverless-devs/credential';
 
 const credential = new Credential();
-await credential.default(access);
+await credential.default(access); // 如果不传入则出现交互，CiCd 环境下则报错
 ```
 
 ### 解密 decrypt

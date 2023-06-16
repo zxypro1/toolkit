@@ -7,7 +7,7 @@ import Logger from '../logger';
 import getAllCredential, { getEnvKeyPair } from './get-all';
 import { ALIYUN_CLI, ALIYUN_CONFIG_FILE, CICD_ACCESS_ALIAS_KEY, DEFAULT_NAME } from "../constant";
 import { Alibaba, IAliCredential } from "../utils";
-import { IResult } from "./set";
+import { IResult } from "./set/type";
 
 export default class GetAccess {
   logger: any;
