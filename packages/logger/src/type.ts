@@ -21,4 +21,8 @@ export interface IOptions {
    * 自定义文件结尾
    */
   eol?: string;
+  /**
+   * 实例列表
+   */
+  instanceKeys?: string[];
 }

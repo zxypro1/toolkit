@@ -3,14 +3,15 @@ import { isCiCdEnvironment } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 // @ts-ignore
 import Acc from '@serverless-devs/acc/commands/run';
-import getAllCredential from '../get-all';
-import { ALIYUN_CLI, ALIYUN_CONFIG_FILE, CICD_ACCESS_ALIAS_KEY, DEFAULT_NAME } from "../../constant";
-import { Alibaba, IAliCredential } from "../../utils";
-import { IResult } from "../set";
-
-export { default as getEnvKeyPair} from './env-key-pair';
+import Logger from '../logger';
+import getAllCredential, { getEnvKeyPair } from './get-all';
+import { ALIYUN_CLI, ALIYUN_CONFIG_FILE, CICD_ACCESS_ALIAS_KEY, DEFAULT_NAME } from "../constant";
+import { Alibaba, IAliCredential } from "../utils";
+import { IResult } from "./set";
 
 export default class GetAccess {
+  logger: any;
+
   /**
    * 简单处理：CICD 环境转换名称、number 类型转string
    * @param access 
@@ -28,10 +29,19 @@ export default class GetAccess {
 
   private access?: string;
   constructor(access?: string) {
+    this.logger = Logger.logger;
+    this.logger.debug(`Incoming access alias is ${access}`);
     this.access = GetAccess.getAccessAlias(access);
+    this.logger.debug(`The converted access alias is ${access}`);
   }
 
   async run(): Promise<IResult> {
+    // 获取环境变量的密钥对
+    const envKeyPair = getEnvKeyPair();
+    if (!isNil(envKeyPair)) {
+      return envKeyPair;
+    }
+
     // 兼容 aliyun-cli
     if (this.access === ALIYUN_CLI) {
       const credential = await this.getAliyunCliAccess() as unknown as Record<string, string>;
@@ -78,7 +88,7 @@ export default class GetAccess {
         set(accData, 'AccountID', accountId);
         return accData;
       } catch (error) {
-        console.debug(`acc commands run error: ${error}`);
+        this.logger.debug(`acc commands run error: ${error}`);
         throw error;
       }
     }

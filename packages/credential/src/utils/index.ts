@@ -4,6 +4,7 @@ import { isEmpty, trim } from 'lodash';
 import yaml from 'js-yaml';
 import { getRootHome } from '@serverless-devs/utils';
 import { DEFAULT_NAME } from '../constant';
+import Logger from '../logger';
 
 export { default as Alibaba, IAliCredential } from './alibaba';
 export { prompt } from './inquirer';
@@ -46,7 +47,8 @@ export function getYamlContent(): Record<string, Record<string, string>> {
  * 获取设置密钥默认名称
  * @returns 
  */
-export async function getAliasDefault(content?: Record<string, Record<string, string>>) {
+export async function getAliasDefault() {
+  const content = getYamlContent();
   if (isEmpty(content)) {
     return DEFAULT_NAME;
   }
@@ -73,7 +75,8 @@ export async function writeData(content: Record<string, Record<string, string>>)
   try {
     fs.ensureDirSync(getRootHome());
     fs.writeFileSync(getYamlPath(), yaml.dump(content));
-  } catch (ex) {
+  } catch (ex: any) {
+    Logger.logger.debug(`write data error: ${ex.message}`);
     throw new Error('Configuration failed');
   }
 }

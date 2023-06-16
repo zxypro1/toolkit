@@ -1,7 +1,8 @@
-import { each, endsWith, assign, set, transform } from "lodash"
-import { ENDS_WITH_KEY_DEVS_KEY } from "../constant";
+import { each, endsWith, assign, set, intersection } from "lodash"
+import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from "../constant";
 import { getYamlContent } from "../utils";
 import decryptCredential from './decrypt';
+import { IResult } from "./set";
 
 type IAccessList = Record<string, Record<string, string>>;
 
@@ -30,11 +31,28 @@ export const getEnvironment = (): IAccessList => {
 export const getAccessFile = () => {
   const yamlResult: IAccessList = getYamlContent();
 
-  transform(yamlResult, (result: IAccessList, value, key) => {
-    set(result, key, decryptCredential(value));
+  each(yamlResult, (value, key) => {
+    set(yamlResult, key, decryptCredential(value));
   })
 
   return yamlResult;
+}
+
+/**
+ * 获取特殊的环境变量
+ */
+export const getEnvKeyPair = (): undefined | IResult => {
+  const envKeys = Object.keys(process.env);
+
+  if (intersection(envKeys, KEY_PAIR_IMPORTANT).length === KEY_PAIR_IMPORTANT.length) {
+    const credential: Record<string, string> = {};
+
+    for (const key of KEY_PAIR_IMPORTANT) {
+      set(credential, key, process.env[key]);
+    }
+
+    return { access: SYSTEM_ENVIRONMENT_ACCESS, credential };
+  }
 }
 
 /**
@@ -45,5 +63,5 @@ export default (): IAccessList => {
   const envResult = getEnvironment();
   const yamlResult = getAccessFile();
 
-  return assign({}, yamlResult, envResult);
+  return assign(getEnvKeyPair(), yamlResult, envResult);
 }

@@ -1,40 +1,37 @@
-import { cloneDeep, isNil } from 'lodash'
+import { cloneDeep } from 'lodash';
+import Logger from './logger';
+import SetCredential from './actions/set';
+import GetCredential from './actions/get';
+import getAllCredential from './actions/get-all';
+import renameCredential from './actions/rename';
+import removeCredential from './actions/remove';
+import decryptCredential from './actions/decrypt';
+import defaultCredential from './actions/default';
+import { ISetOptions, IResult } from './actions/set/type';
 
-import SetCredential, { IResult } from './actions/set'
-import GetCredential, { getEnvKeyPair } from './actions/get'
-import getAllCredential from './actions/get-all'
-import renameCredential from './actions/rename'
-import removeCredential from './actions/remove'
-import decryptCredential from './actions/decrypt'
-import defaultCredential from './actions/default'
 
 export default class Credential {
-  static async get(access?: string): Promise<IResult> {
-    // 获取环境变量的密钥对
-    const envKeyPair = getEnvKeyPair();
-    if (!isNil(envKeyPair)) {
-      return {
-        access: '$system_environment_access',
-        credential: envKeyPair,
-      };
-    }
+  constructor({ logger }: { logger?: any} = {}) {
+    Logger.set(logger);
+  }
 
+  public async get(access?: string): Promise<IResult> {
     const getAccess = new GetCredential(access);
     return await getAccess.run();
   };
 
-  static async set(options: Record<string, any>): Promise<IResult | undefined> {
+  public async set(options?: ISetOptions): Promise<IResult | undefined> {
     const setCredential = new SetCredential();
-    return await setCredential.run(cloneDeep(options));
+    return await setCredential.run(cloneDeep(options || {}));
   };
 
-  static getAll = getAllCredential;
+  public getAll = getAllCredential;
 
-  static remove = removeCredential;
+  public remove = removeCredential;
 
-  static rename = renameCredential;
+  public rename = renameCredential;
 
-  static decrypt = decryptCredential;
+  public decrypt = decryptCredential;
 
-  static default = defaultCredential;
+  public default = defaultCredential;
 }

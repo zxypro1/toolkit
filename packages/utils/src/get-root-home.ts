@@ -4,7 +4,7 @@ import fs from 'fs';
 import getCurrentEnvironment from './get-current-environment';
 import { Environment } from './constants';
 
-const USER_HOME = os.homedir();
+const USER_HOME = process.env.serverless_devs_config_home || os.homedir();
 
 const formatWorkspacePath = (val: string) => val.replace(/~/, USER_HOME);
 

@@ -1,19 +1,21 @@
 import { hasIn, transform, set } from "lodash";
 import { prompt, getYamlContent, writeData } from "../utils";
 import { CRYPTO_TRUE, CRYPTO_FALSE } from "../constant";
+import Logger from '../logger';
 
 export default async (access?: string) => {
+  Logger.logger.debug(`set default access: ${access || ''}`);
   const content = await getYamlContent();
 
   let alias = access;
   if (access) {
     if (!hasIn(content, access)) {
-      console.error(`Not found alias name: ${access}`);
+      Logger.logger.error(`Not found alias name: ${access}`);
       return;
     }
   } else {
     const aliasNames = Object.keys(content);
-    console.log('You can choose an access to set as the default.');
+    Logger.logger.info('You can choose an access to set as the default.');
     const { aliasName } = await prompt([
       {
         type: 'list',

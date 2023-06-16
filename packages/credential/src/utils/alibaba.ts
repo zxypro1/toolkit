@@ -38,12 +38,9 @@ export default class Alibaba {
   }
 
   static isAlibaba(credInformation: Record<string, string>): boolean {
-    if (credInformation?.__provider === PROVIDER.alibaba) {
+    if (hasIn(credInformation, 'AccessKeyID') && hasIn(credInformation, 'AccessKeySecret')) {
+      credInformation.__provider = PROVIDER.alibaba;
       return true;
-    }
-
-    if (credInformation?.__provider === PROVIDER.custom) {
-      return hasIn(credInformation, 'AccessKeyID') && hasIn(credInformation, 'AccessKeySecret');
     }
   
     return false;
