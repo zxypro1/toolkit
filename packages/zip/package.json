@@ -13,7 +13,6 @@
   "dependencies": {
     "@serverless-devs/ignore-walk": "^0.0.1",
     "@serverless-devs/progress-bar": "^0.0.1",
-    "@serverless-devs/s-progress-bar": "^0.0.23",
     "archiver": "^5.3.1",
     "chalk": "^4.1.2",
     "fs-extra": "^11.1.0",
