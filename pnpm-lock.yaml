@@ -155,9 +155,11 @@ importers:
       '@serverless-devs/art-template': ^4.13.2
       '@serverless-devs/utils': workspace:^
       '@types/js-yaml': ^4.0.5
+      '@types/lodash': ^4.14.195
       chalk: ^4.1.2
       fs-extra: ^11.1.0
       js-yaml: ^4.1.0
+      lodash: ^4.17.21
     dependencies:
       '@serverless-cd/debug': 4.3.4
       '@serverless-devs/art-template': 4.13.2
@@ -165,8 +167,10 @@ importers:
       chalk: 4.1.2
       fs-extra: 11.1.1
       js-yaml: 4.1.0
+      lodash: 4.17.21
     devDependencies:
       '@types/js-yaml': 4.0.5
+      '@types/lodash': 4.14.195
 
   packages/progress-bar:
     specifiers:

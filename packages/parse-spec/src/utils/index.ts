@@ -1,14 +1,13 @@
-import fs from 'fs-extra';
 import path from 'path';
 import * as utils from '@serverless-devs/utils';
 
+export const getAbsolutePath = (filePath: string, basePath: string = process.cwd()) => {
+    return path.isAbsolute(filePath) ? filePath : path.join(basePath, filePath);
+}
 
-export async function getFilePath(filePath: string = '') {
-    if (fs.existsSync(filePath)) return path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
-
+export function getDefaultYamlPath() {
     const spath = utils.getYamlPath('s')
     if (spath) return path.resolve(spath);
-
     throw new Error(
         JSON.stringify({
             message: 'the s.yaml/s.yml file was not found.',
@@ -17,8 +16,10 @@ export async function getFilePath(filePath: string = '') {
     );
 }
 
-export const isExtendMode = (data: Record<string, any> = {}) => {
-    // TODO:validate extend yaml
-    return typeof data.extend === 'string';
+export const isExtendMode = (extend: string, basePath: string) => {
+    if (typeof extend !== 'string') return false;
+    // validate extend
+    utils.getYamlContent(getAbsolutePath(extend, basePath));
+    return true;
 }
 
