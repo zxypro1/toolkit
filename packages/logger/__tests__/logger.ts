@@ -1,4 +1,5 @@
-import getLogger from '../src';
+import { get, set } from 'lodash';
+import Logger from '../src';
 import path from 'path';
 
 /**
@@ -24,18 +25,19 @@ async function run() {
   const traceId = Math.random().toString(16).slice(2);
   const keys = Object.keys(yamlConfig);
 
-  const loggers = await getLogger(keys, {
+  const loggers = new Logger({
     traceId,
-    logDir: path.join(__dirname, '..', 'logs'),
+    logDir: path.join(__dirname, 'fixtures', 'logs'),
     secrets: ['abc'],
     level: 'INFO',
+    // instanceKeys: keys,
   });
 
   // 模拟 engine
-  const promiseAll = keys.map(async (key) => {
+  const promiseAll = keys.map(async (key: string) => {
     const inputs: any = yamlConfig[key];
-
-    const logger = loggers[key];
+    const logger = loggers.__generate(key);
+    // const logger = get(loggers, key);
     logger.progress(`Start command ${key}`);
 
     const Component = require(`./fixtures/engine/${inputs.component}`).default;
@@ -43,7 +45,7 @@ async function run() {
     
     return await fc.deploy(inputs).then((res: any) => {
       logger.info(`${key} 运行结束`);
-      loggers.__progressFooter.removeItem(key);
+      loggers.__unset(key);
       return res;
     });
   });

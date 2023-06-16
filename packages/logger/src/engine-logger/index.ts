@@ -9,6 +9,7 @@ import FileTransport from './file-transport';
 import os from 'os';
 import { IOptions } from './type';
 
+
 export default class EngineLogger extends Logger {
   private eol: string;
 
@@ -41,7 +42,6 @@ export default class EngineLogger extends Logger {
     });
     this.set('file', fileTransport);
   }
-
 
   /**
    * 用于文件流持续输出，例如：mvn命令在linux下通过文件流有换行异常

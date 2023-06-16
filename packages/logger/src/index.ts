@@ -1,38 +1,59 @@
-import { set, each } from 'lodash';
+import { set, each, unset } from 'lodash';
 import path from 'path';
 import { IOptions } from './type';
 import EngineLogger from './engine-logger';
 import ProgressFooter from './progress-footer';
 
-async function log(keys: string[], options: IOptions) {
-  const { logDir, traceId, level, secrets, eol } = options;
-  
-  const progressFooter = new ProgressFooter();
-  const loggers: Record<string, any> = {};
-
-  each(keys, (key: string) => {
-    const logger = new EngineLogger({
-      file: path.join(logDir, traceId, `${key}.log`),
-      secrets,
-      level,
-      key,
-      eol,
-    });
-
-    // @ts-ignore
-    logger.progress = (message: string) => {
-      progressFooter.upsert(key, message)
-    };
-
-    set(loggers, key, logger);
-  });
-
-  loggers.__progressFooter = progressFooter;
-  loggers.__clear = () => {
-    progressFooter.clear();
-  };
-
-  return loggers;
+interface ILoggerInstance extends EngineLogger {
+  progress: (message: string) => void;
 }
 
-export default log;
+/**
+ * 最高权限密钥获取
+ * 文档书写
+ * 测试书写
+ */
+export default class Logger {
+  private __options: IOptions;
+  __progressFooter: ProgressFooter;
+
+  constructor(options: IOptions) {
+    this.__options = options;
+    this.__progressFooter = new ProgressFooter();
+    if (options?.instanceKeys) {
+      each(options.instanceKeys, (value: string) => {
+        this.__generate(value);
+      })
+    }
+  }
+
+  __generate(instanceKey: string) {
+    const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
+
+    logger.progress = (message: string) => {
+      this.__progressFooter.upsert(instanceKey, message)
+    };
+
+    set(this, instanceKey, logger);
+    return logger;
+  }
+
+  __unset(instanceKey: string) {
+    unset(this, instanceKey);
+    this.__progressFooter.removeItem(instanceKey);
+  }
+
+  __clear = () => {
+    this.__progressFooter.clear();
+  }
+
+  private __getEggLoggerConfig(key: string) {
+    return {
+      file: path.join(this.__options.logDir, this.__options.traceId, `${key}.log`),
+      secrets: this.__options.secrets,
+      level: this.__options.level,
+      eol: this.__options.eol,
+      key,
+    };
+  }
+}

@@ -1,22 +1,14 @@
-import { each, keys, set, intersection, get, isEmpty, merge, isNumber, cloneDeep } from "lodash";
+import { each, keys, set, intersection, get, isEmpty, merge, isNumber } from "lodash";
 import { getYamlContent, writeData, Alibaba, IAliCredential } from "../../utils";
 import { CRYPTO_STRING, PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
+import Logger from "../../logger";
 import * as inquirer from "./inquirer";
+import * as setType from "./type";
 
 const Crypto = require('crypto-js');
 
-export interface IOptions {
-  access: string;
-  force: boolean;
-}
-
-export type IResult = {
-  access: string;
-  credential: Record<string, string>;
-}
-
 export default class SetCredential {
-  async run(options: Record<string, any>): Promise<IResult | undefined>{
+  async run(options: setType.ISetOptions): Promise<setType.IResult | undefined>{
     const { access, force } = options;
     const credInformation = this.handlerArgv(options);
 
@@ -31,10 +23,10 @@ export default class SetCredential {
 
     // 如果是 ali 密钥则手动添加设置一些可获取密钥
     if (Alibaba.isAlibaba(credInformation)) {
-      if (options.SecurityToken) {
-        set(credInformation, 'SecurityToken', options.SecurityToken);
+      if ((options as setType.IAlibaba).SecurityToken) {
+        set(credInformation, 'SecurityToken', (options as setType.IAlibaba).SecurityToken);
       }
-      await this.setAccountId(options, credInformation);
+      await this.setAccountId((options as setType.IAlibaba), credInformation as unknown as setType.IAlibaba);
     }
 
     const content = await getYamlContent();
@@ -60,7 +52,7 @@ export default class SetCredential {
   // 通过 ak、sk 获取 uid
   //   如果获取到了 uid 并且用户指定了 uid，则先对比一下。使用通过接口获取到的 uid
   //   如果没有获取 uid，如果没有传入 uid，抛出异常。如果传入了 uid，使用传入的
-  private async setAccountId(argvData: Record<string, string>, credInformation: Record<string, string>) {
+  private async setAccountId(argvData: setType.IAlibaba, credInformation: setType.IAlibaba) {
     let uid = argvData.AccountID;
     if (isNumber(uid)) {
       uid = `${uid}`;
@@ -69,7 +61,7 @@ export default class SetCredential {
     try {
       const accountId = await Alibaba.getAccountId(credInformation as unknown as IAliCredential);
       if (uid && uid !== accountId) {
-        console.warn('The inputted AccountID does not match the actual obtained value, using the actual value');
+        Logger.logger.warn('The inputted AccountID does not match the actual obtained value, using the actual value');
       }
       set(credInformation, 'AccountID', accountId);
     } catch (ex) {
@@ -80,21 +72,21 @@ export default class SetCredential {
     }
   }
 
-  private handlerArgv(argvData: Record<string, string>): Record<string, string> {
+  private handlerArgv(argvData: setType.ISetOptions): Record<string, string> {
     const argvKeys = keys(argvData); 
     // 处理已知密钥对支持
     for (const provider in PROVIDER_CREDENTIAL_KEYS) {
       const keys = get(PROVIDER_CREDENTIAL_KEYS, provider);
       // 完整包含 keys
       if (intersection(argvKeys, keys).length === keys.length) {
-        const credInformation = { __provider: provider };
-        each(keys, key => set(credInformation, key, argvData[key]));
+        const credInformation = { };
+        each(keys, (key: string) => set(credInformation, key, get(argvData, key)));
 
         return credInformation;
       }
     }
     // 处理自定义
-    const { keyList, infoList } = argvData;
+    const { keyList, infoList } = argvData as setType.ICustom;
     if (keyList && infoList) {
       const infoKeyList = keyList.split(',');
       const infoValueList = infoList.split(',');

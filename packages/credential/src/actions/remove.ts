@@ -1,12 +1,13 @@
 import { prompt, getYamlContent, writeData } from "../utils";
 import { hasIn, unset } from "lodash";
+import Logger from '../logger';
 
 export default async (access?: string) => {
   const content = await getYamlContent();
 
   if (access) {
     if (!hasIn(content, access)) {
-      console.error(`Not found alias name: ${access}`);
+      Logger.logger.error(`Not found alias name: ${access}`);
       return;
     }
     unset(content, access);

@@ -76,6 +76,18 @@ export async function inputCredentials (): Promise<Record<string, string>> {
   return credentials;
 }
 
+export async function inputAlias() {
+  const { aliasName } = await prompt([
+    {
+      type: 'input',
+      message: 'Please create alias for key pair. If not, please enter to skip',
+      name: 'aliasName',
+      default: await getAliasDefault(),
+    }
+  ]);
+  return trim(aliasName);
+}
+
 /**
  * 获取别名
  * @returns 
@@ -85,15 +97,7 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
   let a = access;
 
   if (isNil(access)) {
-    const { aliasName } = await prompt([
-      {
-        type: 'input',
-        message: 'Please create alias for key pair. If not, please enter to skip',
-        name: 'aliasName',
-        default: await getAliasDefault(),
-      }
-    ]);
-    a = trim(aliasName);
+    a = await inputAlias();
   }
 
   // 如果判断存在命名冲突
@@ -113,6 +117,7 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
     ]);
     
     if (type === 'rename') {
+      options.access = await inputAlias();
       return await getAlias(options);
     } else if (type === 'exit') {
       return false;

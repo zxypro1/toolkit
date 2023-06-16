@@ -1,18 +1,20 @@
 import { prompt, getYamlContent, validateInput, writeData } from "../utils";
 import { hasIn, unset, set, trim } from "lodash";
+import Logger from '../logger';
 
 export interface IRenameOptions {
   source?: string;
   target?: string;
 }
 
-export default async ({ source, target }: IRenameOptions) => {
+export default async (options?: IRenameOptions) => {
+  const { source, target } = options || {};
   const content = await getYamlContent();
 
   let sourceName = source as string;
   if (source) {
     if (!hasIn(content, source)) {
-      console.error(`Not found source alias name: ${source}`);
+      Logger.logger.error(`Not found source alias name: ${source}`);
       return;
     }
   } else {
