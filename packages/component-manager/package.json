@@ -1,5 +1,5 @@
 {
-  "name": "@serverless-devs/ignore-walk",
+  "name": "@serverless-devs/component-manager",
   "version": "0.0.1",
   "description": "ignore-walk for serverless-devs",
   "main": "lib/index.js",
