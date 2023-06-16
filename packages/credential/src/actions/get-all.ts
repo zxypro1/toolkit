@@ -1,8 +1,9 @@
 import { each, endsWith, assign, set, intersection } from "lodash"
 import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from "../constant";
+import Logger from '../logger';
 import { getYamlContent } from "../utils";
 import decryptCredential from './decrypt';
-import { IResult } from "./set";
+import { IResult } from "./set/type";
 
 type IAccessList = Record<string, Record<string, string>>;
 
@@ -17,7 +18,7 @@ export const getEnvironment = (): IAccessList => {
       try {
         set(result, key, JSON.parse(value as string));
       } catch (ex: any) {
-        console.debug(`Parsing ${key} exception: ${ex.message}`);
+        Logger.logger.debug(`Parsing ${key} exception: ${ex.message}`);
       }
     }
   })
