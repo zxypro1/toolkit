@@ -1,6 +1,7 @@
 import { each, keys, set, intersection, get, isEmpty, merge, isNumber } from "lodash";
 import { getYamlContent, writeData, Alibaba, IAliCredential } from "../../utils";
 import { CRYPTO_STRING, PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
+import Logger from "../../logger";
 import * as inquirer from "./inquirer";
 import * as setType from "./type";
 
@@ -60,7 +61,7 @@ export default class SetCredential {
     try {
       const accountId = await Alibaba.getAccountId(credInformation as unknown as IAliCredential);
       if (uid && uid !== accountId) {
-        console.warn('The inputted AccountID does not match the actual obtained value, using the actual value');
+        Logger.logger.warn('The inputted AccountID does not match the actual obtained value, using the actual value');
       }
       set(credInformation, 'AccountID', accountId);
     } catch (ex) {

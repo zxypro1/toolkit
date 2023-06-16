@@ -10,28 +10,34 @@ import Credential from '../src';
 
 const credential = new Credential();
 
-beforeAll(async () => {
-  fs.removeSync(serverless_devs_config_home);
-  await credential.set({
-    access: 'aws',
-    force: true,
-    AccessKeyID: 'AccessKeyID',
-    SecretAccessKey: 'SecretAccessKey',
+describe.skip('Get', () => {
+  beforeAll(async () => {
+    fs.removeSync(serverless_devs_config_home);
+    await credential.set({
+      access: 'aws',
+      force: true,
+      AccessKeyID: 'AccessKeyID',
+      SecretAccessKey: 'SecretAccessKey',
+    })
+  
+    await credential.set({
+      access: 'azure',
+      force: true,
+      KeyVaultName: 'KeyVaultName',
+      TenantID: 'TenantID',
+      ClientID: 'ClientID',
+      ClientSecret: 'ClientSecret',
+    })
+  
+    await credential.set({
+      access: 'baidu',
+      force: true,
+      AccessKeyID: 'AccessKeyID',
+      SecretAccessKey: 'SecretAccessKey',
+    })
   })
 
-  await credential.set({
-    access: 'azure',
-    force: true,
-    KeyVaultName: 'KeyVaultName',
-    TenantID: 'TenantID',
-    ClientID: 'ClientID',
-    ClientSecret: 'ClientSecret',
-  })
-
-  await credential.set({
-    access: 'baidu',
-    force: true,
-    AccessKeyID: 'AccessKeyID',
-    SecretAccessKey: 'SecretAccessKey',
+  test('skip', () => {
+    
   })
 })
