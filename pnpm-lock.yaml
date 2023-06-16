@@ -182,14 +182,22 @@ importers:
   packages/utils:
     specifiers:
       '@types/js-yaml': ^4.0.5
+      '@types/lodash.defaultsdeep': ^4.6.7
+      '@types/lodash.isempty': ^4.4.7
       '@types/minimist': ^1.2.2
       js-yaml: ^4.1.0
+      lodash.defaultsdeep: ^4.6.1
+      lodash.isempty: ^4.4.0
       minimist: ^1.2.8
     dependencies:
       js-yaml: 4.1.0
+      lodash.defaultsdeep: 4.6.1
+      lodash.isempty: 4.4.0
       minimist: 1.2.8
     devDependencies:
       '@types/js-yaml': 4.0.5
+      '@types/lodash.defaultsdeep': 4.6.7
+      '@types/lodash.isempty': 4.4.7
       '@types/minimist': 1.2.2
 
   packages/zip:
@@ -1005,6 +1013,18 @@ packages:
     resolution: {integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==}
     dependencies:
       '@types/node': 18.16.18
+    dev: true
+
+  /@types/lodash.defaultsdeep/4.6.7:
+    resolution: {integrity: sha512-D+AUxs64qehDMkbfFoskG0XsIOh2CHBGqYfcQcubLbZSFCGKJKS885su3a97huqBNHj+p9of9UZ/uUIP46wUGQ==}
+    dependencies:
+      '@types/lodash': 4.14.195
+    dev: true
+
+  /@types/lodash.isempty/4.4.7:
+    resolution: {integrity: sha512-YOzlpoIn9jrfHzjIukKnu9Le3tmi+0PhUdOt2rMpJW/4J6jX7s0HeBatXdh9QckLga8qt4EKBxVIEqtEq6pzLg==}
+    dependencies:
+      '@types/lodash': 4.14.195
     dev: true
 
   /@types/lodash/4.14.195:
@@ -2789,12 +2809,20 @@ packages:
     resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
     dev: false
 
+  /lodash.defaultsdeep/4.6.1:
+    resolution: {integrity: sha512-3j8wdDzYuWO3lM3Reg03MuQR957t287Rpcxp1njpEa8oDrikb+FwGdW3n+FELh/A6qib6yPit0j/pv9G/yeAqA==}
+    dev: false
+
   /lodash.difference/4.5.0:
     resolution: {integrity: sha512-dS2j+W26TQ7taQBGN8Lbbq04ssV3emRw4NY58WErlTO29pIqS0HmoT5aJ9+TUQ1N3G+JOZSji4eugsWwGp9yPA==}
     dev: false
 
   /lodash.flatten/4.4.0:
     resolution: {integrity: sha512-C5N2Z3DgnnKr0LOpv/hKCgKdb7ZZwafIrsesve6lmzvZIRZRGaZ/l6Q8+2W7NaT+ZwO3fFlSCzCzrDCFdJfZ4g==}
+    dev: false
+
+  /lodash.isempty/4.4.0:
+    resolution: {integrity: sha512-oKMuF3xEeqDltrGMfDxAPGIVMSSRv8tbRSODbrs4KGsRRLEhrW8N8Rd4DRgB2+621hY8A8XwwrTVhXWpxFvMzg==}
     dev: false
 
   /lodash.isplainobject/4.0.6:
