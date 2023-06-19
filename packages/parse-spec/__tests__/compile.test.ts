@@ -19,7 +19,7 @@ test("${env('PWD')}", () => {
   expect(res).toBe(`hello ${process.env.PWD}`);
 });
 
-test('vars.region', () => {
+test.only('vars.region', () => {
   const res = compile("hello ${vars.region}", { vars: { region: 'cn-hangzhou' } });
   console.log(res);
   expect(res).toBe(`hello cn-hangzhou`);

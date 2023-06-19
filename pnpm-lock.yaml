@@ -157,6 +157,7 @@ importers:
       '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.195
       chalk: ^4.1.2
+      dotenv: ^16.2.0
       fs-extra: ^11.1.0
       js-yaml: ^4.1.0
       lodash: ^4.17.21
@@ -165,6 +166,7 @@ importers:
       '@serverless-devs/art-template': 4.13.2
       '@serverless-devs/utils': link:../utils
       chalk: 4.1.2
+      dotenv: 16.2.0
       fs-extra: 11.1.1
       js-yaml: 4.1.0
       lodash: 4.17.21
@@ -1721,6 +1723,11 @@ packages:
     resolution: {integrity: sha512-ofrBgwpPhCD85kMKtE9RYFFq6OC1A89oW2vvgWZNCwxrUpRUILopY7lsYyMDSjc8g6U6aiO0Qubg6r4Wgt5ZnA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dev: true
+
+  /dotenv/16.2.0:
+    resolution: {integrity: sha512-jcq2vR1DY1+QA+vH58RIrWLDZOifTGmyQJWzP9arDUbgZcySdzuBb1WvhWZzZtiXgfm+GW2pjBqStqlfpzq7wQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /egg-errors/2.3.2:
     resolution: {integrity: sha512-E+Sx7IBVrfRyHSjFXaq4sCZ3Uk3ka9PYySaQ8VbRZmLEt9ENBCD99yVzLIeWUH2QfzvkrjY9El1eHmLeRx7cfw==}
