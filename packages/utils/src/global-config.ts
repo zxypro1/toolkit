@@ -15,7 +15,7 @@ export const getGlobalConfig = (key: string) => {
   return content?.[key];
 }
 
-export const setGlobalConfig = (key: string, value: string) => {
+export const setGlobalConfig = (key: string, value: unknown) => {
   // 创建 a 目录以及其子目录
   fs.mkdirSync(rootHome, { recursive: true });
 
