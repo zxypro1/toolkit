@@ -1,12 +1,11 @@
 {
-  "name": "@serverless-devs/parse-spec",
+  "name": "@serverless-devs/load-component",
   "version": "0.0.1",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
-    "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "author": "xsahxl",
@@ -16,17 +15,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@serverless-cd/debug": "^4.3.4",
-    "@serverless-devs/art-template": "^4.13.2",
-    "@serverless-devs/utils": "workspace:^",
-    "chalk": "^4.1.2",
-    "dotenv": "^16.2.0",
     "fs-extra": "^11.1.0",
-    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.5",
+    "@types/fs-extra": "^11.0.1",
     "@types/lodash": "^4.14.195"
   }
 }
