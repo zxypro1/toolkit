@@ -130,6 +130,19 @@ importers:
       '@types/lodash': 4.14.195
       '@types/node-fetch': 2.6.4
 
+  packages/load-component:
+    specifiers:
+      '@types/fs-extra': ^11.0.1
+      '@types/lodash': ^4.14.195
+      fs-extra: ^11.1.0
+      lodash: ^4.17.21
+    dependencies:
+      fs-extra: 11.1.1
+      lodash: 4.17.21
+    devDependencies:
+      '@types/fs-extra': 11.0.1
+      '@types/lodash': 4.14.195
+
   packages/logger:
     specifiers:
       '@types/event-emitter': ^0.3.3

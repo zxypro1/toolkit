@@ -19,6 +19,7 @@
     "test:progress-bar": "jest --testTimeout 10000 packages/progress-bar --watchAll",
     "test:load-application": "jest --testTimeout 10000 packages/load-application",
     "test:parse-spec": "jest --testTimeout 10000 packages/parse-spec --watchAll",
+    "test:load-component": "jest --testTimeout 10000 packages/load-component --watchAll",
     "test:engine": "jest --testTimeout 10000 packages/engine --watchAll",
     "test:utils": "jest --testTimeout 10000 packages/utils --watchAll"
   },
