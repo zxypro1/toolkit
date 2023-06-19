@@ -1,6 +1,5 @@
 import { each, endsWith, assign, set, intersection } from "lodash"
 import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from "../constant";
-import Logger from '../logger';
 import { getYamlContent } from "../utils";
 import decryptCredential from './decrypt';
 import { IResult } from "./set/type";
@@ -18,7 +17,7 @@ export const getEnvironment = (): IAccessList => {
       try {
         set(result, key, JSON.parse(value as string));
       } catch (ex: any) {
-        Logger.logger.debug(`Parsing ${key} exception: ${ex.message}`);
+        // 不阻塞主程序运行
       }
     }
   })
