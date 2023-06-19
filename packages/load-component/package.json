@@ -15,6 +15,10 @@
     "access": "public"
   },
   "dependencies": {
+    "@serverless-devs/downloads": "workspace:^",
+    "@serverless-devs/utils": "workspace:^",
+    "@serverless-cd/debug": "^4.3.4",
+    "axios": "^1.4.0",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21"
   },
