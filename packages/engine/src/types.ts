@@ -1,3 +1,4 @@
+import { IStep } from '@serverless-devs/parse-spec'
 export interface IEngineOptions {
   method: string;
   yamlPath?: string;
@@ -8,7 +9,6 @@ export interface IEngineOptions {
   cwd?: string; // 当前工作目录
 
   // TODO: 
-  steps?: IStepOptions[];
   inputs?: Record<string, any>;
   logConfig?: ILogConfig;
   events?: IEvent;
@@ -30,8 +30,6 @@ export enum IOutputType {
 }
 
 interface IEvent {
-  // 全局action pre 动作
-  onInit?: (context: IContext, logger: any) => Promise<void>;
   // 全局action post 动作
   onCompleted?: (context: IContext, logger: any) => Promise<void>;
 }
@@ -45,16 +43,12 @@ export interface ILogConfig {
   eol?: string;
 }
 
-
-export type IStepOptions = {
-  projectName: string; // 项目名称
-  run: () => Promise<any>;
+export type IStepOptions = IStep & {
   id?: string;
   if?: string;
   'continue-on-error'?: boolean;
   'working-directory'?: string;
-};
-export type IInnerStepOptions = IStepOptions & {
+  // 内部字段
   stepCount?: string;
   status?: string;
   error?: Error;
@@ -95,7 +89,7 @@ export interface IRecord {
 export interface IContext {
   cwd: string; // 当前工作目录
   stepCount: string; // 记录当前执行的step
-  steps: IInnerStepOptions[];
+  steps: IStepOptions[];
   env: Record<string, any>; // 记录合并后的环境变量
   status: IStatus; // 记录task的状态
   completed: boolean; // 记录task是否执行完成

@@ -6,6 +6,7 @@
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
+    "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "author": "xsahxl",

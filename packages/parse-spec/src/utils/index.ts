@@ -1,7 +1,7 @@
 import path from 'path';
 import * as utils from '@serverless-devs/utils';
 import compile from '../compile';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 
 export function getDefaultYamlPath() {
@@ -41,3 +41,4 @@ export const getInputs = (inputs: Record<string, any>, context: Record<string, a
     }
     return deepCopy(inputs);
 }
+

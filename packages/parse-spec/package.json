@@ -19,6 +19,7 @@
     "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/art-template": "^4.13.2",
     "@serverless-devs/utils": "workspace:^",
+    "@serverless-devs/load-component": "workspace:^",
     "chalk": "^4.1.2",
     "dotenv": "^16.2.0",
     "fs-extra": "^11.1.0",

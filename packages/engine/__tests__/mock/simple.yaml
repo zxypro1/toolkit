@@ -27,7 +27,8 @@ vars: # 全局变量
     internetAccess: true
 services:
   framework: # 业务名称/模块名称
-    component: ${path('./fc.js')} # 组件名称
+    # component: ${path('./fc.js')} # 组件名称
+    component: v3test # 组件名称
     actions:
       pre-deploy:
         # - run: npm install

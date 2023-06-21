@@ -1,8 +1,9 @@
 import { createMachine, interpret } from 'xstate';
 import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId } from 'lodash';
-import { IInnerStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
+import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
 import { getProcessTime, stringify } from './utils';
-import ParseSpec from '@serverless-devs/parse-spec';
+import ParseSpec, { compile, getInputs, ISpec } from '@serverless-devs/parse-spec';
+import path from 'path';
 
 export { IEngineOptions, IContext } from './types';
 
@@ -11,6 +12,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 class Engine {
   public context = { status: STEP_STATUS.PENING, completed: false } as IContext;
   private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
+  private spec = {} as ISpec;
   private logger: any;
   constructor(private options: IEngineOptions) {
     debug('engine start',);
@@ -24,27 +26,11 @@ class Engine {
     // // logger
     // this.logger = this.getLogger();
   }
-  async start() {
-    const { yamlPath } = this.options;
-    const parse = new ParseSpec(yamlPath);
-    await parse.start();
-
-
-
-  }
-  private async doInit() {
-    const { events } = this.options;
-    if (isFunction(events?.onInit)) {
-      try {
-        await events?.onInit?.(this.context, this.logger);
-      } catch (error) {
-        this.outputErrorLog(error as Error);
-      }
-    }
-  }
-  async parse(): Promise<IContext> {
-    this.doInit();
-    const { steps } = this.options;
+  async start(): Promise<IContext> {
+    const parse = new ParseSpec(get(this.options, 'yamlPath'));
+    this.spec = await parse.start();
+    debug(`spec data: ${stringify(this.spec)}`);
+    const { steps } = this.spec;
     this.context.steps = map(steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING };
     });
@@ -150,7 +136,7 @@ class Engine {
     // TODO: 临时使用 console
     return console;
   }
-  private recordContext(item: IInnerStepOptions, options: Record<string, any> = {}) {
+  private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
     const { status, error, outputs, process_time } = options;
     this.context.stepCount = item.stepCount as string;
     this.context.steps = map(this.context.steps, (obj) => {
@@ -195,7 +181,7 @@ class Engine {
       }
     }
   }
-  private async handleSrc(item: IInnerStepOptions) {
+  private async handleSrc(item: IStepOptions) {
     try {
       const response: any = await this.doSrc(item);
       // 记录全局的执行状态
@@ -251,13 +237,14 @@ class Engine {
       return this.logger.debug(error);
     }
   }
-  private async doSrc(item: IInnerStepOptions) {
-    return await item.run()
+  private async doSrc(item: IStepOptions) {
+    // TODO: 
+    // return await item.run()
   }
   private doArtTemplateCompile(value: string) {
     return value;
   }
-  private async doSkip(item: IInnerStepOptions) {
+  private async doSkip(item: IStepOptions) {
     // id 添加状态
     if (item.id) {
       this.record.steps = {
