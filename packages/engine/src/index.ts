@@ -1,9 +1,10 @@
 import { createMachine, interpret } from 'xstate';
 import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId, filter } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
-import { getProcessTime, stringify } from './utils';
+import { getProcessTime, stringify, throw101Error, throw100Error, throwError } from './utils';
 import ParseSpec, { compile, getInputs, ISpec } from '@serverless-devs/parse-spec';
 import path from 'path';
+import chalk from 'chalk';
 
 export { IEngineOptions, IContext } from './types';
 
@@ -85,7 +86,6 @@ class Engine {
                 );
                 // 替换 always()
                 item.if = replace(item.if, STEP_IF.ALWAYS, 'true');
-                item.if = this.doArtTemplateCompile(item.if);
                 return item.if === 'true' ? this.handleSrc(item) : this.doSkip(item);
               }
               // 检查全局的执行状态，如果是failure，则不执行该步骤, 并记录状态为 skipped
@@ -244,14 +244,33 @@ class Engine {
     const newInputs = getInputs(item.props, this.getFilterContext(item));
     this.recordContext(item, { props: newInputs });
     debug(`doSrc inputs: ${JSON.stringify(newInputs, null, 2)}`);
-    const { method } = this.options;
-    if (isFunction(item.instance[method])) {
-      return await item.instance[method](newInputs);
+    const { method, projectName } = this.options;
+    // 服务级操作
+    if (projectName) {
+      if (isFunction(item.instance[method])) {
+        // 方法存在，执行报错，退出码101
+        try {
+          // TODO: inputs数据
+          return await item.instance[method]({ props: newInputs });
+        } catch (error) {
+          throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
+        }
+      }
+      // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
+      throw100Error(`The [${method}] command was not found.`, `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：${chalk.underline('https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command')}`);
     }
-    // return await item.run()
-  }
-  private doArtTemplateCompile(value: string) {
-    return value;
+    // 应用级操作
+    if (isFunction(item.instance[method])) {
+      // 方法存在，执行报错，退出码101
+      try {
+        // TODO: inputs数据
+        return await item.instance[method]({ props: newInputs });
+      } catch (error) {
+        throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
+      }
+    }
+    // 方法不存在，进行警告，但是并不会报错，最终的exit code为0；
+    throwError(`The [${method}] command was not found.`, `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`);
   }
   private async doSkip(item: IStepOptions) {
     // id 添加状态

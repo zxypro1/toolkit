@@ -86,6 +86,7 @@ importers:
       '@serverless-devs/parse-spec': workspace:^
       '@types/fs-extra': ^11.0.1
       '@types/lodash': ^4.14.195
+      chalk: 4.x
       flatted: ^3.2.7
       fs-extra: ^11.1.0
       lodash: ^4.17.21
@@ -93,6 +94,7 @@ importers:
     dependencies:
       '@serverless-cd/debug': 4.3.4
       '@serverless-devs/parse-spec': link:../parse-spec
+      chalk: 4.1.2
       flatted: 3.2.7
       fs-extra: 11.1.1
       lodash: 4.17.21

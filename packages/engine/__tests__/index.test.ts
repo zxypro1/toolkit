@@ -53,7 +53,7 @@ test('basic', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('order', async () => {
+test('order', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/order.yaml'),
     method: 'deploy'
@@ -62,4 +62,49 @@ test.only('order', async () => {
   console.log(context.error);
 
   expect(context.status).toBe('success');
+});
+
+test('指定服务 方法不存在时', async () => {
+  const method = 'empty';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    projectName: 'framework',
+    method
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toMatch(`The [${method}] command was not found`)
+});
+
+test('指定服务 方法存在，但是执行报错了', async () => {
+  const method = 'error';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    projectName: 'framework',
+    method
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toMatch(`error test`)
+});
+
+test('应用级操作 方法不存在时', async () => {
+  const method = 'empty';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    method
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toMatch(`The [${method}] command was not found`)
+});
+test.only('应用级操作，方法执行报错了', async () => {
+  const method = 'error';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    method
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toMatch(`error test`)
 });
