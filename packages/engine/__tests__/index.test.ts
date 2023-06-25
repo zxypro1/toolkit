@@ -44,12 +44,13 @@ test('extend yaml 格式有问题', async () => {
   }
 });
 
-test('basic', async () => {
+test.only('basic', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/simple.yaml'),
     method: 'deploy'
   });
   const context = await engine.start();
+  console.log(context.error);
   expect(context.status).toBe('success');
 });
 
@@ -98,7 +99,7 @@ test('应用级操作 方法不存在时', async () => {
   console.log(context.error);
   expect(context.error.message).toMatch(`The [${method}] command was not found`)
 });
-test.only('应用级操作，方法执行报错了', async () => {
+test('应用级操作，方法执行报错了', async () => {
   const method = 'error';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/project.yaml'),

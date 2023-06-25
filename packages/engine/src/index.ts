@@ -28,7 +28,7 @@ class Engine {
     // this.logger = this.getLogger();
   }
   async start(): Promise<IContext> {
-    const parse = new ParseSpec(get(this.options, 'yamlPath'));
+    const parse = new ParseSpec(get(this.options, 'yamlPath'), { access: get(this.options, 'globalArgs.access') });
     this.spec = await parse.start();
     debug(`spec data: ${stringify(this.spec)}`);
     const { steps } = this.spec;
@@ -165,6 +165,13 @@ class Engine {
     const data = {
       vars: this.spec.vars,
       cwd: path.dirname(this.spec.yamlPath),
+      // TODO: this.output
+      that: {
+        name: item.projectName,
+        access: item.access,
+        props: item.props,
+        component: item.component,
+      }
     } as Record<string, any>;
     const executedProjects = filter(this.context.steps, obj => obj.order > item.order);
     for (const obj of executedProjects) {

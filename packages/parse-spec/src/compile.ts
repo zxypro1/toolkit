@@ -42,6 +42,10 @@ const compile = (value: string, context: Record<string, any> = {}) => {
     const newPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
     return file(newPath);
   };
+  // fix: this. => that.
+  value = value.replace(/\$\{this\./g, '${that.');
+  console.log('value ===debug', value);
+
   const res = artTemplate.compile(value)(context);
   // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
   if (typeof res === 'string' && REGX.test(res)) {

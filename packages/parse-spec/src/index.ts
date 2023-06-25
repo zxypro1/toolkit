@@ -11,28 +11,32 @@ import { getDefaultYamlPath, isExtendMode } from './utils'
 import compile from './compile';
 import order from './order';
 import { get } from 'lodash';
-import { ISpec } from './types';
+import { ISpec, IOptions, IYaml } from './types';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 
 
 
 class ParseSpec {
-    // yaml data
-    private yamlData: Record<string, any> = {};
-    private yamlPath: string;
-    constructor(filePath: string = '') {
-        this.yamlPath = fs.existsSync(filePath) ? utils.getAbsolutePath(filePath) : getDefaultYamlPath() as string;
-        debug(`yaml path: ${this.yamlPath}`);
+    // yaml
+    private yaml = {} as IYaml;
+    constructor(filePath: string = '', private options: IOptions) {
+        this.yaml.path = fs.existsSync(filePath) ? utils.getAbsolutePath(filePath) : getDefaultYamlPath() as string;
+        debug(`yaml path: ${this.yaml.path}`);
     }
     async start(): Promise<ISpec> {
         debug('parse start');
-        this.yamlData = utils.getYamlContent(this.yamlPath);
-        debug(`yaml content: ${JSON.stringify(this.yamlData, null, 2)}`);
-        require('dotenv').config({ path: path.join(path.dirname(this.yamlPath), '.env') });
-        const steps = isExtendMode(get(this.yamlData, 'extend'), path.dirname(this.yamlPath)) ? await this.doExtend() : await this.doNormal();
+        this.yaml.content = utils.getYamlContent(this.yaml.path);
+        this.yaml.access = get(this.yaml.content, 'access');
+        this.yaml.extend = get(this.yaml.content, 'extend');
+        this.yaml.vars = get(this.yaml.content, 'vars', {});
+        this.yaml.resources = get(this.yaml.content, 'services', {});
+
+        debug(`yaml content: ${JSON.stringify(this.yaml.content, null, 2)}`);
+        require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
+        const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path)) ? await this.doExtend() : await this.doNormal();
         debug('parse end');
-        return { steps: order(steps), vars: get(this.yamlData, 'vars', {}), yamlPath: this.yamlPath };
+        return { steps: order(steps), vars: this.yaml.vars, yamlPath: this.yaml.path };
     }
     async doExtend() {
         debug('do extend');
@@ -40,17 +44,23 @@ class ParseSpec {
     }
     async doNormal() {
         debug('do normal');
-        const projects = get(this.yamlData, 'services', {});
+        const projects = this.yaml.resources;
         debug(`projects: ${JSON.stringify(projects, null, 2)}`);
         const steps = [];
         for (const project in projects) {
             const element = projects[project];
             const data = projects[project]
-            const component = compile(get(data, 'component'), { cwd: path.dirname(this.yamlPath) });
+            const component = compile(get(data, 'component'), { cwd: path.dirname(this.yaml.path) });
             const instance = await loadComponent(component);
-            steps.push({ ...element, projectName: project, instance });
+            steps.push({ ...element, projectName: project, instance, access: this.getAccess(data) });
         }
         return steps;
+    }
+    getAccess(data: Record<string, any>) {
+        // 全局的access > 项目的access > yaml的access
+        if (this.options.access) return this.options.access;
+        if (get(data, 'access')) return get(data, 'access');
+        if (this.yaml.access) return this.yaml.access;
     }
 }
 

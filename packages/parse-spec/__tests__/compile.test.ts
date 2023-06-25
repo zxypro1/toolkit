@@ -61,3 +61,9 @@ test('file().name', () => {
   console.log(res);
   expect(res).toBe('test');
 });
+
+test.only('this', () => {
+  const res = compile("${this.name}", { that: { name: 'test' } });
+  console.log(res);
+  expect(res).toBe('test');
+});
