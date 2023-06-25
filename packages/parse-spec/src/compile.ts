@@ -3,8 +3,7 @@ import yaml from 'js-yaml';
 import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
 import * as utils from '@serverless-devs/utils';
-
-const REGX = /\${([\w\W]*?)}/
+import { REGX } from './contants';
 
 artTemplate.defaults.escape = false;
 artTemplate.defaults.rules.push({
@@ -46,6 +45,7 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   const res = artTemplate.compile(value)(context);
   // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
   if (typeof res === 'string' && REGX.test(res)) {
+
     const newValue = artTemplate.compile(res)(context);
     return newValue || res;
   }

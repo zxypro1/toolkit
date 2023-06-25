@@ -52,3 +52,12 @@ test.only('基本测试', async () => {
   await engine.start();
   expect(1).toBe(1);
 });
+
+test('基本测试', async () => {
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/order.yaml'),
+    method: 'deploy'
+  });
+  await engine.start();
+  expect(1).toBe(1);
+});
