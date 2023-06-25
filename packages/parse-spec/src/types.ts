@@ -4,6 +4,7 @@ export interface IStep {
     props: Record<string, any>;
     actions?: Record<string, any>;
     instance: any;
+    order: number;
 }
 export interface ISpec {
     steps: IStep[];

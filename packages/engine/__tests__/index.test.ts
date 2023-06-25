@@ -44,20 +44,22 @@ test('extend yaml 格式有问题', async () => {
   }
 });
 
-test.only('基本测试', async () => {
+test('basic', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/simple.yaml'),
     method: 'deploy'
   });
   const context = await engine.start();
-  expect(1).toBe(1);
+  expect(context.status).toBe('success');
 });
 
-test('基本测试', async () => {
+test.only('order', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/order.yaml'),
     method: 'deploy'
   });
-  await engine.start();
-  expect(1).toBe(1);
+  const context = await engine.start();
+  console.log(context.error);
+
+  expect(context.status).toBe('success');
 });

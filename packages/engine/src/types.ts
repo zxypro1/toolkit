@@ -52,7 +52,7 @@ export type IStepOptions = IStep & {
   stepCount?: string;
   status?: string;
   error?: Error;
-  outputs?: Record<string, any>;
+  output?: Record<string, any>;
   process_time?: number;
 };
 
@@ -81,7 +81,7 @@ export const STEP_STATUS = { ...STEP_STATUS_BASE, ...STEP_STATUS_SKIP };
 
 export interface IRecord {
   editStatusAble: boolean; // 记录全局的执行状态是否可修改（一旦失败，便不可修改）
-  steps: Record<string, any>; // 记录每个 step 的执行状态以及输出，后续step可以通过steps[$step_id].outputs使用该数据
+  steps: Record<string, any>; // 记录每个 step 的执行状态以及输出，后续step可以通过steps[$step_id].output使用该数据
   status: IStatus; // 记录step的状态
   startTime: number; // 记录step的开始时间
 }

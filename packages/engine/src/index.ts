@@ -1,5 +1,5 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId } from 'lodash';
+import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId, filter } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
 import { getProcessTime, stringify } from './utils';
 import ParseSpec, { compile, getInputs, ISpec } from '@serverless-devs/parse-spec';
@@ -137,7 +137,7 @@ class Engine {
     return console;
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
-    const { status, error, outputs, process_time } = options;
+    const { status, error, output, process_time, props } = options;
     this.context.stepCount = item.stepCount as string;
     this.context.steps = map(this.context.steps, (obj) => {
       if (obj.stepCount === item.stepCount) {
@@ -148,8 +148,11 @@ class Engine {
           obj.error = error;
           this.context.error = error;
         }
-        if (outputs) {
-          obj.outputs = outputs;
+        if (props) {
+          obj.props = props;
+        }
+        if (output) {
+          obj.output = output;
         }
         if (has(options, 'process_time')) {
           obj.process_time = process_time;
@@ -158,11 +161,16 @@ class Engine {
       return obj;
     });
   }
-  private getFilterContext() {
-    return {
+  private getFilterContext(item: IStepOptions) {
+    const data = {
       vars: this.spec.vars,
       cwd: path.dirname(this.spec.yamlPath),
-    };
+    } as Record<string, any>;
+    const executedProjects = filter(this.context.steps, obj => obj.order > item.order);
+    for (const obj of executedProjects) {
+      data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
+    }
+    return data;
   }
   private async doCompleted() {
     this.context.completed = true;
@@ -188,12 +196,12 @@ class Engine {
           ...this.record.steps,
           [item.id]: {
             status: STEP_STATUS.SUCCESS,
-            outputs: response,
+            output: response,
           },
         };
       }
       const process_time = getProcessTime(this.record.startTime);
-      this.recordContext(item, { status: STEP_STATUS.SUCCESS, outputs: response, process_time });
+      this.recordContext(item, { status: STEP_STATUS.SUCCESS, output: response, process_time });
     } catch (e) {
       const error = e as Error;
       const status = item['continue-on-error'] === true ? STEP_STATUS.ERROR_WITH_CONTINUE : STEP_STATUS.FAILURE;
@@ -232,12 +240,11 @@ class Engine {
     }
   }
   private async doSrc(item: IStepOptions) {
-    // TODO: 
     debug(`doSrc item: ${stringify(item)}`);
-    const newInputs = getInputs(item.props, this.getFilterContext());
+    const newInputs = getInputs(item.props, this.getFilterContext(item));
+    this.recordContext(item, { props: newInputs });
     debug(`doSrc inputs: ${JSON.stringify(newInputs, null, 2)}`);
     const { method } = this.options;
-    // fix：重新定义item.instance[method]，找不到this
     if (isFunction(item.instance[method])) {
       return await item.instance[method](newInputs);
     }

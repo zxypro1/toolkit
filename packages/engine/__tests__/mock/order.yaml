@@ -48,7 +48,7 @@ services:
       service: ${vars.service}
       function:
         name: "start-fc-http-nodejs14"
-        description: 'hello world by serverless devs'
+        description: ${c.output.hello} test
         runtime: nodejs14
         codeUri: ./code
         handler: index.handler

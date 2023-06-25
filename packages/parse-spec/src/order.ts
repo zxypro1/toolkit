@@ -15,7 +15,6 @@ class Order {
     sort() {
         const newSteps = map(this.steps, item => ({ ...item, order: this.orderMap[item.projectName] }));
         const result = sortBy(newSteps, (item) => -item.order);
-        debug(`sort result: ${JSON.stringify(result, null, 2)}`);
         return result;
     }
     analysis(dependencies: Record<string, any>) {
@@ -68,7 +67,6 @@ class Order {
         for (const project in dependencies) {
             const element = dependencies[project];
             for (const key in element) {
-                console.log('key', key);
                 if (dependencies[key]) {
                     set(dependencies, project, { ...dependencies[project], ...dependencies[key] })
                 }
