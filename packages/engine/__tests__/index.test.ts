@@ -49,7 +49,7 @@ test.only('基本测试', async () => {
     yamlPath: path.join(__dirname, './mock/simple.yaml'),
     method: 'deploy'
   });
-  await engine.start();
+  const context = await engine.start();
   expect(1).toBe(1);
 });
 

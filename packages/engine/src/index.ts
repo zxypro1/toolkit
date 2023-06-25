@@ -159,15 +159,9 @@ class Engine {
     });
   }
   private getFilterContext() {
-    const { inputs = {} } = this.options;
-    const { env = {} } = this.context;
-    // secrets, cloudSecrets, git 等
     return {
-      ...inputs,
-      status: this.context.status,
-      steps: this.record.steps,
-      env: { ...inputs.env, ...env },
-      inputs,
+      vars: this.spec.vars,
+      cwd: path.dirname(this.spec.yamlPath),
     };
   }
   private async doCompleted() {
@@ -239,6 +233,14 @@ class Engine {
   }
   private async doSrc(item: IStepOptions) {
     // TODO: 
+    debug(`doSrc item: ${stringify(item)}`);
+    const newInputs = getInputs(item.props, this.getFilterContext());
+    debug(`doSrc inputs: ${JSON.stringify(newInputs, null, 2)}`);
+    const { method } = this.options;
+    // fix：重新定义item.instance[method]，找不到this
+    if (isFunction(item.instance[method])) {
+      return await item.instance[method](newInputs);
+    }
     // return await item.run()
   }
   private doArtTemplateCompile(value: string) {

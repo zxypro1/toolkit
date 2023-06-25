@@ -1,4 +1,4 @@
-import { includes, map, split, set, sortBy } from 'lodash';
+import { includes, map, split, set, sortBy, isEmpty } from 'lodash';
 import { REGX } from './contants';
 import { IStep } from './types';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
@@ -8,13 +8,14 @@ class Order {
     constructor(private steps: IStep[]) { }
     run() {
         const dependencies = this.getDependencies();
+        if (isEmpty(dependencies)) return this.steps;
         this.analysis(dependencies);
         return this.sort();
     }
     sort() {
         const newSteps = map(this.steps, item => ({ ...item, order: this.orderMap[item.projectName] }));
         const result = sortBy(newSteps, (item) => -item.order);
-        debug(`order steps: ${JSON.stringify(result, null, 2)}`);
+        debug(`sort result: ${JSON.stringify(result, null, 2)}`);
         return result;
     }
     analysis(dependencies: Record<string, any>) {
@@ -64,7 +65,6 @@ class Order {
             deepCopy(step.props);
         }
         // 得到依赖关系后，需要对a依赖b，b依赖c这种case进行处理 => a依赖b,c
-        console.log('dependencies', dependencies);
         for (const project in dependencies) {
             const element = dependencies[project];
             for (const key in element) {

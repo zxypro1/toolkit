@@ -1,7 +1,7 @@
 export { default as use3version } from './use3version';
 export { default as compile } from './compile';
 export { default as order } from './order';
-export { getInputs } from './utils';
+export { default as getInputs } from './get-inputs';
 export * from './types';
 import loadComponent from '@serverless-devs/load-component';
 import * as utils from '@serverless-devs/utils';
