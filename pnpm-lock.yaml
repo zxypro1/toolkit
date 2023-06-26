@@ -83,6 +83,7 @@ importers:
   packages/engine:
     specifiers:
       '@serverless-cd/debug': ^4.3.4
+      '@serverless-devs/credential': workspace:^0.0.1
       '@serverless-devs/parse-spec': workspace:^
       '@types/fs-extra': ^11.0.1
       '@types/lodash': ^4.14.195
@@ -93,6 +94,7 @@ importers:
       xstate: ^4.37.2
     dependencies:
       '@serverless-cd/debug': 4.3.4
+      '@serverless-devs/credential': link:../credential
       '@serverless-devs/parse-spec': link:../parse-spec
       chalk: 4.1.2
       flatted: 3.2.7

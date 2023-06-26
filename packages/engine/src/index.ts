@@ -3,6 +3,7 @@ import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId, fi
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
 import { getProcessTime, stringify, throw101Error, throw100Error, throwError } from './utils';
 import ParseSpec, { compile, getInputs, ISpec } from '@serverless-devs/parse-spec';
+import Credential from '@serverless-devs/credential';
 import path from 'path';
 import chalk from 'chalk';
 
@@ -171,7 +172,8 @@ class Engine {
         access: item.access,
         props: item.props,
         component: item.component,
-      }
+      },
+      credential: item.credential,
     } as Record<string, any>;
     const executedProjects = filter(this.context.steps, obj => obj.order > item.order);
     for (const obj of executedProjects) {
@@ -248,6 +250,8 @@ class Engine {
   }
   private async doSrc(item: IStepOptions) {
     debug(`doSrc item: ${stringify(item)}`);
+    const c = await new Credential().get(item.access);
+    item.credential = get(c, 'credential');
     const newInputs = getInputs(item.props, this.getFilterContext(item));
     this.recordContext(item, { props: newInputs });
     debug(`doSrc inputs: ${JSON.stringify(newInputs, null, 2)}`);

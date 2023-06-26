@@ -52,7 +52,7 @@ services:
           # functionName: ${next-function.props.function.name}
           # url: ${next-function.output.url.system_url}
           # token: ${env.token}
-          # AccountID: ${config(AccountID)}
+          AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}
           codeUri: ${this.props.function.codeUri}

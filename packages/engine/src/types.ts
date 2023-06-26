@@ -54,6 +54,7 @@ export type IStepOptions = IStep & {
   error?: Error;
   output?: Record<string, any>;
   process_time?: number;
+  credential?: Record<string, any>;
 };
 
 export enum STEP_IF {

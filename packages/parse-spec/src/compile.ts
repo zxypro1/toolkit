@@ -4,6 +4,7 @@ import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
 import * as utils from '@serverless-devs/utils';
 import { REGX } from './contants';
+import { get } from 'lodash';
 
 artTemplate.defaults.escape = false;
 artTemplate.defaults.rules.push({
@@ -37,6 +38,7 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   const cwd = context.cwd || process.cwd();
 
   artTemplate.defaults.imports.env = (value: string) => env[value];
+  artTemplate.defaults.imports.config = (value: string) => get(context, `credential.${value}`);
   artTemplate.defaults.imports.path = (value: string) => utils.getAbsolutePath(value, cwd);
   artTemplate.defaults.imports.file = (filePath: string) => {
     const newPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
@@ -44,8 +46,6 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   };
   // fix: this. => that.
   value = value.replace(/\$\{this\./g, '${that.');
-  console.log('value ===debug', value);
-
   const res = artTemplate.compile(value)(context);
   // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
   if (typeof res === 'string' && REGX.test(res)) {
