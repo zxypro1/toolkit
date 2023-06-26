@@ -1,23 +1,19 @@
 import { prompt, getYamlContent, validateInput, writeData } from "../utils";
 import { hasIn, unset, set, trim } from "lodash";
-import Logger from '../logger';
+import decryptCredential from './decrypt';
+import { IResult } from "./set/type";
 
 export interface IRenameOptions {
   source?: string;
   target?: string;
 }
 
-export default async (options?: IRenameOptions) => {
+export default async (options?: IRenameOptions): Promise<IResult> => {
   const { source, target } = options || {};
   const content = await getYamlContent();
 
   let sourceName = source as string;
-  if (source) {
-    if (!hasIn(content, source)) {
-      Logger.logger.error(`Not found source alias name: ${source}`);
-      return;
-    }
-  } else {
+  if (!source) {
     const aliasNames = Object.keys(content);
     
     const { aliasName } = await prompt([
@@ -31,6 +27,8 @@ export default async (options?: IRenameOptions) => {
       },
     ]);
     sourceName = aliasName;
+  } else if (!hasIn(content, source)) {
+    throw new Error(`Not found source alias name: ${source}`);
   }
 
   let targetName = target as string;
@@ -50,4 +48,9 @@ export default async (options?: IRenameOptions) => {
   unset(content, sourceName);
 
   await writeData(content);
+
+  return {
+    access: targetName,
+    credential: decryptCredential(content[targetName]),
+  }
 }

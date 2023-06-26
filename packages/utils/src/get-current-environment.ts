@@ -1,10 +1,9 @@
 import { Environment } from './constants';
 
 const getCurrentEnvironment = () => {
-  if (process.env.HOME === '/kaniko' && process.env.BUILD_IMAGE_ENV === 'fc-backend') {
+  if (process.env.BUILD_IMAGE_ENV === 'fc-backend') {
     return Environment.AppCenter;
   }
-
   for (const key in process.env) {
     if (key === 'SERVERLESS_CD') return Environment.ServerlessCD;
     if (key === 'SERVERLESS_DEVS_CICD') return Environment.ServerlessDevsCICD;

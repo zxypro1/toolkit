@@ -1,0 +1,30 @@
+{
+  "name": "@serverless-devs/load-component",
+  "version": "0.0.1",
+  "description": "request for serverless-devs",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib node_modules",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "xsahxl",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "dependencies": {
+    "@serverless-devs/downloads": "workspace:^",
+    "@serverless-devs/utils": "workspace:^",
+    "@serverless-cd/debug": "^4.3.4",
+    "axios": "^1.4.0",
+    "fs-extra": "^11.1.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
+    "@types/lodash": "^4.14.195"
+  }
+}
