@@ -45,15 +45,18 @@ const compile = (value: string, context: Record<string, any> = {}) => {
     return file(newPath);
   };
   // fix: this. => that.
-  value = value.replace(/\$\{this\./g, '${that.');
-  const res = artTemplate.compile(value)(context);
-  // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
-  if (typeof res === 'string' && REGX.test(res)) {
-
-    const newValue = artTemplate.compile(res)(context);
-    return newValue || res;
+  const thatVal = value.replace(/\$\{this\./g, '${that.');
+  try {
+    const res = artTemplate.compile(thatVal)(context);
+    // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
+    if (typeof res === 'string' && REGX.test(res)) {
+      const newValue = artTemplate.compile(res)(context);
+      return newValue || res;
+    }
+    return res;
+  } catch (e) {
+    return value;
   }
-  return res;
 };
 
 export default compile;

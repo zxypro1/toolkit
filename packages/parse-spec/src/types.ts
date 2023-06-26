@@ -23,5 +23,4 @@ export interface IYaml {
     access: string;
     extend: string;
     vars: Record<string, any>;
-    resources: Record<string, any>;
 }

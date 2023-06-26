@@ -27,7 +27,7 @@ vars: # 全局变量
     internetAccess: true
 services:
   framework: # 业务名称/模块名称
-    component: fc # 组件名称
+    component: v3test # 组件名称
     actions:
       pre-deploy:
         # - run: npm install
@@ -38,7 +38,7 @@ services:
     props: # 组件的属性值
       region: ${vars.region}
       # service: ${vars.service}
-      service: ${file(./file.yaml)}
+      service: ${file('./file.yaml')}
       function:
         name: vuepress
         description: Serverless Devs Website vuepress Function
@@ -47,11 +47,11 @@ services:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
-          region: ${next-function.props.region}
-          functionName: ${next-function.props.function.name}
-          url: ${next-function.output.url.system_url}
+          region: ${next_function.props.region}
+          functionName: ${next_function.props.function.name}
+          url: ${next_function.output.url.system_url}
           token: ${env.token}
-          AccountID: ${config(AccountID)}
+          AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}
           codeUri: ${this.props.function.codeUri}
@@ -71,14 +71,14 @@ services:
       #     routeConfigs:
       #       - path: /*
 
-  next-function: # 第二个函数的案例，仅供参考
+  next_function: # 第二个函数的案例，仅供参考
     # 如果在当前项目下执行 s deploy，会同时部署模块：
     #   helloworld：服务hello-world-service，函数cpp-event-function
     #   next-function：服务hello-world-service，函数next-function-example
     # 如果想单独部署当前服务与函数，可以执行 s + 模块名/业务名 + deploy，例如：s next-function deploy
     # 如果想单独部署当前函数，可以执行 s + 模块名/业务名 + deploy function，例如：s next-function deploy function
     # 更多命令可参考：https://www.serverless-devs.com/fc/readme#文档相关
-    component: fc
+    component: v3test
     actions:
       pre-deploy:
         - plugin: website-fc

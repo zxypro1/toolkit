@@ -10,8 +10,10 @@ import path from 'path';
 import { getDefaultYamlPath, isExtendMode } from './utils'
 import compile from './compile';
 import order from './order';
-import { get } from 'lodash';
+import getInputs from './get-inputs';
+import { get, isEmpty, omit } from 'lodash';
 import { ISpec, IOptions, IYaml } from './types';
+const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 
@@ -30,7 +32,6 @@ class ParseSpec {
         this.yaml.access = get(this.yaml.content, 'access');
         this.yaml.extend = get(this.yaml.content, 'extend');
         this.yaml.vars = get(this.yaml.content, 'vars', {});
-        this.yaml.resources = get(this.yaml.content, 'services', {});
 
         debug(`yaml content: ${JSON.stringify(this.yaml.content, null, 2)}`);
         require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
@@ -40,12 +41,27 @@ class ParseSpec {
     }
     async doExtend() {
         debug('do extend');
-        return [];
+        const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
+        const extendYaml = utils.getYamlContent(extendPath);
+        const extendVars = get(extendYaml, 'vars', {});
+        const extendContent = getInputs(extendYaml, { cwd: path.dirname(extendPath), vars: extend2(true, {}, extendVars, this.yaml.vars) });
+        debug(`extend yaml content: ${JSON.stringify(extendContent, null, 2)}`);
+        const yamlContent = getInputs(omit(this.yaml.content, 'extend'), { cwd: path.dirname(this.yaml.path), vars: extend2(true, {}, extendVars, this.yaml.vars) });
+        debug(`yaml content: ${JSON.stringify(yamlContent, null, 2)}`);
+        const mergedYamlContent = extend2(true, {}, extendContent, yamlContent);
+        debug(`merged yaml content: ${JSON.stringify(mergedYamlContent, null, 2)}`);
+        const projects = get(mergedYamlContent, 'services', {});
+        debug(`projects: ${JSON.stringify(projects, null, 2)}`);
+        return await this.getSteps(projects);
     }
     async doNormal() {
         debug('do normal');
-        const projects = this.yaml.resources;
+        const projects = get(this.yaml.content, 'services', {});
         debug(`projects: ${JSON.stringify(projects, null, 2)}`);
+        return await this.getSteps(projects);
+
+    }
+    async getSteps(projects: Record<string, any>) {
         const steps = [];
         for (const project in projects) {
             const element = projects[project];

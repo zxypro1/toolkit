@@ -32,7 +32,7 @@ test('yaml格式不正确', async () => {
 
 test('extend yaml 格式有问题', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/extend.yaml'),
+    yamlPath: path.join(__dirname, './mock/extend-error.yaml'),
     method: 'deploy'
   });
   expect.assertions(1);
@@ -44,7 +44,7 @@ test('extend yaml 格式有问题', async () => {
   }
 });
 
-test.only('basic', async () => {
+test('basic', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/simple.yaml'),
     method: 'deploy'
@@ -53,6 +53,17 @@ test.only('basic', async () => {
   console.log(context.error);
   expect(context.status).toBe('success');
 });
+
+test.only('extend', async () => {
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/extend.yaml'),
+    method: 'deploy'
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
 
 test('order', async () => {
   const engine = new Engine({

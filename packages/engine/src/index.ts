@@ -250,9 +250,16 @@ class Engine {
   }
   private async doSrc(item: IStepOptions) {
     debug(`doSrc item: ${stringify(item)}`);
-    const c = await new Credential().get(item.access);
-    item.credential = get(c, 'credential');
-    const newInputs = getInputs(item.props, this.getFilterContext(item));
+    const credentialInstance = new Credential();
+    try {
+      // 只获取已存在的密钥
+      const c = await credentialInstance.get(item.access);
+      item.credential = get(c, 'credential');
+    } catch (error) { };
+
+    const magic = this.getFilterContext(item);
+    debug(`doSrc magic context: ${JSON.stringify(magic, null, 2)}`);
+    const newInputs = getInputs(item.props, magic);
     this.recordContext(item, { props: newInputs });
     debug(`doSrc inputs: ${JSON.stringify(newInputs, null, 2)}`);
     const { method, projectName } = this.options;
@@ -262,7 +269,7 @@ class Engine {
         // 方法存在，执行报错，退出码101
         try {
           // TODO: inputs数据
-          return await item.instance[method]({ props: newInputs });
+          return await item.instance[method]({ props: newInputs, getCredentials: async () => await credentialInstance.get(item.access) });
         } catch (error) {
           throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
         }
