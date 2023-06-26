@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import yaml from 'js-yaml';
 import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
 import * as utils from '@serverless-devs/utils';
@@ -24,23 +23,52 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   const env = { ...process.env, ...context.env };
   const cwd = context.cwd || process.cwd();
 
-  artTemplate.defaults.imports.env = (value: string) => env[value];
-  artTemplate.defaults.imports.config = (value: string) => get(context, `credential.${value}`);
-  artTemplate.defaults.imports.path = (value: string) => utils.getAbsolutePath(value, cwd);
-  artTemplate.defaults.imports.json = (value: string) => JSON.parse(value);
+  artTemplate.defaults.imports.env = (value: string) => {
+    const res = env[value];
+    if (res) return res;
+    throw new Error(`env('${value}') not found`);
+  };
+  artTemplate.defaults.imports.config = (value: string) => {
+    const res = get(context, `credential.${value}`);
+    if (res) return res;
+    throw new Error(`config('${value}') not found`);
+  };
+  artTemplate.defaults.imports.path = (value: string) => {
+    try {
+      return path.isAbsolute(value) ? value : path.join(cwd, value);
+    } catch (error) {
+      throw new Error(`path('${value}') parse error`);
+    }
+  };
+  artTemplate.defaults.imports.json = (value: string) => {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      throw new Error(`json('${value}') parse error`);
+    }
+  };
   artTemplate.defaults.imports.file = (filePath: string) => {
-    const newPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
-    return fs.readFileSync(newPath, 'utf8');
+    try {
+      const newPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
+      return fs.readFileSync(newPath, 'utf8');
+    } catch (error) {
+      throw new Error(`file('${filePath}') not found`);
+    }
   };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');
-  const res = artTemplate.compile(thatVal)(context);
-  // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
-  if (typeof res === 'string' && REGX.test(res)) {
-    const newValue = artTemplate.compile(res)(context);
-    return newValue || res;
+  try {
+    const res = artTemplate.compile(thatVal)(context);
+    // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
+    if (typeof res === 'string' && REGX.test(res)) {
+      const newValue = artTemplate.compile(res)(context);
+      return newValue || res;
+    }
+    return res;
+  } catch (e) {
+    const error = e as Error;
+    throw new Error(`compile error, ${error.message}`);
   }
-  return res;
 };
 
 export default compile;

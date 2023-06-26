@@ -44,6 +44,20 @@ test('extend yaml 格式有问题', async () => {
   }
 });
 
+test('魔法变量含中划线报错', async () => {
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/dashed-line.yaml'),
+    method: 'deploy'
+  });
+  expect.assertions(1);
+  try {
+    await engine.start();
+  } catch (e) {
+    const error = e as Error;
+    expect(error.message).toContain(`not support '-' in value`)
+  }
+});
+
 test.only('basic', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/simple.yaml'),
@@ -53,6 +67,8 @@ test.only('basic', async () => {
   console.log(context.error);
   expect(context.status).toBe('success');
 });
+
+
 
 test('extend', async () => {
   const engine = new Engine({

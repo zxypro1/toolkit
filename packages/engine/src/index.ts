@@ -165,7 +165,7 @@ class Engine {
   private getFilterContext(item: IStepOptions) {
     const data = {
       vars: this.spec.vars,
-      cwd: path.dirname(this.spec.yamlPath),
+      cwd: path.dirname(this.spec.yaml.path),
       // TODO: this.output
       that: {
         name: item.projectName,

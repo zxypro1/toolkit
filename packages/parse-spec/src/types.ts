@@ -10,7 +10,10 @@ export interface IStep {
 export interface ISpec {
     steps: IStep[];
     vars: Record<string, any>;
-    yamlPath: string;
+    yaml: {
+        path: string;
+        content: Record<string, any>;
+    }
 }
 
 export interface IOptions {

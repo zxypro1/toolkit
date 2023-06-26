@@ -47,9 +47,7 @@ services:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
-          region: ${next_function.props.region}
-          functionName: ${next_function.props.function.name}
-          url: ${next_function.output.hello}
+          region: ${next-function.props.region}
           token: ${env.token}
           AccountID: ${config('AccountID')}
           name: ${this.name}
@@ -71,7 +69,7 @@ services:
       #     routeConfigs:
       #       - path: /*
 
-  next_function: # 第二个函数的案例，仅供参考
+  next-function: # 第二个函数的案例，仅供参考
     # 如果在当前项目下执行 s deploy，会同时部署模块：
     #   helloworld：服务hello-world-service，函数cpp-event-function
     #   next-function：服务hello-world-service，函数next-function-example

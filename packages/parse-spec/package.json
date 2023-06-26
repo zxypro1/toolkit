@@ -24,11 +24,9 @@
     "dotenv": "^16.2.0",
     "extend2": "^1.0.1",
     "fs-extra": "^11.1.0",
-    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.195"
   }
 }
