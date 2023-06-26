@@ -11,12 +11,10 @@ import { getDefaultYamlPath, isExtendMode } from './utils'
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { get, isEmpty, omit } from 'lodash';
+import { get, omit } from 'lodash';
 import { ISpec, IOptions, IYaml } from './types';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
-
-
 
 
 class ParseSpec {

@@ -17,19 +17,6 @@ artTemplate.defaults.rules.push({
   },
 });
 
-const file = (filePath: string) => {
-  try {
-    const extname = path.extname(filePath);
-    if (['.yaml', '.yml'].includes(extname)) {
-      return yaml.load(fs.readFileSync(filePath, 'utf8'));
-    }
-    if (extname === '.json') {
-      return fs.readJSONSync(filePath);
-    }
-  } catch (error) {
-    return {};
-  }
-};
 
 const compile = (value: string, context: Record<string, any> = {}) => {
   // 仅针对字符串进行魔法变量解析
@@ -40,23 +27,20 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   artTemplate.defaults.imports.env = (value: string) => env[value];
   artTemplate.defaults.imports.config = (value: string) => get(context, `credential.${value}`);
   artTemplate.defaults.imports.path = (value: string) => utils.getAbsolutePath(value, cwd);
+  artTemplate.defaults.imports.json = (value: string) => JSON.parse(value);
   artTemplate.defaults.imports.file = (filePath: string) => {
     const newPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
-    return file(newPath);
+    return fs.readFileSync(newPath, 'utf8');
   };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');
-  try {
-    const res = artTemplate.compile(thatVal)(context);
-    // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
-    if (typeof res === 'string' && REGX.test(res)) {
-      const newValue = artTemplate.compile(res)(context);
-      return newValue || res;
-    }
-    return res;
-  } catch (e) {
-    return value;
+  const res = artTemplate.compile(thatVal)(context);
+  // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
+  if (typeof res === 'string' && REGX.test(res)) {
+    const newValue = artTemplate.compile(res)(context);
+    return newValue || res;
   }
+  return res;
 };
 
 export default compile;

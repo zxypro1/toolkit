@@ -51,15 +51,15 @@ test('projectName.output.*', () => {
 });
 
 test('file', () => {
-  const res = compile("${file('./file.yaml')}", { cwd: path.join(__dirname, './mock') });
+  const res = compile("${file('./file.json')}", { cwd: path.join(__dirname, './mock') });
   console.log(res);
-  expect(res).toEqual({ name: 'test', desc: 'this is a decs' });
+  expect(typeof res).toBe('string');
 });
 
-test('file().name', () => {
-  const res = compile("${file('./file.yaml').name}", { cwd: path.join(__dirname, './mock') });
+test('json', () => {
+  const res = compile("${json(file('./file.json')).name}", { cwd: path.join(__dirname, './mock') });
   console.log(res);
-  expect(res).toBe('test');
+  expect(res).toBe('website-wof2-pre');
 });
 
 test.only('this', () => {
