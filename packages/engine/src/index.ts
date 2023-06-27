@@ -1,12 +1,34 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId, filter } from 'lodash';
-import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
-import { getProcessTime, throw101Error, throw100Error, throwError } from './utils';
-import { stringify } from '@serverless-devs/utils'
-import ParseSpec, { getInputs, ISpec } from '@serverless-devs/parse-spec';
-import Credential from '@serverless-devs/credential';
+import {
+  isEmpty,
+  get,
+  each,
+  replace,
+  map,
+  isFunction,
+  values,
+  has,
+  uniqueId,
+  filter,
+} from 'lodash';
+import {
+  IStepOptions,
+  IRecord,
+  IStatus,
+  IEngineOptions,
+  IContext,
+  ILogConfig,
+  STEP_STATUS,
+  STEP_IF,
+} from './types';
+import { getProcessTime, throw101Error, throw100Error, throwError, getCredential } from './utils';
+import { stringify } from '@serverless-devs/utils';
+import ParseSpec, { getInputs, ISpec, IHookType } from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
+import Actions from './actions';
+import Credential from '@serverless-devs/credential';
+
 
 export { IEngineOptions, IContext } from './types';
 
@@ -18,7 +40,7 @@ class Engine {
   private spec = {} as ISpec;
   private logger: any;
   constructor(private options: IEngineOptions) {
-    debug('engine start',);
+    debug('engine start');
     debug(`engine options: ${stringify(options)}`);
 
     // const { inputs, cwd = process.cwd(), logConfig = {} } = options;
@@ -30,12 +52,19 @@ class Engine {
     // this.logger = this.getLogger();
   }
   async start(): Promise<IContext> {
+    const globalAccess = get(this.options, 'globalArgs.access');
     const parse = new ParseSpec(get(this.options, 'yamlPath'), {
-      access: get(this.options, 'globalArgs.access'),
-      method: get(this.options, 'method')
+      access: globalAccess,
+      method: get(this.options, 'method'),
     });
     this.spec = await parse.start();
-    const { steps } = this.spec;
+    debug(`spec: ${stringify(this.spec)}`);
+    const { steps, yaml } = this.spec;
+    const globalActionInstance = new Actions(yaml.actions, {
+      access: globalAccess || yaml.access,
+    });
+    await globalActionInstance.start(IHookType.PRE);
+
     this.context.steps = map(steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING };
     });
@@ -66,7 +95,9 @@ class Engine {
       };
 
       each(this.context.steps, (item, index) => {
-        const target = this.context.steps[index + 1] ? get(this.context.steps, `[${index + 1}].stepCount`) : 'final';
+        const target = this.context.steps[index + 1]
+          ? get(this.context.steps, `[${index + 1}].stepCount`)
+          : 'final';
         states[item.stepCount as string] = {
           invoke: {
             id: item.stepCount,
@@ -177,7 +208,7 @@ class Engine {
       },
       credential: item.credential,
     } as Record<string, any>;
-    const executedProjects = filter(this.context.steps, obj => obj.order > item.order);
+    const executedProjects = filter(this.context.steps, (obj) => obj.order > item.order);
     for (const obj of executedProjects) {
       data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
     }
@@ -215,7 +246,8 @@ class Engine {
       this.recordContext(item, { status: STEP_STATUS.SUCCESS, output: response, process_time });
     } catch (e) {
       const error = e as Error;
-      const status = item['continue-on-error'] === true ? STEP_STATUS.ERROR_WITH_CONTINUE : STEP_STATUS.FAILURE;
+      const status =
+        item['continue-on-error'] === true ? STEP_STATUS.ERROR_WITH_CONTINUE : STEP_STATUS.FAILURE;
       // 记录全局的执行状态
       if (this.record.editStatusAble) {
         this.record.status = status as IStatus;
@@ -252,13 +284,7 @@ class Engine {
   }
   private async doSrc(item: IStepOptions) {
     debug(`doSrc item: ${stringify(item)}`);
-    const credentialInstance = new Credential();
-    try {
-      // 只获取已存在的密钥
-      const c = await credentialInstance.get(item.access);
-      item.credential = get(c, 'credential');
-    } catch (error) { };
-
+    item.credential = await getCredential(item.access)
     const magic = this.getFilterContext(item);
     debug(`doSrc magic context: ${JSON.stringify(magic, null, 2)}`);
     const newInputs = getInputs(item.props, magic);
@@ -271,13 +297,22 @@ class Engine {
         // 方法存在，执行报错，退出码101
         try {
           // TODO: inputs数据
-          return await item.instance[method]({ props: newInputs, getCredentials: async () => await credentialInstance.get(item.access) });
+          return await item.instance[method]({
+            props: newInputs,
+            getCredential: async () => await new Credential().get(item.access),
+          });
         } catch (error) {
           throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
         }
       }
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-      throw100Error(`The [${method}] command was not found.`, `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：${chalk.underline('https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command')}`);
+      throw100Error(
+        `The [${method}] command was not found.`,
+        `Please check the component ${item.component
+        } has the ${method} method. Serverless Devs documents：${chalk.underline(
+          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+        )}`,
+      );
     }
     // 应用级操作
     if (isFunction(item.instance[method])) {
@@ -290,7 +325,10 @@ class Engine {
       }
     }
     // 方法不存在，进行警告，但是并不会报错，最终的exit code为0；
-    throwError(`The [${method}] command was not found.`, `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`);
+    throwError(
+      `The [${method}] command was not found.`,
+      `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`,
+    );
   }
   private async doSkip(item: IStepOptions) {
     // id 添加状态

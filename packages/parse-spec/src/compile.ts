@@ -15,7 +15,6 @@ artTemplate.defaults.rules.push({
   },
 });
 
-
 const compile = (value: string, context: Record<string, any> = {}) => {
   // 仅针对字符串进行魔法变量解析
   if (!value || typeof value !== 'string') return value;
@@ -57,7 +56,7 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   artTemplate.defaults.imports.regx = (value: string) => {
     const r = new RegExp(value);
     return r.test(context.method);
-  }
+  };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');
   try {

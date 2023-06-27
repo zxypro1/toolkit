@@ -1,3 +1,6 @@
+import Credential from '@serverless-devs/credential';
+import { get } from 'lodash';
+
 export function getLogPath(filePath: string) {
   return `step_${filePath}.log`;
 }
@@ -38,4 +41,14 @@ export function throw100Error(message: string, tips?: string) {
 
 export function throwError(message: string, tips?: string) {
   throw new Error(JSON.stringify({ message, tips }));
+}
+
+export async function getCredential(access?: string) {
+  try {
+    const instance = new Credential();
+    const res = await instance.get(access);
+    return get(res, 'credential', {});
+  } catch (error) {
+    return {};
+  }
 }

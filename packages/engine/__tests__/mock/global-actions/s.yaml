@@ -29,6 +29,7 @@ vars: # 全局变量
 
 actions:
   pre-${regx('.')}:
+    # - run: npm run error
     - run: echo ${vars.region}-${env('desc')}
     - plugin: ./pluginA.js
       args:
