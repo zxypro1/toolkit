@@ -11,4 +11,13 @@ export default class Registry {
   async login(token?: string): Promise<void>{
     await command.login(token);
   }
+
+  async resetToken() {
+    const token = await command.getToken();
+    await command.resetToken(token);
+  }
+
+  getToken() {
+    return command.getToken();
+  }
 }

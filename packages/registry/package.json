@@ -20,7 +20,6 @@
     "random-string": "^0.2.0"
   },
   "devDependencies": {
-    "@types/opn": "^5.5.0",
     "@types/random-string": "^0.0.28"
   }
 }

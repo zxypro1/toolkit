@@ -1,6 +1,7 @@
 import fs from 'fs';
 import https from 'https';
 import http from 'http';
+import querystring from 'querystring';
 import { getRootHome } from '@serverless-devs/utils';
 import path from 'path';
 
@@ -36,5 +37,34 @@ export const request_get = async (url: string) => {
       })
     });
   });
-  
+}
+
+export const request_post = async (url: string, body: Record<string, any>): Promise<any> => {
+  const uri = new URL(url);
+  const pkg = url.toLowerCase().startsWith('https:') ? https : http;
+
+  const contents = querystring.stringify(body);
+  const options = {
+    hostname: uri.hostname,
+    path: uri.pathname,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+  }
+
+  return new Promise((resolve) => {
+    const res: any = [];
+    const request = pkg.request(options, response => {
+      response.on('data', (chunk: any) => {
+        res.push(chunk);
+      });
+      response.on('end', () => {
+        const r = JSON.parse(Buffer.concat(res).toString());
+        resolve(r);
+      })
+    });
+    request.write(contents);
+    request.end();
+  });
 }

@@ -3,10 +3,8 @@ import path from 'path';
 const serverless_devs_config_home = path.join(__dirname, 'fixtures','logs')
 process.env.serverless_devs_config_home = serverless_devs_config_home;
 
-import './mock'
+import { GENERATE_TOKEN, RESET_TOKEN } from './mock';
 import Registry from '../src';
-import { getPlatformPath } from '../src/utils';
-import fs from 'fs';
 
 describe('Registry', () => {
   test('测试登陆包含参数', async () => {
@@ -14,8 +12,7 @@ describe('Registry', () => {
     const registry = new Registry({});
     await registry.login(token);
   
-    const platformPath = getPlatformPath();
-    const result = fs.readFileSync(platformPath, 'utf-8');
+    const result = registry.getToken();
     expect(result).toBe(token);
   });
 
@@ -23,9 +20,17 @@ describe('Registry', () => {
     const registry = new Registry({});
     await registry.login();
 
-    const platformPath = getPlatformPath();
-    const result = fs.readFileSync(platformPath, 'utf-8')
-    expect(result).toBe('test-token');
+    const result = registry.getToken();
+    expect(result).toBe(GENERATE_TOKEN);
+  });
+
+  test('测试重新登陆', async () => {
+    const registry = new Registry({});
+    await registry.login();
+    await registry.resetToken();
+
+    const result = registry.getToken();
+    expect(result).toBe(RESET_TOKEN);
   });
 })
 
