@@ -1,8 +1,9 @@
 import { createMachine, interpret } from 'xstate';
 import { isEmpty, get, each, replace, map, isFunction, values, has, uniqueId, filter } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, ILogConfig, STEP_STATUS, STEP_IF } from './types';
-import { getProcessTime, stringify, throw101Error, throw100Error, throwError } from './utils';
-import ParseSpec, { compile, getInputs, ISpec } from '@serverless-devs/parse-spec';
+import { getProcessTime, throw101Error, throw100Error, throwError } from './utils';
+import { stringify } from '@serverless-devs/utils'
+import ParseSpec, { getInputs, ISpec } from '@serverless-devs/parse-spec';
 import Credential from '@serverless-devs/credential';
 import path from 'path';
 import chalk from 'chalk';
@@ -31,7 +32,6 @@ class Engine {
   async start(): Promise<IContext> {
     const parse = new ParseSpec(get(this.options, 'yamlPath'), { access: get(this.options, 'globalArgs.access') });
     this.spec = await parse.start();
-    debug(`spec data: ${stringify(this.spec)}`);
     const { steps } = this.spec;
     this.context.steps = map(steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING };

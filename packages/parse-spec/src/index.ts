@@ -21,7 +21,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 class ParseSpec {
     // yaml
     private yaml = {} as IYaml;
-    constructor(filePath: string = '', private options: IOptions) {
+    constructor(filePath: string = '', private options: IOptions = {}) {
         this.yaml.path = fs.existsSync(filePath) ? utils.getAbsolutePath(filePath) : getDefaultYamlPath() as string;
         debug(`yaml path: ${this.yaml.path}`);
     }
@@ -35,8 +35,10 @@ class ParseSpec {
         debug(`yaml content: ${JSON.stringify(this.yaml.content, null, 2)}`);
         require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
         const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path)) ? await this.doExtend() : await this.doNormal();
+        const result = { steps: order(steps), vars: this.yaml.vars, yaml: this.yaml };
+        debug(`parse result: ${utils.stringify(result)}`);
         debug('parse end');
-        return { steps: order(steps), vars: this.yaml.vars, yaml: this.yaml };
+        return result;
     }
     async doExtend() {
         debug('do extend');

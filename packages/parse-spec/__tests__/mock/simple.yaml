@@ -1,0 +1,75 @@
+# ------------------------------------
+#   欢迎您使用阿里云函数计算 FC 组件进行项目开发
+#   组件仓库地址：https://github.com/devsapp/fc
+#   组件帮助文档：https://www.serverless-devs.com/fc/readme
+#   Yaml参考文档：https://www.serverless-devs.com/fc/yaml/readme
+#   关于：
+#      - Serverless Devs和FC组件的关系、如何声明/部署多个函数、超过50M的代码包如何部署
+#      - 关于.fcignore使用方法、工具中.s目录是做什么、函数进行build操作之后如何处理build的产物
+#   等问题，可以参考文档：https://www.serverless-devs.com/fc/tips
+#   关于如何做CICD等问题，可以参考：https://www.serverless-devs.com/serverless-devs/cicd
+#   关于如何进行环境划分等问题，可以参考：https://www.serverless-devs.com/serverless-devs/extend
+#   更多函数计算案例，可参考：https://github.com/devsapp/awesome/
+#   有问题快来钉钉群问一下吧：33947367
+# ------------------------------------
+edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: framework #  项目名称
+# access 是当前应用所需要的密钥信息配置：
+# 密钥配置可以参考：https://www.serverless-devs.com/serverless-devs/command/config
+# 密钥使用顺序可以参考：https://www.serverless-devs.com/serverless-devs/tool#密钥使用顺序与规范
+access: default
+
+vars: # 全局变量
+  region: ${env('region')}
+  service:
+    name: website-wof2
+    description: Serverless Devs Website Service
+    internetAccess: true
+services:
+  framework: # 业务名称/模块名称
+    # component: ${path('./fc.js')} # 组件名称
+    component: v3test # 组件名称
+    actions:
+      pre-deploy:
+        # - run: npm install
+        #   path: ./code
+        # - run: npm run build
+        #   path: ./code
+        - plugin: website-fc
+    props: # 组件的属性值
+      region: ${vars.region}
+      # service: ${vars.service}
+      service:
+        name: website-wof2
+        description: Serverless Devs Website Service
+      function:
+        name: vuepress
+        description: Serverless Devs Website vuepress Function
+        codeUri: ./code/docs/.vuepress/dist
+        timeout: 30
+        memorySize: 512
+        runtime: nodejs12
+        environmentVariables:
+          # region: ${next-function.props.region}
+          # functionName: ${next-function.props.function.name}
+          # url: ${next_function.output.url.system_url}
+          # token: ${env('token')}
+          AccountID: ${config('AccountID')}
+          name: ${this.name}
+          access: ${this.access}
+          codeUri: ${this.props.function.codeUri}
+      # triggers:
+      #   - name: httpTrigger
+      #     type: http
+      #     config:
+      #       authType: anonymous
+      #       methods:
+      #         - GET
+      #         - POST
+      #         - PUT
+      #         - DELETE
+      # customDomains:
+      #   - domainName: auto
+      #     protocol: HTTP
+      #     routeConfigs:
+      #       - path: /*
