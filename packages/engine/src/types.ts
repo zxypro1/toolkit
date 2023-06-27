@@ -11,7 +11,6 @@ export interface IEngineOptions {
   // TODO:
   inputs?: Record<string, any>;
   logConfig?: ILogConfig;
-  events?: IEvent;
 }
 
 export interface IGlobalArgs {
@@ -27,11 +26,6 @@ export enum IOutputType {
   JSON = 'json',
   YAML = 'yaml',
   RAW = 'raw',
-}
-
-interface IEvent {
-  // 全局action post 动作
-  onCompleted?: (context: IContext, logger: any) => Promise<void>;
 }
 
 export interface ILogConfig {

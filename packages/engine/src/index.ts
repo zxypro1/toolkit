@@ -39,6 +39,7 @@ class Engine {
   private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
   private logger: any;
+  private globalActionInstance!: Actions;
   constructor(private options: IEngineOptions) {
     debug('engine start');
     debug(`engine options: ${stringify(options)}`);
@@ -51,7 +52,7 @@ class Engine {
     // // logger
     // this.logger = this.getLogger();
   }
-  async start(): Promise<IContext> {
+  async start() {
     const globalAccess = get(this.options, 'globalArgs.access');
     const parse = new ParseSpec(get(this.options, 'yamlPath'), {
       access: globalAccess,
@@ -61,15 +62,15 @@ class Engine {
     const { steps: _steps, yaml } = this.spec;
     const steps = await this.download(_steps);
 
-    const globalActionInstance = new Actions(yaml.actions, {
+    this.globalActionInstance = new Actions(yaml.actions, {
       access: globalAccess || yaml.access,
     });
-    await globalActionInstance.start(IHookType.PRE);
+    await this.globalActionInstance.start(IHookType.PRE);
 
     this.context.steps = map(steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING };
     });
-    return new Promise(async (resolve) => {
+    const res: IContext = await new Promise(async (resolve) => {
       const states: any = {
         init: {
           on: {
@@ -150,6 +151,10 @@ class Engine {
         .start();
       stepService.send('INIT');
     });
+    if (this.context.status === STEP_STATUS.FAILURE) {
+      throw this.context.error;
+    }
+    return res;
   }
   private async download(steps: IParseStep[]) {
     const newSteps = [];
@@ -225,14 +230,13 @@ class Engine {
   }
   private async doCompleted() {
     this.context.completed = true;
-    const { events } = this.options;
-    if (isFunction(events?.onCompleted)) {
-      try {
-        await events?.onCompleted?.(this.context, this.logger);
-      } catch (error) {
-        this.outputErrorLog(error as Error);
-      }
+    if (this.context.status === STEP_STATUS.SUCCESS) {
+      await this.globalActionInstance.start(IHookType.SUCCESS, this.context);
     }
+    if (this.context.status === STEP_STATUS.FAILURE) {
+      await this.globalActionInstance.start(IHookType.FAIL, this.context);
+    }
+    await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
   }
   private async handleSrc(item: IStepOptions) {
     try {

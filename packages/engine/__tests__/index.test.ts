@@ -137,7 +137,7 @@ test('应用级操作，方法执行报错了', async () => {
   expect(context.error.message).toMatch('101');
 });
 
-test.only('全局action', async () => {
+test.only('全局action 成功', async () => {
   const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),
@@ -145,5 +145,16 @@ test.only('全局action', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
+  // expect(context.error.message).toMatch(`error test`)
+});
+
+test('全局action 失败', async () => {
+  const method = 'deploy';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/global-actions/error.yaml'),
+    method,
+  });
+  const context = await engine.start();
+  // console.log(context.error);
   // expect(context.error.message).toMatch(`error test`)
 });

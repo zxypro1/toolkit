@@ -1,10 +1,11 @@
 import { IAction, IActionType, IHookType, IPluginAction, IRunAction } from '@serverless-devs/parse-spec';
-import { isEmpty, filter } from 'lodash';
+import { isEmpty, filter, map, omit } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import execa from 'execa';
 import loadComponent from '@serverless-devs/load-component';
 import { throwError, getCredential, stringify } from '../utils';
+import { IContext } from '../types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
@@ -13,9 +14,11 @@ interface IOptions {
 }
 
 class Actions {
+  private context!: IContext;
   constructor(private actions: IAction[] = [], private options: IOptions = {}) { }
 
-  async start(hookType: `${IHookType}`) {
+  async start(hookType: `${IHookType}`, context = {} as IContext) {
+    this.context = context;
     const hooks = filter(this.actions, (item) => item.hookType === hookType);
     if (isEmpty(hooks)) return;
     for (const hook of hooks) {
@@ -55,12 +58,15 @@ class Actions {
   private async plugin(hook: IPluginAction) {
     const instance = await loadComponent(hook.value);
     const credential = await getCredential(this.options.access);
+
     // TODO: inputs
     const inputs = {
       access: this.options.access,
       credential,
+      ...this.context,
+      steps: map(this.context.steps, (step) => omit(step, 'instance')),
     };
-    await instance({ ...inputs }, hook.args);
+    await instance(inputs, hook.args);
   }
 }
 
