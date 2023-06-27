@@ -28,20 +28,20 @@ vars: # 全局变量
     description: hello world by serverless devs
 
 actions:
-  pre-deploy:
-    - run: echo pre-deploy
+  pre-${regx('.')}:
+    - run: echo ${vars.region}-${env('desc')}
     - plugin: ./pluginA.js
       args:
         testKey: testValue
   success-deploy:
     - run: echo success-deploy
-  complete-deploy:
+  complete-${regx('deploy')}:
     - run: echo complete-deploy
     - plugin: ./pluginA.js
       args:
         testKey: testValue
   fail-deploy:
-    - run: echo fail-deploy
+    - run: echo fail-${vars.region}-${env('desc')}
     - plugin: ./pluginA.js
       args:
         testKey: testValue

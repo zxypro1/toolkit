@@ -30,7 +30,10 @@ class Engine {
     // this.logger = this.getLogger();
   }
   async start(): Promise<IContext> {
-    const parse = new ParseSpec(get(this.options, 'yamlPath'), { access: get(this.options, 'globalArgs.access') });
+    const parse = new ParseSpec(get(this.options, 'yamlPath'), {
+      access: get(this.options, 'globalArgs.access'),
+      method: get(this.options, 'method')
+    });
     this.spec = await parse.start();
     const { steps } = this.spec;
     this.context.steps = map(steps, (item) => {
@@ -164,7 +167,6 @@ class Engine {
   }
   private getFilterContext(item: IStepOptions) {
     const data = {
-      vars: this.spec.vars,
       cwd: path.dirname(this.spec.yaml.path),
       // TODO: this.output
       that: {

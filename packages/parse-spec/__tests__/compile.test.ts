@@ -19,7 +19,7 @@ test("${env('PWD')}", () => {
   expect(res).toBe(`hello ${process.env.PWD}`);
 });
 
-test.only('vars.region', () => {
+test('vars.region', () => {
   const res = compile("hello ${vars.region}", { vars: { region: 'cn-hangzhou' } });
   console.log(res);
   expect(res).toBe(`hello cn-hangzhou`);
@@ -62,7 +62,7 @@ test('json', () => {
   expect(res).toBe('website-wof2-pre');
 });
 
-test.only('this', () => {
+test('this', () => {
   const res = compile("${this.name}", { that: { name: 'test' } });
   console.log(res);
   expect(res).toBe('test');

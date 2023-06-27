@@ -1,6 +1,7 @@
 import { includes, map, split, set, sortBy, isEmpty } from 'lodash';
 import { REGX } from './contants';
 import { IStep } from './types';
+import * as utils from '@serverless-devs/utils'
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
@@ -26,7 +27,7 @@ class Order {
                 }
             }
         }
-        debug(`order map: ${JSON.stringify(this.orderMap, null, 2)}`);
+        debug(`order map: ${utils.stringify(this.orderMap)}`);
 
     }
     getDependencies() {
@@ -72,7 +73,7 @@ class Order {
                 }
             }
         }
-        debug(`order dependencies: ${JSON.stringify(dependencies, null, 2)}`);
+        debug(`order dependencies: ${utils.stringify(dependencies)}`);
         return dependencies;
     }
 }

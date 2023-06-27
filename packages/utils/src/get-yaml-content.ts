@@ -2,7 +2,8 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 
-export const getAbsolutePath = (filePath: string, basePath: string = process.cwd()) => {
+export const getAbsolutePath = (filePath: string = '', basePath: string = process.cwd()) => {
+    if (!filePath) return filePath;
     return path.isAbsolute(filePath) ? filePath : path.join(basePath, filePath);
 }
 

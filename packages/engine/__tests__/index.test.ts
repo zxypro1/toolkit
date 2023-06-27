@@ -143,7 +143,7 @@ test('应用级操作，方法执行报错了', async () => {
   expect(context.error.message).toMatch('101');
 });
 
-test('全局action', async () => {
+test.only('全局action', async () => {
   const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),

@@ -11,9 +11,9 @@ import { getDefaultYamlPath, isExtendMode } from './utils'
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { concat, get, keys, omit } from 'lodash';
+import { concat, endsWith, get, includes, keys, map, omit, replace } from 'lodash';
 import { ISpec, IOptions, IYaml } from './types';
-import { IGNORE } from './contants';
+import { IGNORE, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -21,9 +21,10 @@ const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 class ParseSpec {
     // yaml
     private yaml = {} as IYaml;
-    constructor(filePath: string = '', private options: IOptions = {}) {
+    constructor(filePath: string = '', private options = {} as IOptions) {
         this.yaml.path = fs.existsSync(filePath) ? utils.getAbsolutePath(filePath) : getDefaultYamlPath() as string;
         debug(`yaml path: ${this.yaml.path}`);
+        debug(`options: ${utils.stringify(this.options)}`);
     }
     async start(): Promise<ISpec> {
         debug('parse start');
@@ -32,13 +33,45 @@ class ParseSpec {
         this.yaml.extend = get(this.yaml.content, 'extend');
         this.yaml.vars = get(this.yaml.content, 'vars', {});
 
-        debug(`yaml content: ${JSON.stringify(this.yaml.content, null, 2)}`);
+        debug(`yaml content: ${utils.stringify(this.yaml.content)}`);
         require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
         const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path)) ? await this.doExtend() : await this.doNormal();
-        const result = { steps: order(steps), vars: this.yaml.vars, yaml: this.yaml };
+        // 获取到真实值后，重新赋值
+        this.yaml.vars = get(this.yaml.content, 'vars', {});
+        this.yaml.actions = await this.parseActions();
+        const result = { steps: order(steps), yaml: this.yaml };
         debug(`parse result: ${utils.stringify(result)}`);
         debug('parse end');
         return result;
+    }
+    async parseActions() {
+        const actionList = [];
+        const actions = get(this.yaml.content, 'actions', {});
+        for (const action in actions) {
+            const element = actions[action];
+            const actionInfo = this.matchAction(action);
+            debug(`action: ${action}, useAction: ${utils.stringify(actionInfo)}`);
+            if (actionInfo.validate) {
+                actionList.push(...map(element, (item) => ({ ...item, type: actionInfo.type })));
+            }
+        }
+        return actionList;
+    }
+    matchAction(action: string) {
+        const useMagic = REGX.test(action);
+        if (useMagic) {
+            const newAction = compile(action, { method: this.options.method });
+            const [type, method] = newAction.split('-');
+            return {
+                validate: method === 'true',
+                type
+            }
+        }
+        const [type, method] = action.split('-');
+        return {
+            validate: method === this.options.method,
+            type
+        }
     }
     async doExtend() {
         debug('do extend');
@@ -50,19 +83,17 @@ class ParseSpec {
             vars: extend2(true, {}, extendVars, this.yaml.vars),
             ignore: concat(IGNORE, keys(get(extendYaml, 'services', {})))
         });
-        debug(`extend yaml content: ${JSON.stringify(extendContent, null, 2)}`);
+        debug(`extend yaml content: ${utils.stringify(extendContent)}`);
         const yamlContent = getInputs(omit(this.yaml.content, 'extend'), {
             cwd: path.dirname(this.yaml.path),
             vars: extend2(true, {}, extendVars, this.yaml.vars),
             ignore: concat(IGNORE, keys(get(this.yaml.content, 'services', {})))
         });
-        debug(`yaml content: ${JSON.stringify(yamlContent, null, 2)}`);
+        debug(`yaml content: ${utils.stringify(yamlContent)}`);
         this.yaml.content = extend2(true, {}, extendContent, yamlContent);
-        debug(`merged yaml content: ${JSON.stringify(this.yaml.content, null, 2)}`);
+        debug(`merged yaml content: ${utils.stringify(this.yaml.content)}`);
         const projects = get(this.yaml.content, 'services', {});
-        this.yaml.vars = get(this.yaml.content, 'vars', {});
-
-        debug(`projects: ${JSON.stringify(projects, null, 2)}`);
+        debug(`projects: ${utils.stringify(projects)}`);
         return await this.getSteps(projects);
     }
     async doNormal() {
@@ -72,9 +103,8 @@ class ParseSpec {
             vars: this.yaml.vars,
             ignore: concat(IGNORE, keys(get(this.yaml.content, 'services', {})))
         });
-        this.yaml.vars = get(this.yaml.content, 'vars', {});
         const projects = get(this.yaml.content, 'services', {});
-        debug(`projects: ${JSON.stringify(projects, null, 2)}`);
+        debug(`projects: ${utils.stringify(projects)}`);
         return await this.getSteps(projects);
 
     }

@@ -12,9 +12,9 @@ const stringify = (value: any) => {
         if (instance) {
             delete data.instance;
         }
-        return JSON.stringify(data, null, 2);
+        return JSON.stringify(data);
     } catch (error) {
-        return flatted.stringify(value, null, 2);
+        return flatted.stringify(value);
     }
 };
 
