@@ -1,0 +1,26 @@
+{
+  "name": "@serverless-devs/registry",
+  "version": "0.0.1",
+  "description": "request for serverless-devs",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib node_modules",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "wss-git",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "dependencies": {
+    "@serverless-devs/utils": "workspace:^",
+    "opn": "^6.0.0",
+    "random-string": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/opn": "^5.5.0",
+    "@types/random-string": "^0.0.28"
+  }
+}

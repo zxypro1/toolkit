@@ -10,6 +10,7 @@
     "clean": "pnpm run -r clean && rimraf node_modules",
     "build": "pnpm run -r build",
     "test": "jest --testTimeout 10000",
+    "test:registry": "jest --testTimeout 10000 packages/registry --watchAll",
     "test:manager": "jest --testTimeout 10000 packages/component-manager --watchAll",
     "test:logger": "ts-node packages/logger/__tests__/logger",
     "test:credential": "jest --testTimeout 10000 packages/credential --watchAll",
