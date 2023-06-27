@@ -37,8 +37,7 @@ services:
         - plugin: website-fc
     props: # 组件的属性值
       region: ${vars.region}
-      # service: ${vars.service}
-      service: ${file('./file.yaml')}
+      service: ${vars.service}
       function:
         name: vuepress
         description: Serverless Devs Website vuepress Function

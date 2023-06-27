@@ -27,7 +27,7 @@ vars: # 全局变量
     internetAccess: true
 services:
   framework: # 业务名称/模块名称
-    component: ${path('./fc.js')} # 组件名称
+    component: v3test # 组件名称
     actions:
       pre-deploy:
         # - run: npm install
@@ -37,8 +37,7 @@ services:
         - plugin: website-fc
     props: # 组件的属性值
       region: ${vars.region}
-      # service: ${vars.service}
-      service: ${file(./file.yaml)}
+      service: ${vars.service}
       function:
         name: vuepress
         description: Serverless Devs Website vuepress Function
@@ -48,10 +47,8 @@ services:
         runtime: nodejs12
         environmentVariables:
           region: ${next-function.props.region}
-          functionName: ${next-function.props.function.name}
-          url: ${next-function.output.url.system_url}
           token: ${env.token}
-          AccountID: ${config(AccountID)}
+          AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}
           codeUri: ${this.props.function.codeUri}
@@ -78,7 +75,7 @@ services:
     # 如果想单独部署当前服务与函数，可以执行 s + 模块名/业务名 + deploy，例如：s next-function deploy
     # 如果想单独部署当前函数，可以执行 s + 模块名/业务名 + deploy function，例如：s next-function deploy function
     # 更多命令可参考：https://www.serverless-devs.com/fc/readme#文档相关
-    component: ${path('./fc.js')} # 组件名称
+    component: v3test
     actions:
       pre-deploy:
         - plugin: website-fc
