@@ -1,5 +1,6 @@
 import Credential from '@serverless-devs/credential';
-import { get } from 'lodash';
+import flatted from 'flatted';
+import { get, omit, set, map } from 'lodash';
 
 export function getLogPath(filePath: string) {
   return `step_${filePath}.log`;
@@ -52,3 +53,20 @@ export async function getCredential(access?: string) {
     return {};
   }
 }
+
+export const stringify = (value: any) => {
+  try {
+    const data = { ...value }
+    const steps = get(value, 'steps');
+    if (steps) {
+      set(data, 'steps', map(steps, (step: any) => omit(step, 'instance')));
+    }
+    const instance = get(data, 'instance');
+    if (instance) {
+      delete data.instance;
+    }
+    return JSON.stringify(data);
+  } catch (error) {
+    return flatted.stringify(value);
+  }
+};

@@ -4,7 +4,7 @@ import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import execa from 'execa';
 import loadComponent from '@serverless-devs/load-component';
-import { throwError, getCredential } from '../utils';
+import { throwError, getCredential, stringify } from '../utils';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
@@ -19,7 +19,7 @@ class Actions {
     const hooks = filter(this.actions, (item) => item.hookType === hookType);
     if (isEmpty(hooks)) return;
     for (const hook of hooks) {
-      debug(`global action: ${utils.stringify(hook)}`);
+      debug(`global action: ${stringify(hook)}`);
       if (hook.actionType === IActionType.RUN) {
         await this.run(hook);
       }

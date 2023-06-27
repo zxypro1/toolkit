@@ -6,7 +6,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
   private orderMap = {} as Record<string, any>;
-  constructor(private steps: IStep[]) {}
+  constructor(private steps: IStep[]) { }
   run() {
     const dependencies = this.getDependencies();
     if (isEmpty(dependencies)) return this.steps;
@@ -30,7 +30,7 @@ class Order {
         }
       }
     }
-    debug(`order map: ${utils.stringify(this.orderMap)}`);
+    debug(`order map: ${JSON.stringify(this.orderMap)}`);
   }
   getDependencies() {
     const projectNameList = map(this.steps, (item) => {
@@ -75,7 +75,7 @@ class Order {
         }
       }
     }
-    debug(`order dependencies: ${utils.stringify(dependencies)}`);
+    debug(`order dependencies: ${JSON.stringify(dependencies)}`);
     return dependencies;
   }
 }

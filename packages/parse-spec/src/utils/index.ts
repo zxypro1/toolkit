@@ -5,7 +5,7 @@ export function getDefaultYamlPath() {
     const spath = utils.getYamlPath('s')
     if (spath) return path.resolve(spath);
     throw new Error(
-        utils.stringify({
+        JSON.stringify({
             message: 'the s.yaml/s.yml file was not found.',
             tips: 'Please check if the s.yaml/s.yml file exists, you can also specify it with -t.',
         }),

@@ -21,13 +21,13 @@ import {
   STEP_STATUS,
   STEP_IF,
 } from './types';
-import { getProcessTime, throw101Error, throw100Error, throwError, getCredential } from './utils';
-import { stringify } from '@serverless-devs/utils';
-import ParseSpec, { getInputs, ISpec, IHookType } from '@serverless-devs/parse-spec';
+import { getProcessTime, throw101Error, throw100Error, throwError, getCredential, stringify } from './utils';
+import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep } from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
 import Actions from './actions';
 import Credential from '@serverless-devs/credential';
+import loadComponent from '@serverless-devs/load-component';
 
 
 export { IEngineOptions, IContext } from './types';
@@ -58,8 +58,9 @@ class Engine {
       method: get(this.options, 'method'),
     });
     this.spec = await parse.start();
-    debug(`spec: ${stringify(this.spec)}`);
-    const { steps, yaml } = this.spec;
+    const { steps: _steps, yaml } = this.spec;
+    const steps = await this.download(_steps);
+
     const globalActionInstance = new Actions(yaml.actions, {
       access: globalAccess || yaml.access,
     });
@@ -149,6 +150,14 @@ class Engine {
         .start();
       stepService.send('INIT');
     });
+  }
+  private async download(steps: IParseStep[]) {
+    const newSteps = [];
+    for (const step of steps) {
+      const instance = await loadComponent(step.component);
+      newSteps.push({ ...step, instance });
+    }
+    return newSteps;
   }
   private getLogger(filePath?: string, itemLogConfig?: any) {
     const logConfig = this.options.logConfig as ILogConfig;

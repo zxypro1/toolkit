@@ -22,6 +22,7 @@
     "@serverless-devs/utils": "workspace:^",
     "chalk": "4.x",
     "execa": "^5.1.1",
+    "flatted": "^3.2.7",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21",
     "xstate": "^4.37.2"

@@ -1,13 +1,12 @@
 import compile from './compile';
 import { every, includes, isEmpty, map, join } from 'lodash';
 import { REGXG } from './contants';
-import * as utils from '@serverless-devs/utils';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 export const getInputs = (inputs: Record<string, any>, context: Record<string, any>) => {
   if (isEmpty(inputs)) return;
   const { ignore } = context;
-  debug(`get inputs ignore: ${utils.stringify(ignore)}`);
+  debug(`get inputs ignore: ${JSON.stringify(ignore)}`);
   const $ignore = map(ignore, (item) => '${' + item);
   function deepCopy(obj: any) {
     let result: any = obj.constructor === Array ? [] : {};

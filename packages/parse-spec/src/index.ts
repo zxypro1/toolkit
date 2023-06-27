@@ -3,7 +3,6 @@ export { default as compile } from './compile';
 export { default as order } from './order';
 export { default as getInputs } from './get-inputs';
 export * from './types';
-import loadComponent from '@serverless-devs/load-component';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
@@ -25,7 +24,7 @@ class ParseSpec {
       ? utils.getAbsolutePath(filePath)
       : (getDefaultYamlPath() as string);
     debug(`yaml path: ${this.yaml.path}`);
-    debug(`options: ${utils.stringify(this.options)}`);
+    debug(`options: ${JSON.stringify(this.options)}`);
   }
   async start(): Promise<ISpec> {
     debug('parse start');
@@ -34,7 +33,7 @@ class ParseSpec {
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.vars = get(this.yaml.content, 'vars', {});
 
-    debug(`yaml content: ${utils.stringify(this.yaml.content)}`);
+    debug(`yaml content: ${JSON.stringify(this.yaml.content)}`);
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
     const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path))
       ? await this.doExtend()
@@ -43,7 +42,7 @@ class ParseSpec {
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.actions = await this.parseActions();
     const result = { steps: order(steps), yaml: this.yaml };
-    debug(`parse result: ${utils.stringify(result)}`);
+    debug(`parse result: ${JSON.stringify(result)}`);
     debug('parse end');
     return result;
   }
@@ -53,7 +52,7 @@ class ParseSpec {
     for (const action in actions) {
       const element = actions[action];
       const actionInfo = this.matchAction(action);
-      debug(`action: ${action}, useAction: ${utils.stringify(actionInfo)}`);
+      debug(`action: ${action}, useAction: ${JSON.stringify(actionInfo)}`);
       if (actionInfo.validate) {
         actionList.push(
           ...map(element, (item) => {
@@ -109,17 +108,17 @@ class ParseSpec {
       vars: extend2(true, {}, extendVars, this.yaml.vars),
       ignore: concat(IGNORE, keys(get(extendYaml, 'services', {}))),
     });
-    debug(`extend yaml content: ${utils.stringify(extendContent)}`);
+    debug(`extend yaml content: ${JSON.stringify(extendContent)}`);
     const yamlContent = getInputs(omit(this.yaml.content, 'extend'), {
       cwd: path.dirname(this.yaml.path),
       vars: extend2(true, {}, extendVars, this.yaml.vars),
       ignore: concat(IGNORE, keys(get(this.yaml.content, 'services', {}))),
     });
-    debug(`yaml content: ${utils.stringify(yamlContent)}`);
+    debug(`yaml content: ${JSON.stringify(yamlContent)}`);
     this.yaml.content = extend2(true, {}, extendContent, yamlContent);
-    debug(`merged yaml content: ${utils.stringify(this.yaml.content)}`);
+    debug(`merged yaml content: ${JSON.stringify(this.yaml.content)}`);
     const projects = get(this.yaml.content, 'services', {});
-    debug(`projects: ${utils.stringify(projects)}`);
+    debug(`projects: ${JSON.stringify(projects)}`);
     return await this.getSteps(projects);
   }
   private async doNormal() {
@@ -130,7 +129,7 @@ class ParseSpec {
       ignore: concat(IGNORE, keys(get(this.yaml.content, 'services', {}))),
     });
     const projects = get(this.yaml.content, 'services', {});
-    debug(`projects: ${utils.stringify(projects)}`);
+    debug(`projects: ${JSON.stringify(projects)}`);
     return await this.getSteps(projects);
   }
   private async getSteps(projects: Record<string, any>) {
@@ -139,8 +138,7 @@ class ParseSpec {
       const element = projects[project];
       const data = projects[project];
       const component = compile(get(data, 'component'), { cwd: path.dirname(this.yaml.path) });
-      const instance = await loadComponent(component);
-      steps.push({ ...element, projectName: project, instance, access: this.getAccess(data) });
+      steps.push({ ...element, projectName: project, component, access: this.getAccess(data) });
     }
     return steps;
   }

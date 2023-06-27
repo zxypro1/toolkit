@@ -44,6 +44,7 @@ export interface ILogConfig {
 }
 
 export type IStepOptions = IStep & {
+  instance: any; //组件实例
   id?: string;
   if?: string;
   'continue-on-error'?: boolean;

@@ -3,7 +3,6 @@ export interface IStep {
   component: string;
   props: Record<string, any>;
   actions?: Record<string, any>;
-  instance: any;
   order: number;
   access: string | undefined;
 }

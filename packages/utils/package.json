@@ -16,7 +16,6 @@
     "access": "public"
   },
   "dependencies": {
-    "flatted": "^3.2.7",
     "js-yaml": "^4.1.0",
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.isempty": "^4.4.0",
