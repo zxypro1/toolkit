@@ -2,8 +2,32 @@ import fs from 'fs';
 import https from 'https';
 import http from 'http';
 import querystring from 'querystring';
-import { getRootHome } from '@serverless-devs/utils';
+import { getRootHome, getYamlPath } from '@serverless-devs/utils';
 import path from 'path';
+
+/**
+ * 获取 yaml 的内容
+ * @param filePath 文件路径（不需要后缀）
+ * @returns 
+ */
+export const getYamlContentText = (filePath: string): string | undefined => {
+  const fileUri = getYamlPath(filePath);
+  if (fileUri) {
+    return fs.readFileSync(fileUri, 'utf-8');
+  }
+  return undefined;
+}
+
+/**
+ * 获取 md 文件内容
+ * @param filePath 文件路径（需要后缀）
+ * @returns 
+ */
+export const getContentText = (fileUri: string): string | undefined => {
+  if (fs.existsSync(fileUri)) {
+    return fs.readFileSync(fileUri, 'utf-8');
+  }
+}
 
 export const getPlatformPath = () => {
   const rootHome = getRootHome();
@@ -52,6 +76,33 @@ export const request_post = async (url: string, body: Record<string, any>): Prom
       'Content-Type': 'application/x-www-form-urlencoded'
     },
   }
+
+  return new Promise((resolve) => {
+    const res: any = [];
+    const request = pkg.request(options, response => {
+      response.on('data', (chunk: any) => {
+        res.push(chunk);
+      });
+      response.on('end', () => {
+        const r = JSON.parse(Buffer.concat(res).toString());
+        resolve(r);
+      })
+    });
+    request.write(contents);
+    request.end();
+  });
+}
+
+export const request_put = async (url: string, filePath: string): Promise<any> => {
+  const uri = new URL(url);
+  const pkg = url.toLowerCase().startsWith('https:') ? https : http;
+
+  const options = {
+    hostname: uri.hostname,
+    path: uri.pathname,
+    method: 'PUT',
+  };
+  const contents = fs.readFileSync(filePath);
 
   return new Promise((resolve) => {
     const res: any = [];

@@ -7,7 +7,7 @@ process.env.serverless_devs_config_home = serverless_devs_config_home;
 import { GENERATE_TOKEN, RESET_TOKEN } from './mock';
 import Registry from '../src';
 
-describe('Registry', () => {
+describe('Login', () => {
   test('测试登陆包含参数', async () => {
     const token = 'xxxxxxxxxxxxxxxx';
     const registry = new Registry({});
@@ -33,5 +33,21 @@ describe('Registry', () => {
     const result = registry.getToken();
     expect(result).toBe(RESET_TOKEN);
   });
+})
+
+describe('Publish', () => {
+  beforeAll(() => {
+    require('dotenv').config({
+      path: path.join(__dirname, '.env'),
+    })
+  })
+
+  afterAll(() => {
+    delete process.env.TOKEN;
+  })
+
+  test('publish', () => {
+    
+  })
 })
 

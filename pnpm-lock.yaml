@@ -283,6 +283,9 @@ importers:
       '@serverless-devs/utils':
         specifier: workspace:^
         version: link:../utils
+      '@serverless-devs/zip':
+        specifier: workspace:^
+        version: link:../zip
       opn:
         specifier: ^6.0.0
         version: 6.0.0

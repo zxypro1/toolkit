@@ -3,13 +3,7 @@ import random from 'random-string';
 import opn from 'opn';
 import { writeFile, sleep, request_get, request_post } from '../utils';
 import logger from '../logger';
-
-// github回调
-const GITHUB_LOGIN_URL = 'https://github.com/login/oauth/authorize?client_id=beae900546180c7bbdd6&redirect_uri=https://registry.devsapp.cn/user/login/github';
-// 登陆
-const REGISTRY_INFORMATION_GITHUB = 'https://registry.devsapp.cn/user/information/github';
-// 刷新 token
-const RESET_URL = 'https://registry.devsapp.cn/user/update/safetycode';
+import { GITHUB_LOGIN_URL, REGISTRY_INFORMATION_GITHUB, RESET_URL } from './constants';
 
 /**
  * 请求接口登陆

@@ -33,7 +33,8 @@ export default class Registry {
     return command.getToken();
   }
 
-  async publish() {
-    
+  async publish(codeUri?: string) {
+    const token = await command.getToken();
+    await command.publish(token, codeUri || process.cwd());
   }
 }
