@@ -1,4 +1,5 @@
 import path from 'path';
+
 // 注意，一定需要上面否则可能会影响真实环境的密钥配置
 const serverless_devs_config_home = path.join(__dirname, 'fixtures','logs')
 process.env.serverless_devs_config_home = serverless_devs_config_home;

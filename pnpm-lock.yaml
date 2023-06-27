@@ -25,6 +25,9 @@ importers:
       '@types/node':
         specifier: ^18.15.1
         version: 18.16.18
+      dotenv:
+        specifier: ^16.2.0
+        version: 16.2.0
       fs-extra:
         specifier: ^11.1.0
         version: 11.1.1
@@ -280,9 +283,6 @@ importers:
       '@serverless-devs/utils':
         specifier: workspace:^
         version: link:../utils
-      fs-extra:
-        specifier: ^11.1.0
-        version: 11.1.1
       opn:
         specifier: ^6.0.0
         version: 6.0.0
@@ -290,9 +290,6 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
     devDependencies:
-      '@types/opn':
-        specifier: ^5.5.0
-        version: 5.5.0
       '@types/random-string':
         specifier: ^0.0.28
         version: 0.0.28
@@ -1189,13 +1186,6 @@ packages:
     resolution: {integrity: sha512-/aNaQZD0+iSBAGnvvN2Cx92HqE5sZCPZtx2TsK+4nvV23fFe09jVDvpArXr2j9DnYlzuU9WuoykDDc6wqvpNcw==}
     dev: true
 
-  /@types/opn@5.5.0:
-    resolution: {integrity: sha512-rfEmrSa/x0vArY1aFnVTBAmy6b2I0oNHONL59qR+vnsHfD5xacM40O4PSiVisERq/GmROjmS3Xo/ptp8fx823g==}
-    deprecated: This is a stub types definition. opn provides its own type definitions, so you do not need this installed.
-    dependencies:
-      opn: 6.0.0
-    dev: true
-
   /@types/prettier@2.7.3:
     resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
     dev: true
@@ -1874,7 +1864,6 @@ packages:
   /dotenv@16.2.0:
     resolution: {integrity: sha512-jcq2vR1DY1+QA+vH58RIrWLDZOifTGmyQJWzP9arDUbgZcySdzuBb1WvhWZzZtiXgfm+GW2pjBqStqlfpzq7wQ==}
     engines: {node: '>=12'}
-    dev: false
 
   /egg-errors@2.3.2:
     resolution: {integrity: sha512-E+Sx7IBVrfRyHSjFXaq4sCZ3Uk3ka9PYySaQ8VbRZmLEt9ENBCD99yVzLIeWUH2QfzvkrjY9El1eHmLeRx7cfw==}
@@ -2428,6 +2417,7 @@ packages:
   /is-wsl@1.1.0:
     resolution: {integrity: sha512-gfygJYZ2gLTDlmbWMI0CE2MwnFzSN/2SZfkMlItC4K/JBlsWVDB0bO6XhqcY13YXE7iMcAJnzTCJjPiTeJJ0Mw==}
     engines: {node: '>=4'}
+    dev: false
 
   /isarray@1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
@@ -3268,6 +3258,7 @@ packages:
     deprecated: The package has been renamed to `open`
     dependencies:
       is-wsl: 1.1.0
+    dev: false
 
   /optionator@0.8.3:
     resolution: {integrity: sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA==}

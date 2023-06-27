@@ -4,9 +4,16 @@ import opn from 'opn';
 import { writeFile, sleep, request_get, request_post } from '../utils';
 import logger from '../logger';
 
+// github回调
 const GITHUB_LOGIN_URL = 'https://github.com/login/oauth/authorize?client_id=beae900546180c7bbdd6&redirect_uri=https://registry.devsapp.cn/user/login/github';
+// 登陆
 const REGISTRY_INFORMATION_GITHUB = 'https://registry.devsapp.cn/user/information/github';
+// 刷新 token
+const RESET_URL = 'https://registry.devsapp.cn/user/update/safetycode';
 
+/**
+ * 请求接口登陆
+ */
 export async function generateToken() {
   const tempToken = random({ length: 20 });
   const loginUrl = `${GITHUB_LOGIN_URL}?token=${tempToken}`;
@@ -35,10 +42,13 @@ export async function generateToken() {
   logger.error('Login failed. Please log in to GitHub account on the pop-up page and authorize it, or try again later.');
 }
 
+/**
+ * 刷新 token
+ * @param token 旧的 token
+ */
 export async function resetToken(token: string) {
-  const url = 'https://registry.devsapp.cn/user/update/safetycode';
   try {
-    const { ResponseId, Response } = await request_post(url, { safety_code: token });
+    const { ResponseId, Response } = await request_post(RESET_URL, { safety_code: token });
     logger.debug(`ResponseId: ${ResponseId}`);
 
     if (Response.Error) {
@@ -53,6 +63,10 @@ export async function resetToken(token: string) {
   logger.log('Serverless Registry login token reset succeeded.');
 }
 
+/**
+ * 登陆
+ * @param token 指定 token
+ */
 export default async function login(token?: string) {
   if (token) {
     writeFile(token);

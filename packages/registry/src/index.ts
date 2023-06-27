@@ -8,16 +8,32 @@ export default class Registry {
     this.logger = Logger.set(logger);
   }
 
+  /**
+   * 设置 token
+   * @param token 指定 token
+   */
   async login(token?: string): Promise<void>{
     await command.login(token);
   }
 
+  /**
+   * 刷新token
+   * @param token 指定 token
+   */
   async resetToken() {
     const token = await command.getToken();
     await command.resetToken(token);
   }
 
-  getToken() {
+  /**
+   * 获取 token
+   * @returns 
+   */
+  getToken(): string {
     return command.getToken();
+  }
+
+  async publish() {
+    
   }
 }
