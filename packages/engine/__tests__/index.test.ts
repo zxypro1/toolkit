@@ -18,7 +18,7 @@ test('未找到yaml文件', async () => {
 
 test('yaml格式不正确', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/exception.yaml'),
+    yamlPath: path.join(__dirname, './mock/error/exception.yaml'),
     method: 'deploy'
   });
   expect.assertions(1);
@@ -32,7 +32,7 @@ test('yaml格式不正确', async () => {
 
 test('extend yaml 格式有问题', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/extend-error.yaml'),
+    yamlPath: path.join(__dirname, './mock/error/extend-error.yaml'),
     method: 'deploy'
   });
   expect.assertions(1);
@@ -46,7 +46,7 @@ test('extend yaml 格式有问题', async () => {
 
 test('魔法变量含中划线报错', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/dashed-line.yaml'),
+    yamlPath: path.join(__dirname, './mock/error/dashed-line.yaml'),
     method: 'deploy'
   });
   expect.assertions(1);
@@ -58,9 +58,9 @@ test('魔法变量含中划线报错', async () => {
   }
 });
 
-test.only('basic', async () => {
+test('basic', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/simple.yaml'),
+    yamlPath: path.join(__dirname, './mock/basic.yaml'),
     method: 'deploy'
   });
   const context = await engine.start();
@@ -72,7 +72,7 @@ test.only('basic', async () => {
 
 test('extend', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/extend.yaml'),
+    yamlPath: path.join(__dirname, './mock/extend/extend.yaml'),
     method: 'deploy'
   });
   const context = await engine.start();
@@ -101,7 +101,9 @@ test('指定服务 方法不存在时', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`The [${method}] command was not found`)
+  expect(context.error.message).toMatch(`The [${method}] command was not found`);
+  expect(context.error.message).toMatch('100');
+
 });
 
 test('指定服务 方法存在，但是执行报错了', async () => {
@@ -114,6 +116,7 @@ test('指定服务 方法存在，但是执行报错了', async () => {
   const context = await engine.start();
   console.log(context.error);
   expect(context.error.message).toMatch(`error test`)
+  expect(context.error.message).toMatch('101');
 });
 
 test('应用级操作 方法不存在时', async () => {
@@ -124,8 +127,10 @@ test('应用级操作 方法不存在时', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`The [${method}] command was not found`)
+  expect(context.error.message).toMatch(`The [${method}] command was not found`);
+
 });
+
 test('应用级操作，方法执行报错了', async () => {
   const method = 'error';
   const engine = new Engine({
@@ -134,5 +139,17 @@ test('应用级操作，方法执行报错了', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`error test`)
+  expect(context.error.message).toMatch(`error test`);
+  expect(context.error.message).toMatch('101');
+});
+
+test('全局action', async () => {
+  const method = 'deploy';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),
+    method
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  // expect(context.error.message).toMatch(`error test`)
 });

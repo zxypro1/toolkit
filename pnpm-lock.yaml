@@ -108,31 +108,26 @@ importers:
         version: 11.0.1
 
   packages/engine:
+    specifiers:
+      '@serverless-cd/debug': ^4.3.4
+      '@serverless-devs/credential': workspace:^
+      '@serverless-devs/parse-spec': workspace:^
+      '@serverless-devs/utils': workspace:^0.0.7
+      '@types/fs-extra': ^11.0.1
+      '@types/lodash': ^4.14.195
+      chalk: 4.x
+      fs-extra: ^11.1.0
+      lodash: ^4.17.21
+      xstate: ^4.37.2
     dependencies:
-      '@serverless-cd/debug':
-        specifier: ^4.3.4
-        version: 4.3.4
-      '@serverless-devs/credential':
-        specifier: workspace:^
-        version: link:../credential
-      '@serverless-devs/parse-spec':
-        specifier: workspace:^
-        version: link:../parse-spec
-      chalk:
-        specifier: 4.x
-        version: 4.1.2
-      flatted:
-        specifier: ^3.2.7
-        version: 3.2.7
-      fs-extra:
-        specifier: ^11.1.0
-        version: 11.1.1
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      xstate:
-        specifier: ^4.37.2
-        version: 4.37.2
+      '@serverless-cd/debug': 4.3.4
+      '@serverless-devs/credential': link:../credential
+      '@serverless-devs/parse-spec': link:../parse-spec
+      '@serverless-devs/utils': link:../utils
+      chalk: 4.1.2
+      fs-extra: 11.1.1
+      lodash: 4.17.21
+      xstate: 4.37.2
     devDependencies:
       '@types/fs-extra':
         specifier: ^11.0.1
@@ -295,19 +290,22 @@ importers:
         version: 0.0.28
 
   packages/utils:
+    specifiers:
+      '@types/js-yaml': ^4.0.5
+      '@types/lodash.defaultsdeep': ^4.6.7
+      '@types/lodash.isempty': ^4.4.7
+      '@types/minimist': ^1.2.2
+      flatted: ^3.2.7
+      js-yaml: ^4.1.0
+      lodash.defaultsdeep: ^4.6.1
+      lodash.isempty: ^4.4.0
+      minimist: ^1.2.8
     dependencies:
-      js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
-      lodash.defaultsdeep:
-        specifier: ^4.6.1
-        version: 4.6.1
-      lodash.isempty:
-        specifier: ^4.4.0
-        version: 4.4.0
-      minimist:
-        specifier: ^1.2.8
-        version: 1.2.8
+      flatted: 3.2.7
+      js-yaml: 4.1.0
+      lodash.defaultsdeep: 4.6.1
+      lodash.isempty: 4.4.0
+      minimist: 1.2.8
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.5

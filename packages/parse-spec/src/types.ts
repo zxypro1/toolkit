@@ -17,7 +17,7 @@ export interface ISpec {
 }
 
 export interface IOptions {
-    access: string | undefined;
+    access?: string;
 }
 
 export interface IYaml {
