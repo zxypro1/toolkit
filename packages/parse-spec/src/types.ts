@@ -17,21 +17,29 @@ export enum IHookType {
 export enum IActionType {
   RUN = 'run',
   PLUGIN = 'plugin',
+  COMPONENT = 'component',
 }
 export interface IRunAction {
   hookType: `${IHookType}`;
   actionType: IActionType.RUN;
   value: string;
   path: string;
+  level: `${IActionLevel}`;
 }
 export interface IPluginAction {
   hookType: `${IHookType}`;
   actionType: IActionType.PLUGIN;
   value: string;
   args?: Record<string, any>;
+  level: `${IActionLevel}`;
 }
 
 export type IAction = IRunAction | IPluginAction;
+
+export enum IActionLevel {
+  PROJECT = 'project',
+  GLOBAL = 'global',
+}
 
 export interface IYaml {
   path: string;

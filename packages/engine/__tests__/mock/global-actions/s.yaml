@@ -27,39 +27,52 @@ vars: # 全局变量
     name: hello-world-service
     description: hello world by serverless devs
 
-actions:
-  pre-${regx('.')}:
-    # - run: npm run error
-    - run: echo ${vars.region}-${env('desc')}
-    - plugin: ./pluginA.js
-      args:
-        testKey: testValue
-  success-deploy:
-    - run: echo success-deploy
-  complete-${regx('deploy')}:
-    - run: echo complete-deploy
-    - plugin: ./pluginA.js
-      args:
-        testKey: testValue
-  fail-deploy:
-    - run: echo fail-${vars.region}-${env('desc')}
-    - plugin: ./pluginA.js
-      args:
-        testKey: testValue
+# actions:
+#   pre-${regx('.')}:
+#     - run: echo ${vars.region}-${env('desc')}
+#     - plugin: ${path('./pluginA.js')}
+#       args:
+#         testKey: testValue
+#   success-deploy:
+#     - run: echo success-deploy
+#   complete-${regx('deploy')}:
+#     - run: echo complete-deploy
+#     - plugin: ${path('./pluginA.js')}
+#       args:
+#         testKey: testValue
+#   fail-deploy:
+#     - run: echo fail-${vars.region}-${env('desc')}
+#     - plugin: ${path('./pluginA.js')}
+#       args:
+#         testKey: testValue
 
 services:
   helloworld: # 业务名称/模块名称
     component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
-    actions: # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
-      pre-deploy: # 在deploy之前运行
-        - run: echo pre-deploy # 要执行的系统命令，类似于一种钩子的形式
-          path: ./ # 执行系统命令/钩子的路径
-        # - plugin: ${path(./pluginA.js)} # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
-        #   args: # 插件的参数信息
-        #     testKey: testValue
-        # - component: fc test # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
-    #      post-deploy: # 在deploy之后运行
-    #        - component: fc versions publish # 要运行的命令行
+    # actions:
+    #   pre-${regx('.')}:
+    #     # - run: npm run error
+    #     - run: echo helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}
+    #     - plugin: ${path('./pluginA.js')}
+    #       args:
+    #         testKey: testValue
+    #     - plugin: ${path('./pluginB.js')}
+
+    #       args:
+    #         testKey: testValue
+    #   success-deploy:
+    #     - run: echo success-deploy
+    #   complete-${regx('deploy')}:
+    #     - run: echo complete-deploy
+    #     - plugin: ${path('./pluginA.js')}
+    #       args:
+    #         testKey: testValue
+    #     - component: v3test deploy
+    #   fail-deploy:
+    #     - run: echo fail-${vars.region}-${env('desc')}
+    #     - plugin: ${path('./pluginA.js')}
+    #       args:
+    #         testKey: testValue
     props:
       region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
       service: ${vars.service}
@@ -88,15 +101,30 @@ services:
                 - POST
   next-helloworld: # 业务名称/模块名称
     component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
-    actions: # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
-      pre-deploy: # 在deploy之前运行
-        - run: echo pre-deploy # 要执行的系统命令，类似于一种钩子的形式
-          path: ./ # 执行系统命令/钩子的路径
-    #     - plugin: ${path(./pluginA.js)}               # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
-    #       args:                          # 插件的参数信息
-    #         testKey: testValue
-    #      post-deploy: # 在deploy之后运行
-    #        - component: fc versions publish # 要运行的命令行
+    actions:
+      pre-${regx('.')}:
+        # - run: npm run error
+        - run: echo next-helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}-${helloworld.output.hello}
+        - plugin: ${path('./pluginA.js')}
+          args:
+            testKey: testValue
+        - plugin: ${path('./pluginB.js')}
+
+          args:
+            testKey: testValue
+      success-deploy:
+        - run: echo success-deploy--${this.props.service.name}-${this.props.function.name}-${this.output.hello}-${helloworld.output.hello}
+      complete-${regx('deploy')}:
+        - run: echo complete-deploy
+        - plugin: ${path('./pluginA.js')}
+          args:
+            testKey: testValue
+        - component: v3test deploy
+      fail-deploy:
+        - run: echo fail-${vars.region}-${env('desc')}
+        - plugin: ${path('./pluginA.js')}
+          args:
+            testKey: testValue
     props:
       region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
       service: ${vars.service}
@@ -123,54 +151,40 @@ services:
               methods:
                 - GET
                 - POST
-  next-helloworld-2: # 业务名称/模块名称
-    component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
-    # actions:       # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
-    #   pre-deploy: # 在deploy之前运行
-    #     - run: echo pre-deploy        # 要执行的系统命令，类似于一种钩子的形式
-    #       path: ./                   # 执行系统命令/钩子的路径
-    #     - plugin: ${path(./pluginA.js)}               # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
-    #       args:                          # 插件的参数信息
-    #         testKey: testValue
-    #      post-deploy: # 在deploy之后运行
-    #        - component: fc versions publish # 要运行的命令行
-    props:
-      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
-      service: ${vars.service}
-      function:
-        name: C
-        description: hello world by serverless devs
-        runtime: nodejs14
-        codeUri: ./code
-        handler: index.handler
-        memorySize: 128
-        timeout: 60
-      triggers:
-        - name: httpTrigger
-          type: http
-          config:
-            authType: anonymous
-            methods:
-              - GET
-      customDomains:
-        - domainName: auto
-          protocol: HTTP
-          routeConfigs:
-            - path: /*
-              methods:
-                - GET
-                - POST
-#  next-function: # 第二个函数的案例，仅供参考
-#    # 如果在当前项目下执行 s deploy，会同时部署模块：
-#    #   helloworld：服务hello-world-service，函数cpp-event-function
-#    #   next-function：服务hello-world-service，函数next-function-example
-#    # 如果想单独部署当前服务与函数，可以执行 s + 模块名/业务名 + deploy，例如：s next-function deploy
-#    # 如果想单独部署当前函数，可以执行 s + 模块名/业务名 + deploy function，例如：s next-function deploy function
-#    # 更多命令可参考：https://www.serverless-devs.com/fc/readme#文档相关
-#    component: fc
-#    props:
-#      region: ${vars.region}
-#      service: ${vars.service} # 应用整体的服务配置
-#      function: # 定义一个新的函数
-#        name: next-function-example
-#        description: 'hello world by serverless devs'
+  # next-helloworld-2: # 业务名称/模块名称
+  #   component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+  #   # actions:       # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
+  #   #   pre-deploy: # 在deploy之前运行
+  #   #     - run: echo pre-deploy        # 要执行的系统命令，类似于一种钩子的形式
+  #   #       path: ./                   # 执行系统命令/钩子的路径
+  #   #     - plugin: ${path(./pluginA.js)}               # 与运行的插件 （可以通过s cli registry search --type Plugin 获取组件列表）
+  #   #       args:                          # 插件的参数信息
+  #   #         testKey: testValue
+  #   #      post-deploy: # 在deploy之后运行
+  #   #        - component: fc versions publish # 要运行的命令行
+  #   props:
+  #     region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+  #     service: ${vars.service}
+  #     function:
+  #       name: C
+  #       description: hello world by serverless devs
+  #       runtime: nodejs14
+  #       codeUri: ./code
+  #       handler: index.handler
+  #       memorySize: 128
+  #       timeout: 60
+  #     triggers:
+  #       - name: httpTrigger
+  #         type: http
+  #         config:
+  #           authType: anonymous
+  #           methods:
+  #             - GET
+  #     customDomains:
+  #       - domainName: auto
+  #         protocol: HTTP
+  #         routeConfigs:
+  #           - path: /*
+  #             methods:
+  #               - GET
+  #               - POST

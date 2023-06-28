@@ -11,7 +11,7 @@ import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
 import { concat, get, keys, map, omit } from 'lodash';
-import { ISpec, IOptions, IYaml, IActionType } from './types';
+import { ISpec, IOptions, IYaml, IActionType, IActionLevel } from './types';
 import { IGNORE, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
@@ -40,15 +40,15 @@ class ParseSpec {
       : await this.doNormal();
     // 获取到真实值后，重新赋值
     this.yaml.vars = get(this.yaml.content, 'vars', {});
-    this.yaml.actions = await this.parseActions();
+    const actions = get(this.yaml.content, 'actions', {});
+    this.yaml.actions = await this.parseActions(actions);
     const result = { steps: order(steps), yaml: this.yaml };
     debug(`parse result: ${JSON.stringify(result)}`);
     debug('parse end');
     return result;
   }
-  private async parseActions() {
+  async parseActions(actions: Record<string, any> = {}, level: string = IActionLevel.GLOBAL) {
     const actionList = [];
-    const actions = get(this.yaml.content, 'actions', {});
     for (const action in actions) {
       const element = actions[action];
       const actionInfo = this.matchAction(action);
@@ -64,6 +64,7 @@ class ParseSpec {
                 path: utils.getAbsolutePath(get(item, 'path', './'), path.dirname(this.yaml.path)),
                 actionType: IActionType.RUN,
                 hookType: actionInfo.type,
+                level,
               };
             }
             if (item[IActionType.PLUGIN]) {
@@ -74,12 +75,25 @@ class ParseSpec {
                 value: fs.existsSync(value) ? value : plugin,
                 actionType: IActionType.PLUGIN,
                 hookType: actionInfo.type,
+                level,
               };
+            }
+            if (item[IActionType.COMPONENT]) {
+              const { component, ...rest } = item;
+              return {
+                ...rest,
+                value: component,
+                actionType: IActionType.COMPONENT,
+                hookType: actionInfo.type,
+                level,
+              };
+
             }
           }),
         );
       }
     }
+    debug(`parse actions: ${JSON.stringify(actionList)}`);
     return actionList;
   }
   private matchAction(action: string) {

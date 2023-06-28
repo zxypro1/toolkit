@@ -34,6 +34,7 @@ import ParseSpec, {
   ISpec,
   IHookType,
   IStep as IParseStep,
+  IActionLevel,
 } from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
@@ -50,7 +51,9 @@ class Engine {
   private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
   private logger: any;
-  private globalActionInstance!: Actions;
+  private parseSpecInstance!: ParseSpec;
+  private globalActionInstance!: Actions; // 全局的 action
+  private actionInstance!: Actions; // 项目的 action
   constructor(private options: IEngineOptions) {
     debug('engine start');
     debug(`engine options: ${stringify(options)}`);
@@ -64,19 +67,21 @@ class Engine {
     // this.logger = this.getLogger();
   }
   async start() {
+    this.context.status = STEP_STATUS.RUNNING;
     const globalAccess = get(this.options, 'globalArgs.access');
-    const parse = new ParseSpec(get(this.options, 'yamlPath'), {
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), {
       access: globalAccess,
       method: get(this.options, 'method'),
     });
-    this.spec = await parse.start();
+    this.spec = await this.parseSpecInstance.start();
     const { steps: _steps, yaml } = this.spec;
     const steps = await this.download(_steps);
 
-    this.globalActionInstance = new Actions(yaml.actions, {
-      access: globalAccess || yaml.access,
-    });
-    await this.globalActionInstance.start(IHookType.PRE);
+    this.globalActionInstance = new Actions(yaml.actions);
+    // 获取全局的 access
+    const access = globalAccess || yaml.access;
+    const credential = await getCredential(access);
+    await this.globalActionInstance.start(IHookType.PRE, { access, credential });
 
     this.context.steps = map(steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING };
@@ -162,9 +167,6 @@ class Engine {
         .start();
       stepService.send('INIT');
     });
-    if (this.context.status === STEP_STATUS.FAILURE) {
-      throw this.context.error;
-    }
     return res;
   }
   private async download(steps: IParseStep[]) {
@@ -224,18 +226,18 @@ class Engine {
   private getFilterContext(item: IStepOptions) {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
-      // TODO: this.output
-      that: {
-        name: item.projectName,
-        access: item.access,
-        props: item.props,
-        component: item.component,
-      },
+      vars: this.spec.yaml.vars,
       credential: item.credential,
     } as Record<string, any>;
-    const executedProjects = filter(this.context.steps, (obj) => obj.order > item.order);
-    for (const obj of executedProjects) {
+    for (const obj of this.context.steps) {
       data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
+    }
+    data.that = {
+      name: item.projectName,
+      access: item.access,
+      component: item.component,
+      props: data[item.projectName].props,
+      output: data[item.projectName].output,
     }
     return data;
   }
@@ -251,7 +253,29 @@ class Engine {
   }
   private async handleSrc(item: IStepOptions) {
     try {
-      const response: any = await this.doSrc(item);
+      await this.handleAfterSrc(item);
+      this.actionInstance.setMagic(this.getFilterContext(item));
+      const newInputs = await this.getProps(item);
+      await this.actionInstance.start(IHookType.SUCCESS, newInputs);
+    } catch (error) {
+      const newInputs = await this.getProps(item);
+      await this.actionInstance.start(IHookType.FAIL, newInputs);
+    } finally {
+      const newInputs = await this.getProps(item);
+      await this.actionInstance.start(IHookType.COMPLETE, newInputs);
+    }
+  }
+  private async handleAfterSrc(item: IStepOptions) {
+    try {
+      debug(`project item: ${stringify(item)}`);
+      item.credential = await getCredential(item.access);
+      const newAction = await this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
+      debug(`project actions: ${JSON.stringify(newAction)}`);
+      this.actionInstance = new Actions(newAction);
+      this.actionInstance.setMagic(this.getFilterContext(item));
+      const newInputs = await this.getProps(item);
+      const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
+      const response: any = await this.doSrc(item, pluginResult);
       // 记录全局的执行状态
       if (this.record.editStatusAble) {
         this.record.status = STEP_STATUS.SUCCESS;
@@ -306,25 +330,35 @@ class Engine {
       return this.logger.debug(error);
     }
   }
-  private async doSrc(item: IStepOptions) {
-    debug(`doSrc item: ${stringify(item)}`);
-    item.credential = await getCredential(item.access);
+  private async getProps(item: IStepOptions) {
     const magic = this.getFilterContext(item);
-    debug(`doSrc magic context: ${JSON.stringify(magic, null, 2)}`);
+    debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
+    // TODO: inputs数据
+    const result = {
+      props: newInputs,
+      command: this.options.method,
+      yaml: this.spec.yaml,
+      projectName: item.projectName,
+      access: item.access,
+      component: item.component,
+      credential: new Credential(),
+    }
     this.recordContext(item, { props: newInputs });
-    debug(`doSrc inputs: ${JSON.stringify(newInputs, null, 2)}`);
+    debug(`get props: ${JSON.stringify(result)}`);
+    return result;
+
+  }
+  private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
     const { method, projectName } = this.options;
+    const newInputs = await this.getProps(item);
+    const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
     // 服务级操作
     if (projectName) {
       if (isFunction(item.instance[method])) {
         // 方法存在，执行报错，退出码101
         try {
-          // TODO: inputs数据
-          return await item.instance[method]({
-            props: newInputs,
-            getCredential: async () => await new Credential().get(item.access),
-          });
+          return await item.instance[method](componentProps);
         } catch (error) {
           throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
         }
@@ -332,8 +366,7 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw100Error(
         `The [${method}] command was not found.`,
-        `Please check the component ${
-          item.component
+        `Please check the component ${item.component
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
@@ -343,8 +376,7 @@ class Engine {
     if (isFunction(item.instance[method])) {
       // 方法存在，执行报错，退出码101
       try {
-        // TODO: inputs数据
-        return await item.instance[method]({ props: newInputs });
+        return await item.instance[method](componentProps);
       } catch (error) {
         throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
       }
