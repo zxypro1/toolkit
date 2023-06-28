@@ -238,7 +238,7 @@ class Engine {
       component: item.component,
       props: data[item.projectName].props,
       output: data[item.projectName].output,
-    }
+    };
     return data;
   }
   private async doCompleted() {
@@ -269,7 +269,10 @@ class Engine {
     try {
       debug(`project item: ${stringify(item)}`);
       item.credential = await getCredential(item.access);
-      const newAction = await this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
+      const newAction = await this.parseSpecInstance.parseActions(
+        item.actions,
+        IActionLevel.PROJECT,
+      );
       debug(`project actions: ${JSON.stringify(newAction)}`);
       this.actionInstance = new Actions(newAction);
       this.actionInstance.setMagic(this.getFilterContext(item));
@@ -343,11 +346,10 @@ class Engine {
       access: item.access,
       component: item.component,
       credential: new Credential(),
-    }
+    };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);
     return result;
-
   }
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
     const { method, projectName } = this.options;
@@ -366,7 +368,8 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw100Error(
         `The [${method}] command was not found.`,
-        `Please check the component ${item.component
+        `Please check the component ${
+          item.component
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,

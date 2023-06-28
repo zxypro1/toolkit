@@ -87,7 +87,6 @@ class ParseSpec {
                 hookType: actionInfo.type,
                 level,
               };
-
             }
           }),
         );

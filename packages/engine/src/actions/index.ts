@@ -19,7 +19,7 @@ class Actions {
   private record: Record<string, any> = {};
   private inputs: Record<string, any> = {};
   private magic: Record<string, any> = {};
-  constructor(private actions: IAction[] = []) { }
+  constructor(private actions: IAction[] = []) {}
   public setMagic(magic: Record<string, any>) {
     this.magic = magic;
   }
