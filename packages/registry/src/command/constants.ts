@@ -13,5 +13,8 @@ export const PUBLISH_URL = 'https://registry.devsapp.cn/package/publish';
 // *** 已发布列表 *** //
 export const CENTER_PUBLISH_URL = 'https://registry.devsapp.cn/center/package/publish';
 
-// *** 已发布列表 *** //
+// *** 指定仓库详情 *** //
 export const getDetailUrl = (name: string) => `https://registry.devsapp.cn/simple/${name}/releases`;
+
+// *** 删除 url *** //
+export const REMOVE_URL = 'https://registry.devsapp.cn/package/delete';
