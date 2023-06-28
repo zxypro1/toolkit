@@ -54,7 +54,7 @@ class Zip {
     // 输出文件的路径
     const outputFile = path.join(this.outputFilePath, this.outputFileName);
     // 确保目录存在
-    fs.ensureDir(this.outputFilePath);
+    await fs.ensureDir(this.outputFilePath);
     // 创建输出文件流
     const output = fs.createWriteStream(outputFile);
 
