@@ -44,7 +44,7 @@ export default class Registry {
 
   /**
    * 获取登陆用户发布的组件
-   * @returns 
+   * @returns
    */
   async list() {
     const token = command.getToken();
@@ -54,7 +54,7 @@ export default class Registry {
   /**
    * 获取发布的组件的信息
    * @param name 组件名称
-   * @returns 
+   * @returns
    */
   async detail(name: string) {
     return await command.detail(name);
@@ -63,14 +63,18 @@ export default class Registry {
   /**
    * 获取发布的组件的信息
    * @param name 组件名称
-   * @returns 
+   * @returns
    */
   async remove(packageName: string, type: string) {
-    if (!packageName || !packageName.includes("@")) {
-      throw new Error('Component name and version is required.\nPlease add --name-version, like: --name-version thinphp@0.0.1');
+    if (!packageName || !packageName.includes('@')) {
+      throw new Error(
+        'Component name and version is required.\nPlease add --name-version, like: --name-version thinphp@0.0.1',
+      );
     }
     if (!type || !['Component', 'Application', 'Plugin'].includes(type)) {
-      throw new Error('Component type and version is required.\nPlease add --name-version, like: --type Component');
+      throw new Error(
+        'Component type and version is required.\nPlease add --name-version, like: --type Component',
+      );
     }
 
     const token = command.getToken();
