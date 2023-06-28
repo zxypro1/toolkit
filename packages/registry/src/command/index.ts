@@ -16,11 +16,11 @@ export const list = async (token: string) => {
     throw new Error(`${Response.Error}: ${Response.Message}`);
   }
   return Response;
-}
+};
 
 export const detail = async (name: string) => {
   const url = getDetailUrl(name);
   const { ResponseId, Response } = await request_get(url);
   logger.debug(`Get registry ${name} detail responseId: ${ResponseId}`);
   return Response;
-}
+};

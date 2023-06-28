@@ -64,7 +64,10 @@ export const request_get = async (url: string): Promise<{ ResponseId: string; Re
   });
 };
 
-export const request_post = async (url: string, body: Record<string, any>): Promise<{ ResponseId: string; Response: any }> => {
+export const request_post = async (
+  url: string,
+  body: Record<string, any>,
+): Promise<{ ResponseId: string; Response: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
@@ -94,7 +97,10 @@ export const request_post = async (url: string, body: Record<string, any>): Prom
   });
 };
 
-export const request_put = async (url: string, filePath: string): Promise<{ ResponseId: string; Response: any }> => {
+export const request_put = async (
+  url: string,
+  filePath: string,
+): Promise<{ ResponseId: string; Response: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
