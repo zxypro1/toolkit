@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
-import * as utils from '@serverless-devs/utils';
 import { REGX } from './contants';
 import { get } from 'lodash';
 
@@ -15,7 +14,6 @@ artTemplate.defaults.rules.push({
     };
   },
 });
-
 
 const compile = (value: string, context: Record<string, any> = {}) => {
   // 仅针对字符串进行魔法变量解析
@@ -54,6 +52,10 @@ const compile = (value: string, context: Record<string, any> = {}) => {
     } catch (error) {
       throw new Error(`file('${filePath}') not found`);
     }
+  };
+  artTemplate.defaults.imports.regx = (value: string) => {
+    const r = new RegExp(value);
+    return r.test(context.method);
   };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');

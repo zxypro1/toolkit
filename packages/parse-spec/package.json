@@ -18,7 +18,6 @@
   "dependencies": {
     "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/art-template": "^4.13.2",
-    "@serverless-devs/load-component": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",
     "dotenv": "^16.2.0",

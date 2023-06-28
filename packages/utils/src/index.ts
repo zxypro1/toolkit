@@ -7,4 +7,4 @@ export { setGlobalConfig, getGlobalConfig, GLOBAL_CONFIG_FILE_PATH } from './glo
 export { default as parseArgv } from './parse-argv';
 export { default as getYamlContent, getYamlPath, getAbsolutePath } from './get-yaml-content';
 export { default as fieldEncryption } from './field-encryption';
-export { default as stringify } from './stringify';
+export { default as isWindow } from './is-window';

@@ -1,4 +1,4 @@
-import { IStep } from '@serverless-devs/parse-spec'
+import { IStep } from '@serverless-devs/parse-spec';
 export interface IEngineOptions {
   method: string;
   yamlPath?: string;
@@ -8,10 +8,9 @@ export interface IEngineOptions {
   globalArgs?: IGlobalArgs;
   cwd?: string; // 当前工作目录
 
-  // TODO: 
+  // TODO:
   inputs?: Record<string, any>;
   logConfig?: ILogConfig;
-  events?: IEvent;
 }
 
 export interface IGlobalArgs {
@@ -29,11 +28,6 @@ export enum IOutputType {
   RAW = 'raw',
 }
 
-interface IEvent {
-  // 全局action post 动作
-  onCompleted?: (context: IContext, logger: any) => Promise<void>;
-}
-
 export interface ILogConfig {
   logPrefix?: string;
   // TODO: 临时方案
@@ -44,6 +38,7 @@ export interface ILogConfig {
 }
 
 export type IStepOptions = IStep & {
+  instance: any; //组件实例
   id?: string;
   if?: string;
   'continue-on-error'?: boolean;
@@ -78,7 +73,6 @@ enum STEP_STATUS_SKIP {
 }
 
 export const STEP_STATUS = { ...STEP_STATUS_BASE, ...STEP_STATUS_SKIP };
-
 
 export interface IRecord {
   editStatusAble: boolean; // 记录全局的执行状态是否可修改（一旦失败，便不可修改）

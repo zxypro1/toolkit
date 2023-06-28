@@ -12,7 +12,7 @@ export function getDefaultYamlPath() {
     );
 }
 
-export const isExtendMode = (extend: string, basePath: string) => {
+export const isExtendMode = (extend: string | undefined, basePath: string) => {
     if (typeof extend !== 'string') return false;
     // validate extend
     utils.getYamlContent(utils.getAbsolutePath(extend, basePath));
