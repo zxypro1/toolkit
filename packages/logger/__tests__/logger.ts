@@ -34,7 +34,7 @@ async function run() {
 
   const getSecrets = () => {
     loggers.__setSecret(['t info inpu']);
-  }
+  };
 
   // 模拟 engine
   const promiseAll = keys.map(async (key: string) => {

@@ -49,9 +49,9 @@ export default class Logger {
 
   __clear = () => {
     this.__progressFooter.clear();
-  }
+  };
 
-  __setSecret = transport.setSecret
+  __setSecret = transport.setSecret;
 
   private __getEggLoggerConfig(key: string) {
     return {

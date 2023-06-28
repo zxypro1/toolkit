@@ -16,7 +16,7 @@ export const mark = (val: string): string => {
   }
 
   return new Array(valLength).fill('*').join('');
-}
+};
 
 class Transport {
   protected secrets: string[] = [];
@@ -29,11 +29,11 @@ class Transport {
         this.secrets.push(s);
       }
     }
-  }
+  };
 
   transportSecrets = (message: string) => {
     const secrets = this.secrets;
-    
+
     const newSecrets = filter(secrets, (secret) => !isEmpty(secret));
 
     let msg = message;
@@ -47,8 +47,7 @@ class Transport {
     }
 
     return msg;
-  }
+  };
 }
-
 
 export default new Transport();
