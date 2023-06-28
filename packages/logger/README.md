@@ -10,8 +10,7 @@ $ npm install @serverless-devs/logger --save
 ## 使用方式
 
 ```ts
-import getLogger from '@serverless-devs/logger';
-
+import Logger from '@serverless-devs/logger';
 
 /**
  * const { key1, key2, __clear, __progressFooter } = loggers;
@@ -19,7 +18,7 @@ import getLogger from '@serverless-devs/logger';
  * __clear 是清理动态效果的作用，需要在退出程序之前调用
  * __progressFooter 是管理动态效果的，基于 cli-progress-footer 实现
  */
-const loggers = await getLogger({
+const loggers = new Logger({
   traceId: 'uuid',
   logDir: 'logFilePath',
   secrets: ['需加密字符'],
@@ -39,6 +38,9 @@ loggers.key1.progress('update progress footer bar'); // 修改底部的动态效
 loggers.unset('key1');
 // loggers.key1.debug('debug'); // error: 因为
 
+// 动态新增加密密钥
+loggers.__setSecret(['key1', 'key2']);
+
 // 新增日志实例
 const logKey3 = loggers.__generate('key3');
 loggers.key1.debug('debug key3');
@@ -50,8 +52,8 @@ loggers.__clear();
 ## 参数解析
 
 ```ts
-import getLogger from '@serverless-devs/logger';
-const loggers = await getLogger(options);
+import Logger from '@serverless-devs/logger';
+const loggers = new Logger(options);
 ```
 
 ### Options

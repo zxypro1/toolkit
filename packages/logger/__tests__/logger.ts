@@ -29,9 +29,12 @@ async function run() {
     traceId,
     logDir: path.join(__dirname, 'fixtures', 'logs'),
     secrets: ['abc'],
-    level: 'INFO',
-    // instanceKeys: keys,
+    // level: 'INFO',
   });
+
+  const getSecrets = () => {
+    loggers.__setSecret(['t info inpu']);
+  }
 
   // 模拟 engine
   const promiseAll = keys.map(async (key: string) => {
@@ -44,6 +47,7 @@ async function run() {
     const fc = new Component({ logger });
 
     return await fc.deploy(inputs).then((res: any) => {
+      getSecrets(); // 动态加入密钥
       logger.info(`${key} 运行结束`);
       loggers.__unset(key);
       return res;

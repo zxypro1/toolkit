@@ -1,8 +1,9 @@
 import { Logger, LoggerLevel, EggLoggerOptions } from 'egg-logger';
 import { set, get } from 'lodash';
+import os from 'os';
 import ConsoleTransport from './console-transport';
 import FileTransport from './file-transport';
-import os from 'os';
+import { transport } from './utils';
 import { IOptions } from './type';
 
 export default class EngineLogger extends Logger {
@@ -11,10 +12,12 @@ export default class EngineLogger extends Logger {
   constructor(props: IOptions) {
     super({} as EggLoggerOptions);
 
+    const secrets = get(props, 'secrets', []);
+    transport.setSecret(secrets);
+
     const key = get(props, 'key');
     const file = get(props, 'file');
     // const consoleLogPath = get(props, 'consoleLogPath');
-    const secrets = get(props, 'secrets', []);
     const eol = get(props, 'eol', os.EOL);
     const level = process.env.NODE_CONSOLE_LOGGRE_LEVEL as LoggerLevel;
 
@@ -25,13 +28,11 @@ export default class EngineLogger extends Logger {
       eol,
       // file: consoleLogPath,
       key,
-      secrets,
     });
     this.set('console', consoleTransport);
 
     const fileTransport = new FileTransport({
       level: level || get(props, 'level', 'DEBUG'),
-      secrets,
       file,
       eol,
     });

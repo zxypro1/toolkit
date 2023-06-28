@@ -13,7 +13,7 @@ export default class Fc {
 
     await new Promise((r) => {
       const intervalId = setInterval(() => {
-        this.logger.debug('Test', i);
+        this.logger.debug('Test info inputs 1abcd', i);
         this.logger.progress(`aaa ${i++}`); // 自定义
 
         if (i === (inputs.runTime || 20)) {

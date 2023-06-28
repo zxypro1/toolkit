@@ -3,6 +3,7 @@ import path from 'path';
 import { IOptions } from './type';
 import EngineLogger from './engine-logger';
 import ProgressFooter from './progress-footer';
+import { transport } from './engine-logger/utils';
 
 export { default as EngineLogger } from './engine-logger';
 export { default as ProgressFooter } from './progress-footer';
@@ -48,7 +49,9 @@ export default class Logger {
 
   __clear = () => {
     this.__progressFooter.clear();
-  };
+  }
+
+  __setSecret = transport.setSecret
 
   private __getEggLoggerConfig(key: string) {
     return {

@@ -1,7 +1,7 @@
 import { LoggerLevel, ConsoleTransport as _ConsoleTransport, LoggerMeta } from 'egg-logger';
 import chalk from 'chalk';
 import { get } from 'lodash';
-import { transportSecrets, sliceEggLoggerFormatterTime } from '../utils';
+import { transport, sliceEggLoggerFormatterTime } from './utils';
 import { ConsoleTransportOptions } from './type';
 
 export default class ConsoleTransport extends _ConsoleTransport {
@@ -10,12 +10,11 @@ export default class ConsoleTransport extends _ConsoleTransport {
 
     super({
       formatter: (meta?: LoggerMeta) => {
-        const secrets = get(meta, 'secrets', []);
         const message = get(meta, 'message', '');
         const level = get(meta, 'level', 'INFO') as LoggerLevel;
         const time = sliceEggLoggerFormatterTime(get(meta, 'date', ''));
 
-        let msg = transportSecrets(message, secrets);
+        let msg = transport.transportSecrets(message);
 
         msg = `[${time}][${level}][${key}] ${msg}`;
 
