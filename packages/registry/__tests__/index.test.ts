@@ -4,38 +4,9 @@ import path from 'path';
 const serverless_devs_config_home = path.join(__dirname, 'fixtures', 'logs');
 process.env.serverless_devs_config_home = serverless_devs_config_home;
 
-import { GENERATE_TOKEN, RESET_TOKEN } from './mock';
 import Registry from '../src';
 
-describe('Login', () => {
-  test('测试登陆包含参数', async () => {
-    const token = 'xxxxxxxxxxxxxxxx';
-    const registry = new Registry({});
-    await registry.login(token);
-
-    const result = registry.getToken();
-    expect(result).toBe(token);
-  });
-
-  test('测试登陆不包含参数', async () => {
-    const registry = new Registry({});
-    await registry.login();
-
-    const result = registry.getToken();
-    expect(result).toBe(GENERATE_TOKEN);
-  });
-
-  test('测试重新登陆', async () => {
-    const registry = new Registry({});
-    await registry.login();
-    await registry.resetToken();
-
-    const result = registry.getToken();
-    expect(result).toBe(RESET_TOKEN);
-  });
-});
-
-describe('Publish', () => {
+describe.skip('Publish', () => {
   beforeAll(() => {
     require('dotenv').config({
       path: path.join(__dirname, '.env'),
@@ -43,8 +14,37 @@ describe('Publish', () => {
   });
 
   afterAll(() => {
-    delete process.env.TOKEN;
+    delete process.env.serverless_devs_registry_token;
   });
 
-  test('publish', () => {});
+  test('publish', async () => {
+    const registry = new Registry({});
+
+    const component = path.join(__dirname, 'fixtures', 'component');
+    await registry.publish(component);
+  });
+});
+
+describe('API', () => {
+  beforeEach(() => {
+    require('dotenv').config({
+      path: path.join(__dirname, '.env'),
+    });
+  });
+
+  afterAll(() => {
+    delete process.env.serverless_devs_registry_token;
+  });
+
+  test('list', async () => {
+    const registry = new Registry({});
+    const result = await registry.list();
+    expect(Array.isArray(result)).toBeTruthy();
+  });
+
+  test('detail', async () => {
+    const registry = new Registry({});
+    const result = await registry.detail('wss-test');
+    expect(Array.isArray(result)).toBeTruthy();
+  });
 });

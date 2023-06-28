@@ -1,11 +1,9 @@
 import random from 'random-string';
+import { GENERATE_TOKEN, RESET_TOKEN } from './constants';
 
 // 需要 mock 的方法
 require('opn');
 const utils = require('../../src/utils');
-
-export const GENERATE_TOKEN = 'generateToken';
-export const RESET_TOKEN = 'resetToken';
 
 jest.mock('opn', () => jest.fn());
 utils.request_get = jest.fn(() => ({

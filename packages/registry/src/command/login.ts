@@ -33,7 +33,7 @@ export async function generateToken() {
     logger.debug(`ResponseId: ${ResponseId}`);
     if (!Response.Error && Response?.safety_code) {
       writeFile(Response.safety_code);
-      logger.log(`${Response.login}Welcome to Serverless Devs Registry.`);
+      logger.log(`${Response.login} Welcome to Serverless Devs Registry.`);
       return;
     }
   }

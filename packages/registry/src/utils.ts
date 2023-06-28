@@ -64,10 +64,7 @@ export const request_get = async (url: string): Promise<{ ResponseId: string; Re
   });
 };
 
-export const request_post = async (
-  url: string,
-  body: Record<string, any>,
-): Promise<any> => {
+export const request_post = async (url: string, body: Record<string, any>): Promise<any> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
@@ -101,10 +98,7 @@ export const request_post = async (
   });
 };
 
-export const request_put = async (
-  url: string,
-  filePath: string,
-): Promise<any> => {
+export const request_put = async (url: string, filePath: string): Promise<any> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
