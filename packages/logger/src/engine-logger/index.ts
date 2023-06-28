@@ -1,14 +1,9 @@
-import {
-  Logger,
-  LoggerLevel,
-  EggLoggerOptions,
-} from 'egg-logger';
+import { Logger, LoggerLevel, EggLoggerOptions } from 'egg-logger';
 import { set, get } from 'lodash';
 import ConsoleTransport from './console-transport';
 import FileTransport from './file-transport';
 import os from 'os';
 import { IOptions } from './type';
-
 
 export default class EngineLogger extends Logger {
   private eol: string;
@@ -62,7 +57,7 @@ export default class EngineLogger extends Logger {
   private setEol(eol: string = os.EOL) {
     const c = this.get('console') as object;
     const f = this.get('file');
-    
+
     set(c, 'options.eol', eol);
     if (f) {
       set(f, 'options.eol', eol);

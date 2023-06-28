@@ -21,14 +21,25 @@ import {
   STEP_STATUS,
   STEP_IF,
 } from './types';
-import { getProcessTime, throw101Error, throw100Error, throwError, getCredential, stringify } from './utils';
-import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep } from '@serverless-devs/parse-spec';
+import {
+  getProcessTime,
+  throw101Error,
+  throw100Error,
+  throwError,
+  getCredential,
+  stringify,
+} from './utils';
+import ParseSpec, {
+  getInputs,
+  ISpec,
+  IHookType,
+  IStep as IParseStep,
+} from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
 import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
-
 
 export { IEngineOptions, IContext } from './types';
 
@@ -297,7 +308,7 @@ class Engine {
   }
   private async doSrc(item: IStepOptions) {
     debug(`doSrc item: ${stringify(item)}`);
-    item.credential = await getCredential(item.access)
+    item.credential = await getCredential(item.access);
     const magic = this.getFilterContext(item);
     debug(`doSrc magic context: ${JSON.stringify(magic, null, 2)}`);
     const newInputs = getInputs(item.props, magic);
@@ -321,7 +332,8 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw100Error(
         `The [${method}] command was not found.`,
-        `Please check the component ${item.component
+        `Please check the component ${
+          item.component
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,

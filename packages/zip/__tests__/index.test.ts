@@ -27,7 +27,7 @@ beforeAll(() => {
     console.error(`${errorMessage} 命令不存在，无法测试内部文件，请安装后重试`);
     testZipContents = false;
   }
-})
+});
 
 // 清除测试文件
 const outputFiles: string[] = [];
@@ -38,8 +38,8 @@ afterAll(() => {
     } catch (e) {
       console.error('删除测试文件失败，请手动删除：', file, '。错误信息: ', e);
     }
-  })
-})
+  });
+});
 
 test('最简单压缩', async () => {
   const { outputFile, count } = await zip({
@@ -56,7 +56,6 @@ test('最简单压缩', async () => {
     expect(fileNames).toContain('index.js');
     expect(fileNames).toContain('bootstrap');
     expect(fileNames).toContain('bootstrap.sh');
-
 
     // 测试压缩文件的状态：比如可执行、软链等
     const unzipBasePath = path.join(fixturesUri, 'basic-unzip');
@@ -81,7 +80,7 @@ test('配置压缩目录前缀', async () => {
   const { outputFile, count } = await zip({
     codeUri: path.join(fixturesUri, 'basic'),
     outputFilePath: path.join(fixturesUri, 'test-zip-dir'),
-    prefix: 'node_modules'
+    prefix: 'node_modules',
   });
   outputFiles.push(outputFile);
 
@@ -101,7 +100,7 @@ test('配置指定 ignore 的文件', async () => {
   const { outputFile, count } = await zip({
     codeUri: path.join(fixturesUri, 'appoint-ignore'),
     outputFilePath: path.join(fixturesUri, 'test-zip-dir'),
-    ignoreFiles: ['.test-ignore']
+    ignoreFiles: ['.test-ignore'],
   });
   outputFiles.push(outputFile);
 
@@ -126,7 +125,6 @@ test('较复杂的测试case', async () => {
     outputFileName,
   });
   outputFiles.push(outputFile);
-  
 
   expect(count).toBe(8);
   expect(outputFile).toBe(path.join(outputFilePath, outputFileName));
@@ -135,33 +133,39 @@ test('较复杂的测试case', async () => {
   if (testZipContents) {
     // 测试 zip 内的内容
     const fileNames = getFileNameList(outputFile);
-    expect(fileNames).toEqual(expect.arrayContaining([
-      '.fcignore',
-      'apt-get.list',
-      'dir-2/.hide-dir/apt-get.list',
-      'dir-2/no-ignore/file',
-      'empty-dir/',
-      'ignore-non-root-dir/index',
-      'index.js',
-    ]));
-    expect(fileNames).not.toEqual(expect.arrayContaining([
-      '.hide-dir/apt-get.list',
-      '.hide-dir/apt-get2.list',
-      'dir-2/file',
-      'dir-2/ignore-all/test',
-      'dir-2/ignore-non-root-dir/index',
-      'ignore-all/test',
-      'keep-empty-dir/ignore-file',
-    ]));
+    expect(fileNames).toEqual(
+      expect.arrayContaining([
+        '.fcignore',
+        'apt-get.list',
+        'dir-2/.hide-dir/apt-get.list',
+        'dir-2/no-ignore/file',
+        'empty-dir/',
+        'ignore-non-root-dir/index',
+        'index.js',
+      ]),
+    );
+    expect(fileNames).not.toEqual(
+      expect.arrayContaining([
+        '.hide-dir/apt-get.list',
+        '.hide-dir/apt-get2.list',
+        'dir-2/file',
+        'dir-2/ignore-all/test',
+        'dir-2/ignore-non-root-dir/index',
+        'ignore-all/test',
+        'keep-empty-dir/ignore-file',
+      ]),
+    );
   }
 });
 
-
 function getFileNameList(file: string) {
-  const { stdout, error } = spawnSync(`unzip -v ${file} | sed -r '1,3d; s/^([^ ]+ +){3}//' | awk '{print $NF}'`, {
-    shell: true,
-    encoding: 'utf8',
-  });
+  const { stdout, error } = spawnSync(
+    `unzip -v ${file} | sed -r '1,3d; s/^([^ ]+ +){3}//' | awk '{print $NF}'`,
+    {
+      shell: true,
+      encoding: 'utf8',
+    },
+  );
   if (error) {
     throw error;
   }

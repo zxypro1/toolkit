@@ -25,7 +25,9 @@ export default class ProgressFooter {
     this.showList = new Map();
 
     const o = { ...defaultOptions, ...options };
-    this.spinner = isString(o.spinner) ? get(cliSpinners, o.spinner, defaultOptions.spinner) : o.spinner;
+    this.spinner = isString(o.spinner)
+      ? get(cliSpinners, o.spinner, defaultOptions.spinner)
+      : o.spinner;
     this.format = o.format;
     this.openRefresh = o.openRefresh;
 
@@ -95,8 +97,8 @@ export default class ProgressFooter {
 
   /**
    * 更新或者插入一条动态输出
-   * @param id 
-   * @param message 
+   * @param id
+   * @param message
    */
   public upsert(id: string, message: string) {
     if (this.showList.has(id)) {
@@ -122,7 +124,7 @@ export default class ProgressFooter {
 
   /**
    * 删除指定ID的动态输出
-   * @param id 
+   * @param id
    */
   public removeItem(id: string) {
     this.showList.delete(id);

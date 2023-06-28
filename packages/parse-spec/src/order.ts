@@ -6,7 +6,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
   private orderMap = {} as Record<string, any>;
-  constructor(private steps: IStep[]) { }
+  constructor(private steps: IStep[]) {}
   run() {
     const dependencies = this.getDependencies();
     if (isEmpty(dependencies)) return this.steps;

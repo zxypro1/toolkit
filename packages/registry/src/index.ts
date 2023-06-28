@@ -12,7 +12,7 @@ export default class Registry {
    * 设置 token
    * @param token 指定 token
    */
-  async login(token?: string): Promise<void>{
+  async login(token?: string): Promise<void> {
     await command.login(token);
   }
 
@@ -27,7 +27,7 @@ export default class Registry {
 
   /**
    * 获取 token
-   * @returns 
+   * @returns
    */
   getToken(): string {
     return command.getToken();

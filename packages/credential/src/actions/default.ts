@@ -1,6 +1,6 @@
-import { hasIn, transform, set } from "lodash";
-import { prompt, getYamlContent, writeData } from "../utils";
-import { CRYPTO_TRUE, CRYPTO_FALSE } from "../constant";
+import { hasIn, transform, set } from 'lodash';
+import { prompt, getYamlContent, writeData } from '../utils';
+import { CRYPTO_TRUE, CRYPTO_FALSE } from '../constant';
 
 export default async (access?: string) => {
   const content = await getYamlContent();
@@ -18,18 +18,19 @@ export default async (access?: string) => {
         name: 'aliasName',
         message: 'You can choose an access to set as the default.\nPlease select an access:',
         choices: aliasNames.map((alias: string) => ({
-          name: alias, value: alias
+          name: alias,
+          value: alias,
         })),
       },
     ]);
     alias = aliasName;
-  };
+  }
 
   transform(content, (result: Record<string, Record<string, string>>, value, key) => {
     value.__default = CRYPTO_FALSE;
     set(result, key, value);
-  })
+  });
 
   set(content, `${alias}.__default`, CRYPTO_TRUE);
   await writeData(content);
-}
+};

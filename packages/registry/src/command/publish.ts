@@ -1,4 +1,3 @@
-
 import zip from '@serverless-devs/zip';
 import { getRootHome } from '@serverless-devs/utils';
 import fs from 'fs';
@@ -47,4 +46,4 @@ export default async (token: string, codeUri: string) => {
 
   // 删除压缩文件
   fs.unlinkSync(zipResult.outputFile);
-}
+};

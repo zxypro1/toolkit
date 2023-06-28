@@ -26,7 +26,7 @@ export default class Logger {
     if (options?.instanceKeys) {
       each(options.instanceKeys, (value: string) => {
         this.__generate(value);
-      })
+      });
     }
   }
 
@@ -34,7 +34,7 @@ export default class Logger {
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 
     logger.progress = (message: string) => {
-      this.__progressFooter.upsert(instanceKey, message)
+      this.__progressFooter.upsert(instanceKey, message);
     };
 
     set(this, instanceKey, logger);
@@ -48,7 +48,7 @@ export default class Logger {
 
   __clear = () => {
     this.__progressFooter.clear();
-  }
+  };
 
   private __getEggLoggerConfig(key: string) {
     return {

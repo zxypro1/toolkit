@@ -15,15 +15,13 @@ export default function getRootHome() {
     try {
       const data = JSON.parse(fs.readFileSync(sJsonPath, { encoding: 'utf8' }));
       return data.workspace ? formatWorkspacePath(data.workspace) : homedir;
-    } catch (ex) {
-
-    }
+    } catch (ex) {}
   }
-  
+
   const env = getCurrentEnvironment();
   if (env === Environment.Yunxiao) {
-    return path.join(USER_HOME, '.cache', '.s')
-  };
+    return path.join(USER_HOME, '.cache', '.s');
+  }
 
   return homedir;
 }

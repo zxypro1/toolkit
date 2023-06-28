@@ -13,7 +13,7 @@ export const GLOBAL_CONFIG_FILE_PATH = path.join(rootHome, 'set-config.yml');
 export const getGlobalConfig = (key: string) => {
   const content = getYamlContent(GLOBAL_CONFIG_FILE_PATH);
   return content?.[key];
-}
+};
 
 export const setGlobalConfig = (key: string, value: unknown) => {
   // 创建 a 目录以及其子目录
@@ -23,4 +23,4 @@ export const setGlobalConfig = (key: string, value: unknown) => {
   content[key] = value;
 
   fs.writeFileSync(GLOBAL_CONFIG_FILE_PATH, yaml.dump(content));
-}
+};

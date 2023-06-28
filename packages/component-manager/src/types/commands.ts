@@ -3,7 +3,10 @@ export interface ICommands {
 }
 
 type ICommanded = ICommands;
-export type IRunFunction = ((args: Record<string, number | boolean | string>, props: Record<string, any>) => boolean);
+export type IRunFunction = (
+  args: Record<string, number | boolean | string>,
+  props: Record<string, any>,
+) => boolean;
 
 export interface ICommand {
   /**
@@ -51,29 +54,28 @@ export interface IHelp {
 }
 
 export interface IParseCommandsResult {
-	/**
-	 * 解析后的参数
-	 */
-	argsData?: Record<string, number | boolean | string>;
-	/**
-	 * 对映指令的 help 信息
-	 */
-	help?: IHelp;
-	/**
-	 * 指令, 下标 [0] 为一级指令、[1] 为二级指令，依次类推
-	 */
-	argsCommand: string[];
-	/**
-	 * 支持并行运行
-	 */
-	parallel: boolean;
-	/**
-	 * 存在阻塞程序运行的行为
-	 */
-	hangRun: boolean;
-	/**
-	 * 需单独指定运行
-	 */
-	singleton: boolean;
+  /**
+   * 解析后的参数
+   */
+  argsData?: Record<string, number | boolean | string>;
+  /**
+   * 对映指令的 help 信息
+   */
+  help?: IHelp;
+  /**
+   * 指令, 下标 [0] 为一级指令、[1] 为二级指令，依次类推
+   */
+  argsCommand: string[];
+  /**
+   * 支持并行运行
+   */
+  parallel: boolean;
+  /**
+   * 存在阻塞程序运行的行为
+   */
+  hangRun: boolean;
+  /**
+   * 需单独指定运行
+   */
+  singleton: boolean;
 }
-

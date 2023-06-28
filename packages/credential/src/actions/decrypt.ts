@@ -1,5 +1,5 @@
-import { cloneDeep } from "lodash";
-import { CRYPTO_STRING } from "../constant";
+import { cloneDeep } from 'lodash';
+import { CRYPTO_STRING } from '../constant';
 
 const Crypto = require('crypto-js');
 
@@ -16,4 +16,4 @@ export default (info: Record<string, string>): Record<string, string> => {
   });
 
   return cloneInfo;
-}
+};

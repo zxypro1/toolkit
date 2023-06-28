@@ -1,8 +1,4 @@
-import {
-  LoggerLevel,
-  ConsoleTransport as _ConsoleTransport,
-  LoggerMeta,
-} from 'egg-logger';
+import { LoggerLevel, ConsoleTransport as _ConsoleTransport, LoggerMeta } from 'egg-logger';
 import chalk from 'chalk';
 import { get } from 'lodash';
 import { transportSecrets, sliceEggLoggerFormatterTime } from '../utils';
@@ -26,7 +22,7 @@ export default class ConsoleTransport extends _ConsoleTransport {
         if (!chalk.supportsColor) {
           return msg;
         }
-          
+
         if (level === 'ERROR') {
           return chalk.red(msg);
         } else if (level === 'WARN') {

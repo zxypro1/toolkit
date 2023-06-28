@@ -16,7 +16,7 @@ const commands = {
           description: '[Optional] Deploy resource using local config',
           defaultOption: false,
           type: Boolean,
-        }
+        },
       ],
     },
     subCommands: {
@@ -31,7 +31,7 @@ const commands = {
               description: '[Optional] Deploy resource using local config',
               defaultOption: false,
               type: Boolean,
-            }
+            },
           ],
         },
         hangRun: false,
@@ -66,10 +66,9 @@ const commands = {
           type: Boolean,
         },
       ],
-    }
-  }
-}
-
+    },
+  },
+};
 
 export default class Fc {
   static readonly commands = commands;

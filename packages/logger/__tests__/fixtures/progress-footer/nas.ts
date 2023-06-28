@@ -4,11 +4,11 @@ export default class B {
   constructor(progress: any) {
     this.progress = progress;
   }
-  
+
   async show() {
     let i = 0;
 
-    await new Promise(r => {
+    await new Promise((r) => {
       const intervalId = setInterval(() => {
         this.progress(`bbb ${i++}`);
         if (i === 50) {
@@ -16,6 +16,6 @@ export default class B {
           r('');
         }
       }, 100);
-    })
+    });
   }
 }

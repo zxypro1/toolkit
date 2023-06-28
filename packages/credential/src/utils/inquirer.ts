@@ -8,5 +8,5 @@ export const prompt = async (options: QuestionCollection, errorMessage?: string)
   if (isCiCdEnvironment()) {
     throw new Error(errorMessage || DEFAULT_PROMPT_MESSAGE);
   }
-  return await inquirer.prompt(options) 
-}
+  return await inquirer.prompt(options);
+};

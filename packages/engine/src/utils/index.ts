@@ -14,7 +14,7 @@ export function throw101Error(error: Error, prefix: string) {
   let jsonMsg;
   try {
     jsonMsg = JSON.parse(error.message);
-  } catch (error) { }
+  } catch (error) {}
 
   if (jsonMsg && jsonMsg.tips) {
     throw new Error(
@@ -31,7 +31,7 @@ export function throw101Error(error: Error, prefix: string) {
       code: 101,
       message: error.message,
       stack: error.stack,
-      prefix
+      prefix,
     }),
   );
 }
@@ -56,10 +56,14 @@ export async function getCredential(access?: string) {
 
 export const stringify = (value: any) => {
   try {
-    const data = { ...value }
+    const data = { ...value };
     const steps = get(value, 'steps');
     if (steps) {
-      set(data, 'steps', map(steps, (step: any) => omit(step, 'instance')));
+      set(
+        data,
+        'steps',
+        map(steps, (step: any) => omit(step, 'instance')),
+      );
     }
     const instance = get(data, 'instance');
     if (instance) {

@@ -1,16 +1,16 @@
 import { DecompressOptions } from 'decompress';
 
 export interface IOptions extends DecompressOptions {
-   /**
+  /**
    * Path to where your file will be written.
    *
    * @default process.cwd()
    */
-   dest?: string;
-   /**
-    * The logger
-    */
-   logger?: any;
+  dest?: string;
+  /**
+   * The logger
+   */
+  logger?: any;
   /**
    * If set to `true`, try extracting the file using [`decompress`](https://github.com/kevva/decompress).
    *

@@ -31,7 +31,7 @@ const commands = {
       ],
     },
   },
-}
+};
 
 export default class Nas {
   static readonly commands = commands;

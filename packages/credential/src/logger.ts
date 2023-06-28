@@ -1,4 +1,3 @@
-
 class Logger {
   logger: any = console;
 

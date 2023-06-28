@@ -21,7 +21,7 @@ class Walker extends EE {
   entries: any;
   sawError: boolean;
 
-  constructor (opts) {
+  constructor(opts) {
     opts = opts || {};
     super(opts);
     // set to true if this.path is a symlink, whether follow is true or not
@@ -39,18 +39,19 @@ class Walker extends EE {
     this.sawError = false;
   }
 
-  sort (a, b) {
+  sort(a, b) {
     return a.localeCompare(b, 'en');
   }
 
-  emit (ev, data) {
+  emit(ev, data) {
     let ret = false;
     if (!(this.sawError && ev === 'error')) {
       if (ev === 'error') {
         this.sawError = true;
       } else if (ev === 'done' && !this.parent) {
         data = Array.from(data)
-          .map((e: string) => /^@/.test(e) ? `./${e}` : e).sort(this.sort);
+          .map((e: string) => (/^@/.test(e) ? `./${e}` : e))
+          .sort(this.sort);
         this.result = data;
       }
 
@@ -63,19 +64,16 @@ class Walker extends EE {
     return ret;
   }
 
-  start () {
-    fs.readdir(this.path, (er, entries) =>
-      er ? this.emit('error', er) : this.onReaddir(entries));
+  start() {
+    fs.readdir(this.path, (er, entries) => (er ? this.emit('error', er) : this.onReaddir(entries)));
     return this;
   }
 
-  isIgnoreFile (e) {
-    return e !== '.' &&
-      e !== '..' &&
-      this.ignoreFiles.indexOf(e) !== -1;
+  isIgnoreFile(e) {
+    return e !== '.' && e !== '..' && this.ignoreFiles.indexOf(e) !== -1;
   }
 
-  onReaddir (entries) {
+  onReaddir(entries) {
     this.entries = entries;
     if (entries.length === 0) {
       if (this.includeEmpty) {
@@ -83,7 +81,7 @@ class Walker extends EE {
       }
       this.emit('done', this.result);
     } else {
-      const hasIg = this.entries.some(e => this.isIgnoreFile(e));
+      const hasIg = this.entries.some((e) => this.isIgnoreFile(e));
 
       if (hasIg) {
         this.addIgnoreFiles();
@@ -93,36 +91,37 @@ class Walker extends EE {
     }
   }
 
-  addIgnoreFiles () {
-    const newIg = this.entries
-      .filter(e => this.isIgnoreFile(e));
+  addIgnoreFiles() {
+    const newIg = this.entries.filter((e) => this.isIgnoreFile(e));
 
     let igCount = newIg.length;
-    const then = _ => {
+    const then = (_) => {
       if (--igCount === 0) {
         this.filterEntries();
       }
-    }
+    };
 
-    newIg.forEach(e => this.addIgnoreFile(e, then));
+    newIg.forEach((e) => this.addIgnoreFile(e, then));
   }
 
-  addIgnoreFile (file, then) {
+  addIgnoreFile(file, then) {
     const ig = path.resolve(this.path, file);
     fs.readFile(ig, 'utf8', (er, data) =>
-      er ? this.emit('error', er) : this.onReadIgnoreFile(file, data, then));
+      er ? this.emit('error', er) : this.onReadIgnoreFile(file, data, then),
+    );
   }
 
-  onReadIgnoreFile (file, data, then) {
+  onReadIgnoreFile(file, data, then) {
     const mmopt = {
       matchBase: true,
       dot: true,
       flipNegate: true,
       nocase: true,
     };
-    const rules = data.split(/\r?\n/)
-      .filter(line => !/^#|^$/.test(line.trim()))
-      .map(r => {
+    const rules = data
+      .split(/\r?\n/)
+      .filter((line) => !/^#|^$/.test(line.trim()))
+      .map((r) => {
         // support ./ && !./
         if (r) {
           if (r.startsWith('./')) {
@@ -140,7 +139,7 @@ class Walker extends EE {
     then();
   }
 
-  filterEntries () {
+  filterEntries() {
     // at this point we either have ignore rules, or just inheriting
     // this exclusion is at the point where we know the list of
     // entries in the dir, but don't know what they are.  since
@@ -149,13 +148,15 @@ class Walker extends EE {
     // of files that will be included later.  Anything included
     // at this point will be checked again later once we know
     // what it is.
-    const filtered = this.entries.map(entry => {
-      // at this point, we don't know if it's a dir or not.
-      const passFile = this.filterEntry(entry, false);
-      const passDir = this.filterEntry(entry, true);
+    const filtered = this.entries
+      .map((entry) => {
+        // at this point, we don't know if it's a dir or not.
+        const passFile = this.filterEntry(entry, false);
+        const passDir = this.filterEntry(entry, true);
 
-      return (passFile || passDir) ? [entry, passFile, passDir] : false;
-    }).filter(e => e);
+        return passFile || passDir ? [entry, passFile, passDir] : false;
+      })
+      .filter((e) => e);
 
     // now we stat them all
     // if it's a dir, and passes as a dir, then recurse
@@ -164,34 +165,34 @@ class Walker extends EE {
     if (entryCount === 0) {
       this.emit('done', this.result);
     } else {
-      const then = _ => {
+      const then = (_) => {
         if (--entryCount === 0) {
           this.emit('done', this.result);
         }
-      }
+      };
 
-      filtered.forEach(filt => {
+      filtered.forEach((filt) => {
         const entry = filt[0];
         const file = filt[1];
         const dir = filt[2];
         this.stat({ entry, file, dir }, then);
-      })
+      });
     }
   }
 
-  onstat ({ st, entry, file, dir, isSymbolicLink }, then) {
+  onstat({ st, entry, file, dir, isSymbolicLink }, then) {
     const abs = this.path + '/' + entry;
     if (!st.isDirectory()) {
       if (file) {
         this.result.add(abs.substring(this.root.length + 1));
       }
-      then()
+      then();
     } else {
       // is a directory
       if (dir) {
         this.walker(entry, { isSymbolicLink }, then);
       } else {
-        // TODO: 
+        // TODO:
         // if (file) {
         //   this.result.add(abs.substring(this.root.length + 1));
         // }
@@ -200,7 +201,7 @@ class Walker extends EE {
     }
   }
 
-  stat ({ entry, file, dir }, then) {
+  stat({ entry, file, dir }, then) {
     const abs = this.path + '/' + entry;
     fs.lstat(abs, (er, st) => {
       if (er) {
@@ -214,15 +215,15 @@ class Walker extends EE {
             } else {
               this.onstat({ st, entry, file, dir, isSymbolicLink }, then);
             }
-          })
+          });
         } else {
           this.onstat({ st, entry, file, dir, isSymbolicLink }, then);
         }
       }
-    })
+    });
   }
 
-  walkerOpt (entry, opts) {
+  walkerOpt(entry, opts) {
     return {
       path: this.path + '/' + entry,
       parent: this,
@@ -233,11 +234,11 @@ class Walker extends EE {
     };
   }
 
-  walker (entry, opts, then) {
+  walker(entry, opts, then) {
     new Walker(this.walkerOpt(entry, opts)).on('done', then).start();
   }
 
-  filterEntry (entry, partial) {
+  filterEntry(entry, partial) {
     let included = true;
 
     if (this.parent && this.parent.filterEntry) {
@@ -245,9 +246,9 @@ class Walker extends EE {
       included = this.parent.filterEntry(pt, partial);
     }
 
-    this.ignoreFiles.forEach(f => {
+    this.ignoreFiles.forEach((f) => {
       if (this.ignoreRules[f]) {
-        this.ignoreRules[f].forEach(rule => {
+        this.ignoreRules[f].forEach((rule) => {
           // negation means inclusion
           // so if it's negated, and already included, no need to check
           // likewise if it's neither negated nor included
@@ -255,39 +256,38 @@ class Walker extends EE {
             // first, match against /foo/bar
             // then, against foo/bar
             // then, in the case of partials, match with a /
-            const match = rule.match('/' + entry) ||
+            const match =
+              rule.match('/' + entry) ||
               rule.match(entry) ||
-              (!!partial && (
-                rule.match('/' + entry + '/') ||
-                rule.match(entry + '/'))) ||
-              (!!partial && rule.negate && (
-                rule.match('/' + entry, true) ||
-                rule.match(entry, true)));
+              (!!partial && (rule.match('/' + entry + '/') || rule.match(entry + '/'))) ||
+              (!!partial &&
+                rule.negate &&
+                (rule.match('/' + entry, true) || rule.match(entry, true)));
 
             if (match) {
               included = rule.negate;
             }
           }
-        })
+        });
       }
-    })
+    });
 
     return included;
   }
 }
 
 class WalkerSync extends Walker {
-  start () {
+  start() {
     this.onReaddir(fs.readdirSync(this.path));
     return this;
   }
 
-  addIgnoreFile (file, then) {
+  addIgnoreFile(file, then) {
     const ig = path.resolve(this.path, file);
     this.onReadIgnoreFile(file, fs.readFileSync(ig, 'utf8'), then);
   }
 
-  stat ({ entry, file, dir }, then) {
+  stat({ entry, file, dir }, then) {
     const abs = this.path + '/' + entry;
     let st = fs.lstatSync(abs);
     const isSymbolicLink = st.isSymbolicLink();
@@ -298,7 +298,7 @@ class WalkerSync extends Walker {
     this.onstat({ st, entry, file, dir, isSymbolicLink }, then);
   }
 
-  walker (entry, opts, then) {
+  walker(entry, opts, then) {
     new WalkerSync(this.walkerOpt(entry, opts)).start();
     then();
   }
@@ -307,9 +307,9 @@ class WalkerSync extends Walker {
 const walk = (opts: IOptions, callback?) => {
   const p = new Promise((resolve, reject) => {
     new Walker(opts).on('done', resolve).on('error', reject).start();
-  })
-  return callback ? p.then(res => callback(null, res), callback) : p;
-}
+  });
+  return callback ? p.then((res) => callback(null, res), callback) : p;
+};
 
 const walkSync = (opts: IOptions) => new WalkerSync(opts).start().result;
 
@@ -317,4 +317,4 @@ walk.sync = walkSync;
 walk.Walker = Walker;
 walk.WalkerSync = WalkerSync;
 
-export default walk
+export default walk;

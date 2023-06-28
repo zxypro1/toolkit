@@ -9,21 +9,20 @@ import decryptCredential from './actions/decrypt';
 import defaultCredential from './actions/default';
 import { ISetOptions, IResult } from './actions/set/type';
 
-
 export default class Credential {
-  constructor({ logger }: { logger?: any} = {}) {
+  constructor({ logger }: { logger?: any } = {}) {
     Logger.set(logger);
   }
 
   public async get(access?: string): Promise<IResult> {
     const getAccess = new GetCredential(access);
     return await getAccess.run();
-  };
+  }
 
   public async set(options?: ISetOptions): Promise<IResult | undefined> {
     const setCredential = new SetCredential();
     return await setCredential.run(cloneDeep(options || {}));
-  };
+  }
 
   public getAll = getAllCredential;
 

@@ -1,6 +1,5 @@
 import { each, filter, includes, isString, isEmpty, replace } from 'lodash';
 
-
 export const sliceFormatterSlice = (value: string) => value.slice(0, -4);
 
 export const mark = (val: string): string => {
@@ -19,10 +18,10 @@ export const mark = (val: string): string => {
   }
 
   return new Array(valLength).fill('*').join('');
-}
+};
 
 export const transportSecrets = (message: string, secrets: string[]): string => {
-  const newSecrets = filter(secrets, secret => !isEmpty(secret));
+  const newSecrets = filter(secrets, (secret) => !isEmpty(secret));
 
   let msg = message;
   if (!isEmpty(secrets)) {
@@ -35,4 +34,4 @@ export const transportSecrets = (message: string, secrets: string[]): string => 
   }
 
   return msg;
-}
+};

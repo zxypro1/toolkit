@@ -42,7 +42,7 @@ async function run() {
 
     const Component = require(`./fixtures/engine/${inputs.component}`).default;
     const fc = new Component({ logger });
-    
+
     return await fc.deploy(inputs).then((res: any) => {
       logger.info(`${key} 运行结束`);
       loggers.__unset(key);
@@ -56,4 +56,3 @@ async function run() {
 }
 
 run();
-

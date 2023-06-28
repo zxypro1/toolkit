@@ -46,7 +46,7 @@ class Zip {
         if (!fs.pathExistsSync(file)) {
           throw new Error(`Include codeUri: ${file} is not exist`);
         }
-      })
+      });
     }
   }
 
@@ -57,22 +57,25 @@ class Zip {
     fs.ensureDir(this.outputFilePath);
     // 创建输出文件流
     const output = fs.createWriteStream(outputFile);
-    
+
     const zipArchiver = archiver('zip', {
-      zlib: { level: this.level }
-    }).on('warning', (err) => logger.warn(err))
-      .on('error', (err) => { throw err });
+      zlib: { level: this.level },
+    })
+      .on('warning', (err) => logger.warn(err))
+      .on('error', (err) => {
+        throw err;
+      });
 
     zipArchiver.pipe(output);
 
     let count = await this.zipTo(zipArchiver, this.codeUri);
-    
+
     if (this.includes) {
       for (const include of this.includes) {
         const c = await this.zipTo(zipArchiver, include);
       }
     }
-  
+
     return await new Promise((resolve, reject) => {
       let bar: ProgressService;
       zipArchiver.on('progress', (processOptions) => {
@@ -99,7 +102,7 @@ class Zip {
     });
   }
 
-  private async zipTo(zipArchiver: archiver.Archiver, codeUri: string): Promise<number>{
+  private async zipTo(zipArchiver: archiver.Archiver, codeUri: string): Promise<number> {
     const absCodeUri = path.resolve(codeUri);
     const fsStat = fs.statSync(codeUri);
 
@@ -143,7 +146,7 @@ class Zip {
         const content: any = await this.readLines(fPath);
         if (content[0] === 'XSym' && content.length === 5) {
           const target = content[3];
-          zipArchiver.symlink(relative, target, (isBootstrap || isWindows) ? s.mode | 73 : s.mode);
+          zipArchiver.symlink(relative, target, isBootstrap || isWindows ? s.mode | 73 : s.mode);
           return 1;
         }
       }
@@ -171,7 +174,7 @@ class Zip {
   private async readLines(fileName: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const lines: any[] = [];
-  
+
       readline
         .createInterface({ input: fs.createReadStream(fileName) })
         .on('line', (line) => lines.push(line))

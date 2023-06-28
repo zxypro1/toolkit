@@ -17,6 +17,6 @@ export default class Question {
       },
     ]);
 
-    this.logger.info("answers.prompt", answers.prompt);
+    this.logger.info('answers.prompt', answers.prompt);
   }
 }

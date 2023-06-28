@@ -13,7 +13,7 @@ utils.request_get = jest.fn(() => ({
   Response: {
     login: 'wss-git',
     safety_code: GENERATE_TOKEN,
-  }
+  },
 }));
 
 utils.request_post = jest.fn(() => ({
@@ -21,5 +21,5 @@ utils.request_post = jest.fn(() => ({
   Response: {
     login: 'wss-git',
     safety_code: RESET_TOKEN,
-  }
+  },
 }));

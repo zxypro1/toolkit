@@ -1,4 +1,3 @@
-
 class Logger {
   protected logger: any = console;
 

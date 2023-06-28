@@ -7,7 +7,6 @@ beforeEach(() => {
   process.env = { ...env };
 });
 
-
 test('本地路径', async () => {
   const componentPath = path.resolve(__dirname, './mock/fc.js');
   const instance = await loadComponent(componentPath);
@@ -38,7 +37,6 @@ test('devsapp/fc@0.1.72', async () => {
   console.log(instance);
   // expect(get(instance, '__path')).toBe(componentPath);
 });
-
 
 test('core_load_serverless_devs_component=devsapp/fc@dev', async () => {
   process.env.core_load_serverless_devs_component = 'devsapp/fc@dev';

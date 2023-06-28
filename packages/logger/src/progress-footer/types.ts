@@ -14,7 +14,7 @@ export interface IFormatOptions {
 export interface IPropsOptions {
   /**
    * 开启刷新
-   * 
+   *
    * @default true
    */
   openRefresh?: boolean;

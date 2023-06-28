@@ -1,4 +1,4 @@
-import path from "path";
+import path from 'path';
 import os from 'os';
 import * as setType from './actions/set/type';
 
@@ -48,7 +48,7 @@ export const PROVIDER_CREDENTIAL_KEYS = {
   [PROVIDER.baidu]: ['AccessKeyID', 'SecretAccessKey'],
   [PROVIDER.google]: ['PrivateKeyData'],
   [PROVIDER.tencent]: ['AccountID', 'SecretID', 'SecretKey'],
-}
+};
 
 export const CRYPTO_STRING = 'SecretKey123';
 export const CRYPTO_TRUE = Crypto.AES.encrypt('true', CRYPTO_STRING).toString();
@@ -57,7 +57,7 @@ export const CRYPTO_FALSE = Crypto.AES.encrypt('false', CRYPTO_STRING).toString(
 export const DEFAULT_NAME = 'default';
 // 兼容 aliyun-cli 获取密钥方式
 export const ALIYUN_CLI = '${aliyun-cli}';
-export const ALIYUN_CONFIG_FILE = path.join(os.homedir(), '.aliyun', 'config.json')
+export const ALIYUN_CONFIG_FILE = path.join(os.homedir(), '.aliyun', 'config.json');
 // 通过环境变量配置特殊获取 KEY
 export const ENDS_WITH_KEY_DEVS_KEY = '_serverless_devs_key';
 // 环境变量特殊key

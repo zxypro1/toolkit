@@ -5,11 +5,11 @@ export default class A {
   constructor(progress: any) {
     this.progress = progress;
   }
-  
+
   async show() {
     let i = 0;
-    
-    await new Promise(r => {
+
+    await new Promise((r) => {
       const intervalId = setInterval(() => {
         this.progress(`aaa ${i++}`); // 自定义
         // 用户自定义的 spanner
@@ -21,6 +21,6 @@ export default class A {
           r('');
         }
       }, 50);
-    })
+    });
   }
 }

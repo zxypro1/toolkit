@@ -2,9 +2,9 @@ import ProgressFooter from '../../../src/progress-footer';
 
 // engine log 开发时，不可以将所有的日志都暴露出来，所以选择性的暴露给用户
 function getFunctionProgress(key: string, progressFooter: ProgressFooter) {
-  function show(message: string){
-    progressFooter.upsert(key, message)
-  };
+  function show(message: string) {
+    progressFooter.upsert(key, message);
+  }
 
   show.upsert = progressFooter.upsert;
   show.removeItem = progressFooter.removeItem;
@@ -41,11 +41,11 @@ async function test() {
   await Promise.all([
     a.show().then(() => {
       console.log(`${keyA} 结束了`);
-      progressFooter.removeItem(keyA)
+      progressFooter.removeItem(keyA);
     }),
     b.show().then(() => {
       console.log(`${keyB} 结束了`);
-      progressFooter.removeItem(keyB)
+      progressFooter.removeItem(keyB);
     }),
   ]);
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -54,4 +54,3 @@ async function test() {
 }
 
 test();
-

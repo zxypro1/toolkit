@@ -9,7 +9,7 @@ import Logger from '../logger';
 export { default as Alibaba, IAliCredential } from './alibaba';
 export { prompt } from './inquirer';
 
-export const validateInput = (input: string) => isEmpty(trim(input)) ? 'Cannot be empty' : true 
+export const validateInput = (input: string) => (isEmpty(trim(input)) ? 'Cannot be empty' : true);
 
 /**
  * 获取 yaml 文件路径
@@ -30,7 +30,7 @@ export function getYamlPath(): string {
 
 /**
  * 获取密钥文件的内容
- * @returns 
+ * @returns
  */
 export function getYamlContent(): Record<string, Record<string, string>> {
   const fileYamlPath = getYamlPath();
@@ -45,7 +45,7 @@ export function getYamlContent(): Record<string, Record<string, string>> {
 
 /**
  * 获取设置密钥默认名称
- * @returns 
+ * @returns
  */
 export async function getAliasDefault() {
   const content = getYamlContent();
@@ -53,7 +53,7 @@ export async function getAliasDefault() {
     return DEFAULT_NAME;
   }
 
-  const keys = Object.keys(content).filter((item) => item.startsWith(DEFAULT_NAME))
+  const keys = Object.keys(content).filter((item) => item.startsWith(DEFAULT_NAME));
   if (keys.length === 0) {
     return DEFAULT_NAME;
   }

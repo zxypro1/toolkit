@@ -1,4 +1,4 @@
-import { IFormatOptions, IMateValue, IShowList } from "./types";
+import { IFormatOptions, IMateValue, IShowList } from './types';
 import { blackBright, green, greenBright } from 'chalk';
 import cliSpinners from 'cli-spinners';
 import { get } from 'lodash';
@@ -18,7 +18,7 @@ export default {
 
       const showMessage = `${blackBright(key)} ${frames[frameIndex]} ${green(`${runTime}s`)}
     ${greenBright(message)}`;
-  
+
       show.push(showMessage);
     });
 

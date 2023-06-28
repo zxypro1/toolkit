@@ -15,5 +15,9 @@ console.log(stdoutFormatter.removed('trigger', 'cn-hangzhou/functionName/trigger
 console.log(stdoutFormatter.checked('trigger', 'cn-hangzhou/functionName/triggerName', 'exists'));
 console.log(stdoutFormatter.using('trigger', 'cn-hangzhou/functionName/triggerName'));
 console.log(stdoutFormatter.retrying('trigger', 'create', 'cn-hangzhou/functionName/triggerName'));
-console.log(stdoutFormatter.retrying('trigger', 'create', 'cn-hangzhou/functionName/triggerName', 2));
-console.log(stdoutFormatter.retrying('trigger', 'create', 'cn-hangzhou/functionName/triggerName', 2, 5));
+console.log(
+  stdoutFormatter.retrying('trigger', 'create', 'cn-hangzhou/functionName/triggerName', 2),
+);
+console.log(
+  stdoutFormatter.retrying('trigger', 'create', 'cn-hangzhou/functionName/triggerName', 2, 5),
+);

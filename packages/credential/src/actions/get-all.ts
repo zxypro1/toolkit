@@ -1,8 +1,8 @@
-import { each, endsWith, assign, set, intersection } from "lodash"
-import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from "../constant";
-import { getYamlContent } from "../utils";
+import { each, endsWith, assign, set, intersection } from 'lodash';
+import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from '../constant';
+import { getYamlContent } from '../utils';
 import decryptCredential from './decrypt';
-import { IResult } from "./set/type";
+import { IResult } from './set/type';
 
 type IAccessList = Record<string, Record<string, string>>;
 
@@ -20,10 +20,10 @@ export const getEnvironment = (): IAccessList => {
         // 不阻塞主程序运行
       }
     }
-  })
+  });
 
   return result;
-}
+};
 
 /**
  * 通过 access.yaml 获取配置文件
@@ -33,10 +33,10 @@ export const getAccessFile = () => {
 
   each(yamlResult, (value, key) => {
     set(yamlResult, key, decryptCredential(value));
-  })
+  });
 
   return yamlResult;
-}
+};
 
 /**
  * 获取特殊的环境变量
@@ -53,7 +53,7 @@ export const getEnvKeyPair = (): undefined | IResult => {
 
     return { access: SYSTEM_ENVIRONMENT_ACCESS, credential };
   }
-}
+};
 
 /**
  * 获取所有的密钥
@@ -64,4 +64,4 @@ export default (): IAccessList => {
   const yamlResult = getAccessFile();
 
   return assign(getEnvKeyPair(), yamlResult, envResult);
-}
+};

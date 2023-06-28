@@ -8,7 +8,7 @@ export enum ProgressType {
 }
 
 const DEFAULT_BAR_FORMAT = `Loading ${green(
-  ':loading'
+  ':loading',
 )} ((:bar)) :current/:total(Bytes) :percent :etas`;
 const DEFAULT_LOADING_FORMAT = `Loading ${green(':loading')} ((:bar)) :etas`;
 

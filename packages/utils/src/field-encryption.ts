@@ -14,4 +14,4 @@ export default (val: string): string => {
   }
 
   return new Array(valLength).fill('*').join('');
-}
+};

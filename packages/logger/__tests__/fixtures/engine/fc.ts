@@ -5,13 +5,13 @@ export default class Fc {
   constructor({ logger }: any) {
     this.logger = logger;
   }
-  
+
   async deploy(inputs: any) {
     let i = 0;
 
     this.logger.info('测试 info inputs', inputs);
-    
-    await new Promise(r => {
+
+    await new Promise((r) => {
       const intervalId = setInterval(() => {
         this.logger.debug('Test', i);
         this.logger.progress(`aaa ${i++}`); // 自定义

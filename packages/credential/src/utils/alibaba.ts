@@ -1,6 +1,6 @@
-import { get, hasIn, isNil } from "lodash";
+import { get, hasIn, isNil } from 'lodash';
 import Core from '@alicloud/pop-core';
-import { PROVIDER } from "../constant";
+import { PROVIDER } from '../constant';
 
 export interface IAliCredential {
   AccessKeyID: string;
@@ -19,13 +19,9 @@ export default class Alibaba {
       apiVersion: '2015-04-01',
     };
     const client = new Core(params);
-  
+
     try {
-      const result: any = await client.request(
-        'GetCallerIdentity',
-        {},
-        { method: 'POST' },
-      );
+      const result: any = await client.request('GetCallerIdentity', {}, { method: 'POST' });
       const accountId = get(result, 'AccountId');
       if (isNil(accountId)) {
         throw new Error(`The obtained accountId is abnormal, RequestId is ${result.RequestId}`);
@@ -42,7 +38,7 @@ export default class Alibaba {
       credInformation.__provider = PROVIDER.alibaba;
       return true;
     }
-  
+
     return false;
   }
 }

@@ -1,4 +1,10 @@
-import { IAction, IActionType, IHookType, IPluginAction, IRunAction } from '@serverless-devs/parse-spec';
+import {
+  IAction,
+  IActionType,
+  IHookType,
+  IPluginAction,
+  IRunAction,
+} from '@serverless-devs/parse-spec';
 import { isEmpty, filter, map, omit } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
@@ -15,7 +21,7 @@ interface IOptions {
 
 class Actions {
   private context!: IContext;
-  constructor(private actions: IAction[] = [], private options: IOptions = {}) { }
+  constructor(private actions: IAction[] = [], private options: IOptions = {}) {}
 
   async start(hookType: `${IHookType}`, context = {} as IContext) {
     this.context = context;
@@ -45,15 +51,13 @@ class Actions {
         if (hook.hookType !== IHookType.PRE) return;
         if (utils.isWindow()) {
           debug('Command run execution environment：CMD');
-          debug('Please check whether the actions section of yaml can be executed in the current environment.')
+          debug(
+            'Please check whether the actions section of yaml can be executed in the current environment.',
+          );
         }
         throwError('Global pre-action failed to execute:' + error.message);
       }
     }
-
-
-
-
   }
   private async plugin(hook: IPluginAction) {
     const instance = await loadComponent(hook.value);

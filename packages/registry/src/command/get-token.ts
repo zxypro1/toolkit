@@ -12,4 +12,4 @@ export default (): string => {
   }
 
   return fs.readFileSync(platformPath, 'utf-8');
-}
+};

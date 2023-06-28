@@ -1,7 +1,7 @@
-import { prompt, getYamlContent, validateInput, writeData } from "../utils";
-import { hasIn, unset, set, trim } from "lodash";
+import { prompt, getYamlContent, validateInput, writeData } from '../utils';
+import { hasIn, unset, set, trim } from 'lodash';
 import decryptCredential from './decrypt';
-import { IResult } from "./set/type";
+import { IResult } from './set/type';
 
 export interface IRenameOptions {
   source?: string;
@@ -15,14 +15,15 @@ export default async (options?: IRenameOptions): Promise<IResult> => {
   let sourceName = source as string;
   if (!source) {
     const aliasNames = Object.keys(content);
-    
+
     const { aliasName } = await prompt([
       {
         type: 'list',
         name: 'aliasName',
         message: 'Please select need rename alias name:',
         choices: aliasNames.map((alias: string) => ({
-          name: alias, value: alias
+          name: alias,
+          value: alias,
         })),
       },
     ]);
@@ -52,5 +53,5 @@ export default async (options?: IRenameOptions): Promise<IResult> => {
   return {
     access: targetName,
     credential: decryptCredential(content[targetName]),
-  }
-}
+  };
+};

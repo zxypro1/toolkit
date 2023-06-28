@@ -1,10 +1,10 @@
 import { isFunction, get, isEmpty, isPlainObject, each, set, concat } from 'lodash';
 import minimist, { Opts } from 'minimist';
-import { IOptions } from "./types";
-import { ICommand, IHelp, IRunFunction, IParseCommandsResult } from "./types/commands";
+import { IOptions } from './types';
+import { ICommand, IHelp, IRunFunction, IParseCommandsResult } from './types/commands';
 
 export async function handlerHelp(
-  commandHelp: ICommand['help'], 
+  commandHelp: ICommand['help'],
   props: IOptions['props'],
   args: IOptions['args'],
   argsData: Record<string, any>,
@@ -30,11 +30,11 @@ export async function handlerHelp(
     }
     const alias = get(opt, 'alias');
     if (name && alias) {
-      set(opts, `alias.${name}`, alias)
+      set(opts, `alias.${name}`, alias);
     }
     const defaultValue = get(opt, 'defaultValue');
     if (defaultValue) {
-      set(opts, `default.${name}`, defaultValue)
+      set(opts, `default.${name}`, defaultValue);
     }
 
     const type = get(opt, 'type');

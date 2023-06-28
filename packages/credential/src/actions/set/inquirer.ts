@@ -31,23 +31,23 @@ async function addCustom(info: Record<string, string>) {
       },
     ]);
 
-    set(info, trim(key), trim(value))
+    set(info, trim(key), trim(value));
     await addCustom(info);
   }
 }
 
 /**
  * 密钥设置处理
- * @returns 
+ * @returns
  */
-export async function inputCredentials (): Promise<Record<string, string>> {
+export async function inputCredentials(): Promise<Record<string, string>> {
   const { provider } = await prompt([
     {
       type: 'list',
       name: 'provider',
       message: 'Please select a provider:',
       choices: PROVIDER_LIST,
-    }
+    },
   ]);
 
   const docs = get(PROVIDER_DOCS, provider);
@@ -67,9 +67,12 @@ export async function inputCredentials (): Promise<Record<string, string>> {
       validate: validateInput,
     }));
     const result = await prompt(promptList);
-    const trimResult = transform(result, (result: Record<string, string>, value: string, key: string) => {
-      result[key] = trim(value)
-    })
+    const trimResult = transform(
+      result,
+      (result: Record<string, string>, value: string, key: string) => {
+        result[key] = trim(value);
+      },
+    );
     merge(credentials, trimResult);
   }
 
@@ -83,16 +86,19 @@ export async function inputAlias() {
       message: 'Please create alias for key pair. If not, please enter to skip',
       name: 'aliasName',
       default: await getAliasDefault(),
-    }
+    },
   ]);
   return trim(aliasName);
 }
 
 /**
  * 获取别名
- * @returns 
+ * @returns
  */
-export async function getAlias(options: { access?: string; force?: boolean }): Promise<string | boolean> {
+export async function getAlias(options: {
+  access?: string;
+  force?: boolean;
+}): Promise<string | boolean> {
   const { access, force } = options || {};
   let a = access;
 
@@ -115,7 +121,7 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
         ],
       },
     ]);
-    
+
     if (type === 'rename') {
       options.access = await inputAlias();
       return await getAlias(options);
@@ -126,4 +132,3 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
 
   return a as string;
 }
-
