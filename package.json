@@ -5,8 +5,8 @@
   "description": "toolkit for serverless-devs",
   "scripts": {
     "install:all": "pnpm install",
-    "format": "prettier --write packages/**/*.ts",
-    "format-check": "prettier --check packages/**/*.ts",
+    "format": "prettier --write packages/**/src/",
+    "format-check": "prettier --check packages/**/src/",
     "clean": "pnpm run -r clean && rimraf node_modules",
     "build": "pnpm run -r build",
     "test": "jest --testTimeout 10000",
