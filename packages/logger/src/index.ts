@@ -40,12 +40,12 @@ export default class Logger {
 
     set(this, instanceKey, logger);
     return logger;
-  }
+  };
 
   __unset = (instanceKey: string) => {
     unset(this, instanceKey);
     this.__progressFooter.removeItem(instanceKey);
-  }
+  };
 
   __clear = () => {
     this.__progressFooter.clear();
@@ -63,5 +63,5 @@ export default class Logger {
       eol: this.__options.eol,
       key,
     };
-  }
+  };
 }
