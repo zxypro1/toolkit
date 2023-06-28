@@ -47,7 +47,7 @@ export function writeFile(token: string) {
 export const sleep = async (timer: number) =>
   await new Promise((resolve) => setTimeout(resolve, timer));
 
-export const request_get = async (url: string) => {
+export const request_get = async (url: string): Promise<{ ResponseId: string; Response: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
   return new Promise((resolve) => {
@@ -64,7 +64,7 @@ export const request_get = async (url: string) => {
   });
 };
 
-export const request_post = async (url: string, body: Record<string, any>): Promise<any> => {
+export const request_post = async (url: string, body: Record<string, any>): Promise<{ ResponseId: string; Response: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
@@ -94,7 +94,7 @@ export const request_post = async (url: string, body: Record<string, any>): Prom
   });
 };
 
-export const request_put = async (url: string, filePath: string): Promise<any> => {
+export const request_put = async (url: string, filePath: string): Promise<{ ResponseId: string; Response: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 

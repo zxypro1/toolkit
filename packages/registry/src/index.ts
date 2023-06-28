@@ -37,4 +37,13 @@ export default class Registry {
     const token = await command.getToken();
     await command.publish(token, codeUri || process.cwd());
   }
+
+  async list() {
+    const token = await command.getToken();
+    return await command.list(token);
+  }
+
+  async detail(name: string) {
+    return await command.detail(name);
+  }
 }

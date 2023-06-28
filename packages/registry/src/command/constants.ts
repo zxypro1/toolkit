@@ -9,3 +9,9 @@ export const RESET_URL = 'https://registry.devsapp.cn/user/update/safetycode';
 
 // *** 发布 *** //
 export const PUBLISH_URL = 'https://registry.devsapp.cn/package/publish';
+
+// *** 已发布列表 *** //
+export const CENTER_PUBLISH_URL = 'https://registry.devsapp.cn/center/package/publish';
+
+// *** 已发布列表 *** //
+export const getDetailUrl = (name: string) => `https://registry.devsapp.cn/simple/${name}/releases`;
