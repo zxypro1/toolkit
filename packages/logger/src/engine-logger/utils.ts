@@ -1,3 +1,4 @@
+export const sliceEggLoggerFormatterTime = (value: string) => value.slice(0, -4);
 import { each, filter, includes, isString, isEmpty, replace } from 'lodash';
 
 export const mark = (val: string): string => {
@@ -50,4 +51,4 @@ class Transport {
   };
 }
 
-export default new Transport();
+export const transport = new Transport();

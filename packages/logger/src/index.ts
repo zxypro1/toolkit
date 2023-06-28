@@ -31,7 +31,7 @@ export default class Logger {
     }
   }
 
-  __generate(instanceKey: string) {
+  __generate = (instanceKey: string) => {
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 
     logger.progress = (message: string) => {
@@ -42,7 +42,7 @@ export default class Logger {
     return logger;
   }
 
-  __unset(instanceKey: string) {
+  __unset = (instanceKey: string) => {
     unset(this, instanceKey);
     this.__progressFooter.removeItem(instanceKey);
   }
@@ -51,9 +51,11 @@ export default class Logger {
     this.__progressFooter.clear();
   };
 
-  __setSecret = transport.setSecret;
+  __setSecret = (secret: string[]) => {
+    transport.setSecret(secret);
+  };
 
-  private __getEggLoggerConfig(key: string) {
+  private __getEggLoggerConfig = (key: string) => {
     return {
       file: path.join(this.__options.logDir, this.__options.traceId, `${key}.log`),
       secrets: this.__options.secrets,
