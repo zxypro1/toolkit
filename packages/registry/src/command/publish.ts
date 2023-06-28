@@ -6,11 +6,11 @@ import { PUBLISH_URL } from './constants';
 import logger from '../logger';
 import path from 'path';
 
-async function publish(token: string): Promise<string> {
-  const publishYaml = getYamlContentText('./publish');
-  const sYaml = getYamlContentText('./src/s');
-  const versionMd = getContentText('./version.md');
-  const readme = getContentText('./readme.md');
+async function publish(token: string, codeUri: string): Promise<string> {
+  const publishYaml = getYamlContentText(path.join(codeUri, 'publish'));
+  const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
+  const versionMd = getContentText(path.join(codeUri, 'version.md'));
+  const readme = getContentText(path.join(codeUri, 'readme.md'));
 
   const { Response, ResponseId } = await request_post(PUBLISH_URL, {
     safety_code: token,
@@ -19,16 +19,17 @@ async function publish(token: string): Promise<string> {
     syaml: sYaml,
     readme,
   });
-  logger.debug(`ResponseId: ${ResponseId}`);
+  logger.debug(`Publish responseId: ${ResponseId}`);
   if (Response?.Error) {
     throw new Error(`${Response.Error}: ${Response.Message}`);
   }
+  logger.debug(`Publish responseId: ${JSON.stringify(Response)}`);
   return Response.url;
 }
 
 export default async (token: string, codeUri: string) => {
   // 发布版本，获取上传文件地址
-  const uploadUrl = await publish(token);
+  const uploadUrl = await publish(token, codeUri);
   logger.debug(`Publish upload url: ${uploadUrl}`);
 
   // 压缩文件
@@ -41,8 +42,7 @@ export default async (token: string, codeUri: string) => {
   logger.debug(`Zip file outputFile: ${zipResult.outputFile}`);
 
   // 上传压缩文件
-  const result = await request_put(uploadUrl, zipResult.outputFile);
-  console.log(result);
+  await request_put(uploadUrl, zipResult.outputFile);
 
   // 删除压缩文件
   fs.unlinkSync(zipResult.outputFile);

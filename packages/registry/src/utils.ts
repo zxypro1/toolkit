@@ -67,7 +67,7 @@ export const request_get = async (url: string): Promise<{ ResponseId: string; Re
 export const request_post = async (
   url: string,
   body: Record<string, any>,
-): Promise<{ ResponseId: string; Response: any }> => {
+): Promise<any> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
@@ -88,8 +88,12 @@ export const request_post = async (
         res.push(chunk);
       });
       response.on('end', () => {
-        const r = JSON.parse(Buffer.concat(res).toString());
-        resolve(r);
+        const result = Buffer.concat(res).toString();
+        try {
+          resolve(JSON.parse(result));
+        } catch (_ex) {
+          resolve(result);
+        }
       });
     });
     request.write(contents);
@@ -100,26 +104,23 @@ export const request_post = async (
 export const request_put = async (
   url: string,
   filePath: string,
-): Promise<{ ResponseId: string; Response: any }> => {
+): Promise<any> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
 
   const options = {
-    hostname: uri.hostname,
-    path: uri.pathname,
     method: 'PUT',
   };
   const contents = fs.readFileSync(filePath);
 
   return new Promise((resolve) => {
     const res: any = [];
-    const request = pkg.request(options, (response) => {
+    const request = pkg.request(uri, options, (response) => {
       response.on('data', (chunk: any) => {
         res.push(chunk);
       });
       response.on('end', () => {
-        const r = JSON.parse(Buffer.concat(res).toString());
-        resolve(r);
+        resolve(Buffer.concat(res).toString());
       });
     });
     request.write(contents);

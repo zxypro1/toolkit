@@ -15,6 +15,7 @@ export const list = async (token: string) => {
   if (Response.Error) {
     throw new Error(`${Response.Error}: ${Response.Message}`);
   }
+
   return Response;
 };
 
