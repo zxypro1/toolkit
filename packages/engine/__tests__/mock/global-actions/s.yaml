@@ -119,7 +119,7 @@ services:
         - plugin: ${path('./pluginA.js')}
           args:
             testKey: testValue
-        - component: v3test deploy
+        - component: v3test deploy -e '{"word_file":"example.docx"}'
       fail-deploy:
         - run: echo fail-${vars.region}-${env('desc')}
         - plugin: ${path('./pluginA.js')}

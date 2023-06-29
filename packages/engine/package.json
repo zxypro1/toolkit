@@ -25,6 +25,7 @@
     "flatted": "^3.2.7",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21",
+    "string-argv": "^0.3.2",
     "xstate": "^4.37.2"
   },
   "devDependencies": {

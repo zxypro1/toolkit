@@ -1,33 +1,44 @@
 import {
   IAction,
+  IActionLevel,
   IActionType,
+  IComponentAction,
   IHookType,
   IPluginAction,
   IRunAction,
   getInputs,
 } from '@serverless-devs/parse-spec';
-import { isEmpty, filter } from 'lodash';
+import { isEmpty, filter, includes, set } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import execa from 'execa';
 import loadComponent from '@serverless-devs/load-component';
-import { throwError, stringify } from '../utils';
+import stringArgv from 'string-argv';
+import { throwError, stringify, throw101Error, throw100Error } from '../utils';
+import chalk from 'chalk';
+
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
+interface IRecord {
+  magic: Record<string, any>;
+  componentProps: Record<string, any>;
+  pluginOutput: Record<string, any>;
+}
+
 class Actions {
-  private record: Record<string, any> = {};
+  private record = {} as IRecord;
   private inputs: Record<string, any> = {};
-  private magic: Record<string, any> = {};
-  constructor(private actions: IAction[] = []) {}
-  public setMagic(magic: Record<string, any>) {
-    this.magic = magic;
+  constructor(private actions: IAction[] = []) { }
+  public setValue(key: string, value: any) {
+    set(this.record, key, value);
   }
   public async start(hookType: `${IHookType}`, inputs: Record<string, any> = {}) {
     this.inputs = inputs;
     const hooks = filter(this.actions, (item) => item.hookType === hookType);
     if (isEmpty(hooks)) return {};
-    const newHooks = getInputs(hooks, this.magic);
+    const newHooks = getInputs(hooks, this.record.magic);
+    debug(`Start the ${hookType}-action`);
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
       if (hook.actionType === IActionType.RUN) {
@@ -36,7 +47,12 @@ class Actions {
       if (hook.actionType === IActionType.PLUGIN) {
         await this.plugin(hook);
       }
+      // 项目action才有component
+      if (hook.actionType === IActionType.COMPONENT && hook.level === IActionLevel.PROJECT) {
+        await this.component(hook);
+      }
     }
+    debug(`End the ${hookType}-action`);
     return this.record.pluginOutput;
   }
   private async run(hook: IRunAction) {
@@ -66,6 +82,34 @@ class Actions {
     // TODO: inputs
     const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
     this.record.pluginOutput = await instance(inputs, hook.args);
+  }
+  private async component(hook: IComponentAction) {
+    const argv = stringArgv(hook.value);
+    const { _ } = utils.parseArgv(argv);
+    const [componentName, method] = _;
+    const instance = await loadComponent(componentName);
+    if (instance[method]) {
+      // 方法存在，执行报错，退出码101
+      const newInputs = { ...this.record.componentProps, argv: filter(argv.slice(2), (o) => !includes([componentName, method], o)) };
+      try {
+        return await instance[method](newInputs);
+      } catch (error) {
+        throw101Error(error as Error, `${hook.actionType}-action failed to execute:`);
+      }
+    }
+    // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
+    throw100Error(
+      `The [${method}] command was not found.`,
+      `Please check the component ${componentName
+      } has the ${method} method. Serverless Devs documents：${chalk.underline(
+        'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+      )}`,
+    );
+
+
+
+
+
   }
 }
 
