@@ -1,4 +1,4 @@
-import { includes, map, split, set, sortBy, isEmpty } from 'lodash';
+import { includes, map, split, set, sortBy, isEmpty, get } from 'lodash';
 import { REGX } from './contants';
 import { IStep } from './types';
 import * as utils from '@serverless-devs/utils';
@@ -41,6 +41,8 @@ class Order {
     let topKey = '';
 
     function deepCopy(obj: any) {
+      console.log('obj==debug', obj);
+
       let result: any = obj.constructor === Array ? [] : {};
       if (typeof obj === 'object') {
         for (var i in obj) {
@@ -64,7 +66,7 @@ class Order {
     }
     for (const step of this.steps) {
       topKey = step.projectName;
-      deepCopy(step.props);
+      deepCopy(get(step, 'props', {}));
     }
     // 得到依赖关系后，需要对a依赖b，b依赖c这种case进行处理 => a依赖b,c
     for (const project in dependencies) {

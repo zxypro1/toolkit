@@ -137,7 +137,7 @@ test('应用级操作，方法执行报错了', async () => {
   expect(context.error.message).toMatch('101');
 });
 
-test.only('全局action 成功', async () => {
+test('全局action 成功', async () => {
   const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),
@@ -145,10 +145,10 @@ test.only('全局action 成功', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  // expect(context.error.message).toMatch(`error test`)
+  expect(context.status).toBe('success');
 });
 
-test('全局action 失败', async () => {
+test.only('全局action 失败', async () => {
   const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/error.yaml'),
@@ -156,5 +156,18 @@ test('全局action 失败', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  // expect(context.error.message).toMatch(`error test`)
+  expect(context.error.message).toMatch('Not implemented')
+  expect(context.error.message).toMatch('101');
+});
+
+test('s projectName deploy', async () => {
+  const method = 'deploy';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    method,
+    projectName: 'framework'
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
 });

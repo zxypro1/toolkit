@@ -28,7 +28,7 @@ interface IRecord {
 class Actions {
   private record = {} as IRecord;
   private inputs: Record<string, any> = {};
-  constructor(private actions: IAction[] = []) { }
+  constructor(private actions: IAction[] = []) {}
   public setValue(key: string, value: any) {
     set(this.record, key, value);
   }

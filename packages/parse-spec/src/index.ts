@@ -145,11 +145,25 @@ class ParseSpec {
     debug(`projects: ${JSON.stringify(projects)}`);
     return this.getSteps(projects);
   }
+  private getOneStep(project: Record<string, any>) {
+    const component = compile(get(project, 'component'), { cwd: path.dirname(this.yaml.path) });
+    return [
+      {
+        ...project,
+        projectName: this.options.projectName,
+        component,
+        access: this.getAccess(project),
+      },
+    ];
+  }
   private getSteps(projects: Record<string, any>) {
+    if (this.options.projectName)
+      return this.getOneStep(get(projects, this.options.projectName, {}));
     const steps = [];
     for (const project in projects) {
       const element = projects[project];
       const data = projects[project];
+
       const component = compile(get(data, 'component'), { cwd: path.dirname(this.yaml.path) });
       steps.push({ ...element, projectName: project, component, access: this.getAccess(data) });
     }

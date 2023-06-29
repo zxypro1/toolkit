@@ -56,4 +56,5 @@ export interface ISpec {
 export interface IOptions {
   method: string;
   access?: string;
+  projectName?: string;
 }

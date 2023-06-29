@@ -72,6 +72,7 @@ class Engine {
     const globalAccess = get(this.options, 'globalArgs.access');
     this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), {
       access: globalAccess,
+      projectName: get(this.options, 'projectName'),
       method: get(this.options, 'method'),
     });
     this.spec = this.parseSpecInstance.start();
@@ -373,7 +374,8 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw100Error(
         `The [${method}] command was not found.`,
-        `Please check the component ${item.component
+        `Please check the component ${
+          item.component
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
