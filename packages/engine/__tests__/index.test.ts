@@ -155,6 +155,6 @@ test('全局action 失败', async () => {
     method,
   });
   const context = await engine.start();
-  // console.log(context.error);
+  console.log(context.error);
   // expect(context.error.message).toMatch(`error test`)
 });

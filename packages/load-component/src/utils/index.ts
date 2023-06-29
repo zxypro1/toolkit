@@ -47,10 +47,8 @@ export const buildComponentInstance = async (componentPath: string, params?: any
     if (componentInstance) {
       componentInstance.__path = componentPath;
     }
-    debug('load component success');
     return componentInstance;
   } catch (error) {
-    debug('load component error', error);
     return ChildComponent;
   }
 };
