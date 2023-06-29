@@ -1,5 +1,6 @@
 import { Logger, LoggerLevel, EggLoggerOptions } from 'egg-logger';
 import { set, get } from 'lodash';
+import prettyjson, { RendererOptions } from 'prettyjson';
 import os from 'os';
 import ConsoleTransport from './console-transport';
 import FileTransport from './file-transport';
@@ -49,10 +50,19 @@ export default class EngineLogger extends Logger {
     this.setEol('');
 
     // @ts-ignore: 输出
-    super.log(level, [message]);
+    super.log(level, [transport.transportSecrets(message)]);
 
     // 修改为初始实例时的行尾
     this.setEol(this.eol);
+  }
+
+  output(content: Record<string, any>, indent: number, options?: RendererOptions) {
+    const message = prettyjson.render(
+      content,
+      options || { keysColor: 'bold' },
+      indent,
+    );
+    super.write(transport.transportSecrets(message));
   }
 
   private setEol(eol: string = os.EOL) {
