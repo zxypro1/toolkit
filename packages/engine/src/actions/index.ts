@@ -17,7 +17,6 @@ import stringArgv from 'string-argv';
 import { throwError, stringify, throw101Error, throw100Error } from '../utils';
 import chalk from 'chalk';
 
-
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
 interface IRecord {
@@ -90,7 +89,10 @@ class Actions {
     const instance = await loadComponent(componentName);
     if (instance[method]) {
       // 方法存在，执行报错，退出码101
-      const newInputs = { ...this.record.componentProps, argv: filter(argv.slice(2), (o) => !includes([componentName, method], o)) };
+      const newInputs = {
+        ...this.record.componentProps,
+        argv: filter(argv.slice(2), (o) => !includes([componentName, method], o)),
+      };
       try {
         return await instance[method](newInputs);
       } catch (error) {
@@ -100,16 +102,10 @@ class Actions {
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
     throw100Error(
       `The [${method}] command was not found.`,
-      `Please check the component ${componentName
-      } has the ${method} method. Serverless Devs documents：${chalk.underline(
+      `Please check the component ${componentName} has the ${method} method. Serverless Devs documents：${chalk.underline(
         'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
       )}`,
     );
-
-
-
-
-
   }
 }
 

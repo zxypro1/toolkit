@@ -26,7 +26,7 @@ class ParseSpec {
     debug(`yaml path: ${this.yaml.path}`);
     debug(`options: ${JSON.stringify(this.options)}`);
   }
-  async start(): Promise<ISpec> {
+  start(): ISpec {
     debug('parse start');
     this.yaml.content = utils.getYamlContent(this.yaml.path);
     this.yaml.access = get(this.yaml.content, 'access');
@@ -36,18 +36,18 @@ class ParseSpec {
     debug(`yaml content: ${JSON.stringify(this.yaml.content)}`);
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
     const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path))
-      ? await this.doExtend()
-      : await this.doNormal();
+      ? this.doExtend()
+      : this.doNormal();
     // 获取到真实值后，重新赋值
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
-    this.yaml.actions = await this.parseActions(actions);
+    this.yaml.actions = this.parseActions(actions);
     const result = { steps: order(steps), yaml: this.yaml };
     debug(`parse result: ${JSON.stringify(result)}`);
     debug('parse end');
     return result;
   }
-  async parseActions(actions: Record<string, any> = {}, level: string = IActionLevel.GLOBAL) {
+  parseActions(actions: Record<string, any> = {}, level: string = IActionLevel.GLOBAL) {
     const actionList = [];
     for (const action in actions) {
       const element = actions[action];
@@ -111,7 +111,7 @@ class ParseSpec {
       type,
     };
   }
-  private async doExtend() {
+  private doExtend() {
     debug('do extend');
     const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
     const extendYaml = utils.getYamlContent(extendPath);
@@ -132,9 +132,9 @@ class ParseSpec {
     debug(`merged yaml content: ${JSON.stringify(this.yaml.content)}`);
     const projects = get(this.yaml.content, 'services', {});
     debug(`projects: ${JSON.stringify(projects)}`);
-    return await this.getSteps(projects);
+    return this.getSteps(projects);
   }
-  private async doNormal() {
+  private doNormal() {
     debug('do normal');
     this.yaml.content = getInputs(this.yaml.content, {
       cwd: path.dirname(this.yaml.path),
@@ -143,9 +143,9 @@ class ParseSpec {
     });
     const projects = get(this.yaml.content, 'services', {});
     debug(`projects: ${JSON.stringify(projects)}`);
-    return await this.getSteps(projects);
+    return this.getSteps(projects);
   }
-  private async getSteps(projects: Record<string, any>) {
+  private getSteps(projects: Record<string, any>) {
     const steps = [];
     for (const project in projects) {
       const element = projects[project];

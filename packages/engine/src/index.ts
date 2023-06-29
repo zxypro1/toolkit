@@ -74,7 +74,7 @@ class Engine {
       access: globalAccess,
       method: get(this.options, 'method'),
     });
-    this.spec = await this.parseSpecInstance.start();
+    this.spec = this.parseSpecInstance.start();
     const { steps: _steps, yaml } = this.spec;
     const steps = await this.download(_steps);
 
@@ -349,7 +349,7 @@ class Engine {
       access: item.access,
       component: item.component,
       credential: new Credential(),
-      argv: filter(args, o => !includes([projectName, method], o))
+      argv: filter(args, (o) => !includes([projectName, method], o)),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);
@@ -359,7 +359,7 @@ class Engine {
     const { method, projectName } = this.options;
     const newInputs = await this.getProps(item);
     const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
-    this.actionInstance.setValue('componentProps', componentProps)
+    this.actionInstance.setValue('componentProps', componentProps);
     // 服务级操作
     if (projectName) {
       if (isFunction(item.instance[method])) {
