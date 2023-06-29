@@ -1,7 +1,6 @@
 import { includes, map, split, set, sortBy, isEmpty, get } from 'lodash';
 import { REGX } from './contants';
 import { IStep } from './types';
-import * as utils from '@serverless-devs/utils';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
@@ -41,8 +40,6 @@ class Order {
     let topKey = '';
 
     function deepCopy(obj: any) {
-      console.log('obj==debug', obj);
-
       let result: any = obj.constructor === Array ? [] : {};
       if (typeof obj === 'object') {
         for (var i in obj) {
