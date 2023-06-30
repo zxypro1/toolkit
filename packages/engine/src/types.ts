@@ -38,7 +38,7 @@ export interface ILogConfig {
 }
 
 export type IStepOptions = IStep & {
-  instance: any; //组件实例
+  instance?: any; //组件实例
   id?: string;
   if?: string;
   'continue-on-error'?: boolean;
@@ -50,6 +50,7 @@ export type IStepOptions = IStep & {
   output?: Record<string, any>;
   process_time?: number;
   credential?: Record<string, any>;
+  done?: boolean; //当前步骤是否执行完成
 };
 
 export enum STEP_IF {

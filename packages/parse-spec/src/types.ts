@@ -5,6 +5,7 @@ export interface IStep {
   actions?: Record<string, any>;
   order: number;
   access: string | undefined;
+  flowId?: number;
 }
 
 export enum IHookType {
@@ -48,6 +49,7 @@ export interface IYaml {
   vars?: Record<string, any>;
   actions?: IAction[];
   access?: string;
+  flow?: Record<string, any>;
 }
 export interface ISpec {
   steps: IStep[];

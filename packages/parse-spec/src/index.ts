@@ -10,8 +10,8 @@ import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { concat, get, keys, map, omit } from 'lodash';
-import { ISpec, IOptions, IYaml, IActionType, IActionLevel } from './types';
+import { concat, each, find, get, includes, isEmpty, keys, map, omit, split } from 'lodash';
+import { ISpec, IOptions, IYaml, IActionType, IActionLevel, IStep } from './types';
 import { IGNORE, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
@@ -32,6 +32,7 @@ class ParseSpec {
     this.yaml.access = get(this.yaml.content, 'access');
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.vars = get(this.yaml.content, 'vars', {});
+    this.yaml.flow = get(this.yaml.content, 'flow', {});
 
     debug(`yaml content: ${JSON.stringify(this.yaml.content)}`);
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
@@ -42,10 +43,38 @@ class ParseSpec {
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
     this.yaml.actions = this.parseActions(actions);
-    const result = { steps: order(steps), yaml: this.yaml };
+    const result = {
+      steps: isEmpty(this.yaml.flow) ? order(steps) : this.doFlow(steps),
+      yaml: this.yaml,
+    };
     debug(`parse result: ${JSON.stringify(result)}`);
     debug('parse end');
     return result;
+  }
+  private doFlow(steps: IStep[]) {
+    const newSteps: IStep[] = [];
+    const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
+    debug(`find flow: ${JSON.stringify(flowObj)}`);
+    const fn = (projects: string[] = [], index: number) => {
+      for (const project of projects) {
+        for (const step of steps) {
+          if (includes(project, step.projectName)) {
+            step.flowId = index;
+            newSteps.push({ ...step, flowId: index });
+          }
+        }
+      }
+    };
+    each(flowObj, fn);
+    debug(`flow steps: ${JSON.stringify(newSteps)}`);
+    return newSteps;
+  }
+  private matchFlow(flow: string) {
+    const useMagic = REGX.test(flow);
+    if (useMagic) {
+      return compile(flow, { method: this.options.method });
+    }
+    return flow === this.options.method;
   }
   parseActions(actions: Record<string, any> = {}, level: string = IActionLevel.GLOBAL) {
     const actionList = [];
@@ -99,13 +128,13 @@ class ParseSpec {
     const useMagic = REGX.test(action);
     if (useMagic) {
       const newAction = compile(action, { method: this.options.method });
-      const [type, method] = newAction.split('-');
+      const [type, method] = split(newAction, '-');
       return {
         validate: method === 'true',
         type,
       };
     }
-    const [type, method] = action.split('-');
+    const [type, method] = split(action, '-');
     return {
       validate: method === this.options.method,
       type,
@@ -165,7 +194,12 @@ class ParseSpec {
       const data = projects[project];
 
       const component = compile(get(data, 'component'), { cwd: path.dirname(this.yaml.path) });
-      steps.push({ ...element, projectName: project, component, access: this.getAccess(data) });
+      steps.push({
+        ...element,
+        projectName: project,
+        component,
+        access: this.getAccess(data),
+      });
     }
     return steps;
   }

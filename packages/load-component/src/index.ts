@@ -12,6 +12,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 class Componet {
   constructor(private name: string, private params?: Record<string, any>) {}
   async run() {
+    if (!this.name) return;
     // 本地路径
     if (fs.existsSync(this.name)) {
       return await buildComponentInstance(this.name, this.params);

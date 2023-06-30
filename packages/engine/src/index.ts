@@ -11,6 +11,7 @@ import {
   uniqueId,
   filter,
   includes,
+  omit,
 } from 'lodash';
 import {
   IStepOptions,
@@ -86,7 +87,7 @@ class Engine {
     await this.globalActionInstance.start(IHookType.PRE, { access, credential });
 
     this.context.steps = map(steps, (item) => {
-      return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING };
+      return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
     });
     const res: IContext = await new Promise(async (resolve) => {
       const states: any = {
@@ -106,6 +107,7 @@ class Engine {
                   : this.record.status;
               this.context.status = status;
               await this.doCompleted();
+              this.context.steps = map(this.context.steps, (item) => omit(item, ['instance']));
               debug(`context: ${stringify(this.context)}`);
               debug('engine end');
               resolve(this.context);
@@ -118,10 +120,13 @@ class Engine {
         const target = this.context.steps[index + 1]
           ? get(this.context.steps, `[${index + 1}].stepCount`)
           : 'final';
+        const flowProject = filter(this.context.steps, (o) => o.flowId === item.flowId);
         states[item.stepCount as string] = {
           invoke: {
             id: item.stepCount,
             src: async () => {
+              // 并行时如果已经执行过，则跳过。
+              if (item.done) return;
               this.record.startTime = Date.now();
               // 记录 context
               this.recordContext(item, { status: STEP_STATUS.RUNNING });
@@ -141,13 +146,15 @@ class Engine {
                 );
                 // 替换 always()
                 item.if = replace(item.if, STEP_IF.ALWAYS, 'true');
-                return item.if === 'true' ? this.handleSrc(item) : this.doSkip(item);
+                return item.if === 'true'
+                  ? await Promise.all(map(flowProject, (o) => this.handleSrc(o)))
+                  : await Promise.all(map(flowProject, (o) => this.doSkip(o)));
               }
               // 检查全局的执行状态，如果是failure，则不执行该步骤, 并记录状态为 skipped
               if (this.record.status === STEP_STATUS.FAILURE) {
-                return this.doSkip(item);
+                return await Promise.all(map(flowProject, (o) => this.doSkip(o)));
               }
-              return this.handleSrc(item);
+              return await Promise.all(map(flowProject, (o) => this.handleSrc(o)));
             },
             onDone: {
               target,
@@ -201,7 +208,7 @@ class Engine {
     return console;
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
-    const { status, error, output, process_time, props } = options;
+    const { status, error, output, process_time, props, done } = options;
     this.context.stepCount = item.stepCount as string;
     this.context.steps = map(this.context.steps, (obj) => {
       if (obj.stepCount === item.stepCount) {
@@ -217,6 +224,9 @@ class Engine {
         }
         if (output) {
           obj.output = output;
+        }
+        if (done) {
+          obj.done = done;
         }
         if (has(options, 'process_time')) {
           obj.process_time = process_time;
@@ -264,6 +274,7 @@ class Engine {
       const newInputs = await this.getProps(item);
       await this.actionInstance.start(IHookType.FAIL, newInputs);
     } finally {
+      this.recordContext(item, { done: true });
       const newInputs = await this.getProps(item);
       await this.actionInstance.start(IHookType.COMPLETE, newInputs);
     }
@@ -360,6 +371,7 @@ class Engine {
     const { method, projectName } = this.options;
     const newInputs = await this.getProps(item);
     const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
+    debug(`component props: ${stringify(componentProps)}`);
     this.actionInstance.setValue('componentProps', componentProps);
     // 服务级操作
     if (projectName) {

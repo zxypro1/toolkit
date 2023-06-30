@@ -148,7 +148,7 @@ test('全局action 成功', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('全局action 失败', async () => {
+test('全局action 失败', async () => {
   const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/error.yaml'),
@@ -169,5 +169,17 @@ test('s projectName deploy', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
+
+test.only('flow', async () => {
+  const method = 'deploy';
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/flow.yaml'),
+    method,
+  });
+  const context = await engine.start();
+  console.log(context);
   expect(context.status).toBe('success');
 });
