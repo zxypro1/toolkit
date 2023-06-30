@@ -58,10 +58,10 @@ export interface IYaml {
   access?: string;
   flow?: Record<string, any>;
 }
-export type ISpec = IRecord &  {
+export type ISpec = IRecord & {
   steps: IStep[];
   yaml: IYaml;
-}
+};
 export interface IRecord {
   method: string;
   access?: string;

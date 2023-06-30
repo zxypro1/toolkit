@@ -21,7 +21,9 @@ class ParseSpec {
   private yaml = {} as IYaml;
   private record = {} as IRecord;
   constructor(filePath: string = '', private argv: string[] = []) {
-    this.yaml.path = fs.existsSync(filePath)? utils.getAbsolutePath(filePath) : (getDefaultYamlPath() as string);
+    this.yaml.path = fs.existsSync(filePath)
+      ? utils.getAbsolutePath(filePath)
+      : (getDefaultYamlPath() as string);
     debug(`yaml path: ${this.yaml.path}`);
     debug(`argv: ${JSON.stringify(argv)}`);
   }
@@ -33,7 +35,7 @@ class ParseSpec {
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
-    this.parseArgv()
+    this.parseArgv();
     debug(`yaml content: ${JSON.stringify(this.yaml.content)}`);
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
     const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path))
@@ -53,8 +55,8 @@ class ParseSpec {
     return result;
   }
   private formatSteps(steps: IStep[]) {
-    if(this.record.projectName) return steps;
-    return isEmpty(this.yaml.flow) ? order(steps) : this.doFlow(steps)
+    if (this.record.projectName) return steps;
+    return isEmpty(this.yaml.flow) ? order(steps) : this.doFlow(steps);
   }
   private parseArgv() {
     const argv = utils.parseArgv(this.argv);
@@ -62,11 +64,11 @@ class ParseSpec {
     const { _, ...rest } = argv;
     this.record.args = rest;
     this.record.access = get(argv, 'access');
-    if (includes(this.yaml.projectNames,_[0] )) {
+    if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
-      return this.record.method = _[1];
+      return (this.record.method = _[1]);
     }
-   this.record.method = _[0];
+    this.record.method = _[0];
   }
   private doFlow(steps: IStep[]) {
     const newSteps: IStep[] = [];
@@ -203,8 +205,7 @@ class ParseSpec {
     ];
   }
   private getSteps(projects: Record<string, any>) {
-    if (this.record.projectName)
-      return this.getOneStep(get(projects, this.record.projectName, {}));
+    if (this.record.projectName) return this.getOneStep(get(projects, this.record.projectName, {}));
     const steps = [];
     for (const project in projects) {
       const element = projects[project];
