@@ -34,8 +34,14 @@ export interface IPluginAction {
   args?: Record<string, any>;
   level: `${IActionLevel}`;
 }
+export interface IComponentAction {
+  hookType: `${IHookType}`;
+  actionType: IActionType.COMPONENT;
+  value: string;
+  level: `${IActionLevel}`;
+}
 
-export type IAction = IRunAction | IPluginAction;
+export type IAction = IRunAction | IPluginAction | IComponentAction;
 
 export enum IActionLevel {
   PROJECT = 'project',
@@ -45,18 +51,20 @@ export enum IActionLevel {
 export interface IYaml {
   path: string;
   content: Record<string, any>;
+  projectNames: string[];
   extend?: string;
   vars?: Record<string, any>;
   actions?: IAction[];
   access?: string;
   flow?: Record<string, any>;
 }
-export interface ISpec {
+export type ISpec = IRecord &  {
   steps: IStep[];
   yaml: IYaml;
 }
-export interface IOptions {
+export interface IRecord {
   method: string;
   access?: string;
   projectName?: string;
+  args: Record<string, any>;
 }

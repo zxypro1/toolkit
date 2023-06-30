@@ -1,9 +1,7 @@
 import { IStep } from '@serverless-devs/parse-spec';
 export interface IEngineOptions {
-  method: string;
+  argv: string[]; // process.argv.slice(2)
   yamlPath?: string;
-  projectName?: string;
-  args?: string[];
   env?: Record<string, string>;
   globalArgs?: IGlobalArgs;
   cwd?: string; // 当前工作目录

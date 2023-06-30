@@ -71,12 +71,9 @@ class Engine {
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
     const globalAccess = get(this.options, 'globalArgs.access');
-    this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), {
-      access: globalAccess,
-      projectName: get(this.options, 'projectName'),
-      method: get(this.options, 'method'),
-    });
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), this.options.argv);
     this.spec = this.parseSpecInstance.start();
+
     const { steps: _steps, yaml } = this.spec;
     const steps = await this.download(_steps);
 
@@ -351,24 +348,25 @@ class Engine {
     const magic = this.getFilterContext(item);
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
-    const { args, projectName, method } = this.options;
+    const { args, method } = this.spec;
     // TODO: inputs数据
     const result = {
       props: newInputs,
-      command: this.options.method,
+      method,
       yaml: this.spec.yaml,
       projectName: item.projectName,
       access: item.access,
       component: item.component,
       credential: new Credential(),
-      argv: filter(args, (o) => !includes([projectName, method], o)),
+      args,
+      // argv: filter(args, (o) => !includes([projectName, method], o)),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);
     return result;
   }
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
-    const { method, projectName } = this.options;
+    const { method, projectName } = this.spec;
     const newInputs = await this.getProps(item);
     const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
     debug(`component props: ${stringify(componentProps)}`);

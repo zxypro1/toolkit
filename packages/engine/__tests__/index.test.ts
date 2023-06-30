@@ -4,7 +4,7 @@ import path from 'path';
 test('未找到yaml文件', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/empty.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   expect.assertions(1);
   try {
@@ -18,7 +18,7 @@ test('未找到yaml文件', async () => {
 test('yaml格式不正确', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/error/exception.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   expect.assertions(1);
   try {
@@ -32,7 +32,7 @@ test('yaml格式不正确', async () => {
 test('extend yaml 格式有问题', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/error/extend-error.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   expect.assertions(1);
   try {
@@ -46,7 +46,7 @@ test('extend yaml 格式有问题', async () => {
 test('魔法变量含中划线报错', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/error/dashed-line.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   expect.assertions(1);
   try {
@@ -60,7 +60,7 @@ test('魔法变量含中划线报错', async () => {
 test('basic', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/basic.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -70,7 +70,7 @@ test('basic', async () => {
 test('extend', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/extend/extend.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -80,7 +80,7 @@ test('extend', async () => {
 test('order', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/order.yaml'),
-    method: 'deploy',
+    argv: ['deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -92,8 +92,7 @@ test('指定服务 方法不存在时', async () => {
   const method = 'empty';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/project.yaml'),
-    projectName: 'framework',
-    method,
+    argv: ['framework','empty']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -102,11 +101,10 @@ test('指定服务 方法不存在时', async () => {
 });
 
 test('指定服务 方法存在，但是执行报错了', async () => {
-  const method = 'error';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/project.yaml'),
-    projectName: 'framework',
-    method,
+    argv: ['framework','error']
+
   });
   const context = await engine.start();
   console.log(context.error);
@@ -115,21 +113,20 @@ test('指定服务 方法存在，但是执行报错了', async () => {
 });
 
 test('应用级操作 方法不存在时', async () => {
-  const method = 'empty';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/project.yaml'),
-    method,
+    argv: ['empty']
+    
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`The [${method}] command was not found`);
+  expect(context.error.message).toMatch(`The [empty] command was not found`);
 });
 
 test('应用级操作，方法执行报错了', async () => {
-  const method = 'error';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/project.yaml'),
-    method,
+    argv: ['error']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -138,10 +135,9 @@ test('应用级操作，方法执行报错了', async () => {
 });
 
 test('全局action 成功', async () => {
-  const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),
-    method,
+    argv: ['deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -149,10 +145,9 @@ test('全局action 成功', async () => {
 });
 
 test('全局action 失败', async () => {
-  const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/error.yaml'),
-    method,
+    argv: ['deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -161,11 +156,9 @@ test('全局action 失败', async () => {
 });
 
 test('s projectName deploy', async () => {
-  const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/project.yaml'),
-    method,
-    projectName: 'framework'
+    argv: ['framework','deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -174,10 +167,9 @@ test('s projectName deploy', async () => {
 
 
 test.only('flow', async () => {
-  const method = 'deploy';
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/flow.yaml'),
-    method,
+    argv: ['deploy']
   });
   const context = await engine.start();
   console.log(context);
