@@ -7,9 +7,10 @@ const DEFAULT_OPTS = {
     access: 'a',
     help: 'h',
     force: 'f',
+    template: 't',
   },
   boolean: ['help', 'force'],
-  string: ['access'],
+  string: ['access', 'template'],
 };
 
 /**
