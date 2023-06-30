@@ -71,7 +71,7 @@ const commands = {
 };
 
 export default class Fc {
-  static readonly commands = commands;
+  readonly commands = commands;
 
   async deploy() {
     console.log('fc run deploy');

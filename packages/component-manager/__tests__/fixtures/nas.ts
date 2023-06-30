@@ -34,7 +34,7 @@ const commands = {
 };
 
 export default class Nas {
-  static readonly commands = commands;
+  readonly commands = commands;
 
   async deploy() {
     console.log('nas run deploy');

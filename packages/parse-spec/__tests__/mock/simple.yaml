@@ -26,6 +26,17 @@ vars: # 全局变量
     description: Serverless Devs Website Service
     internetAccess: true
 services:
+  # deploy: # 业务名称/模块名称
+  #   # component: ${path('./fc.js')} # 组件名称
+  #   component: ${path('./fc.js')} # 组件名称
+  #   props:
+  #     abc: test
+  b: # 业务名称/模块名称
+    # component: ${path('./fc.js')} # 组件名称
+    component: v3test # 组件名称
+    props:
+      abc: test
+
   framework: # 业务名称/模块名称
     # component: ${path('./fc.js')} # 组件名称
     component: v3test # 组件名称

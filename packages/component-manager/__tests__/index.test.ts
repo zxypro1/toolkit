@@ -30,7 +30,7 @@ const getRunConfigs = async () =>
 
       // 组件地址
       const componentPath = path.join(__dirname, 'fixtures', inputs.component);
-      const Component = require(componentPath).default;
+      const Component = new (require(componentPath).default)();
       return {
         Component,
         commands: Component.commands,
