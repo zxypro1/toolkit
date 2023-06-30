@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",
     "cli-progress-footer": "^2.3.2",
     "cli-spinners": "^2.9.0",

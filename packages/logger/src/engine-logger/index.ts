@@ -1,4 +1,5 @@
 import { Logger, LoggerLevel, EggLoggerOptions } from 'egg-logger';
+import { getGlobalConfig } from '@serverless-devs/utils';
 import { set, get } from 'lodash';
 import prettyjson, { RendererOptions } from 'prettyjson';
 import os from 'os';
@@ -32,12 +33,14 @@ export default class EngineLogger extends Logger {
     });
     this.set('console', consoleTransport);
 
-    const fileTransport = new FileTransport({
-      level: level || get(props, 'level', 'DEBUG'),
-      file,
-      eol,
-    });
-    this.set('file', fileTransport);
+    if (getGlobalConfig('log') !== 'disable') {
+      const fileTransport = new FileTransport({
+        level: level || get(props, 'level', 'DEBUG'),
+        file,
+        eol,
+      });
+      this.set('file', fileTransport);
+    }
   }
 
   /**
