@@ -16,6 +16,7 @@ import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
 import { throwError, stringify, throw101Error, throw100Error } from '../utils';
 import chalk from 'chalk';
+import { ILoggerInstance } from '@serverless-devs/logger';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
@@ -25,10 +26,19 @@ interface IRecord {
   pluginOutput: Record<string, any>;
 }
 
+interface IOptions {
+  hookLevel: `${IActionLevel}`;
+  projectName?: string;
+  logger: ILoggerInstance;
+}
+
 class Actions {
   private record = {} as IRecord;
+  private logger: ILoggerInstance;
   private inputs: Record<string, any> = {};
-  constructor(private actions: IAction[] = []) {}
+  constructor(private actions: IAction[] = [], private option = {} as IOptions) {
+    this.logger = option.logger;
+  }
   public setValue(key: string, value: any) {
     set(this.record, key, value);
   }
@@ -36,8 +46,14 @@ class Actions {
     this.inputs = inputs;
     const hooks = filter(this.actions, (item) => item.hookType === hookType);
     if (isEmpty(hooks)) return {};
+    this.logger.info(
+      `Start the ${hookType}-action in ${
+        this.option.hookLevel === IActionLevel.PROJECT
+          ? `${this.option.projectName} project`
+          : IActionLevel.GLOBAL
+      }`,
+    );
     const newHooks = getInputs(hooks, this.record.magic);
-    debug(`Start the ${hookType}-action`);
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
       if (hook.actionType === IActionType.RUN) {
@@ -51,7 +67,13 @@ class Actions {
         await this.component(hook);
       }
     }
-    debug(`End the ${hookType}-action`);
+    this.logger.info(
+      `End the ${hookType}-action in ${
+        this.option.hookLevel === IActionLevel.PROJECT
+          ? `${this.option.projectName} project`
+          : IActionLevel.GLOBAL
+      }`,
+    );
     return this.record.pluginOutput;
   }
   private async run(hook: IRunAction) {

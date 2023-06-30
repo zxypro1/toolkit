@@ -1,5 +1,6 @@
 import Engine from '../src';
 import path from 'path';
+import fs from 'fs-extra';
 
 test('未找到yaml文件', async () => {
   const engine = new Engine({
@@ -132,9 +133,10 @@ test('应用级操作，方法执行报错了', async () => {
   console.log(context.error);
   expect(context.error.message).toMatch(`error test`);
   expect(context.error.message).toMatch('101');
+  fs.writeFileSync(path.join(__dirname, './result.yaml'), JSON.stringify(context, null, 2), 'utf8');
 });
 
-test('全局action 成功', async () => {
+test.only('全局action 成功', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),
     argv: ['deploy']
@@ -166,12 +168,12 @@ test('s projectName deploy', async () => {
 });
 
 
-test.only('flow', async () => {
+test('flow', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/flow.yaml'),
     argv: ['deploy']
   });
   const context = await engine.start();
-  console.log(context);
+  console.log(context.error);
   expect(context.status).toBe('success');
 });

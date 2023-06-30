@@ -26,6 +26,7 @@ export interface IRunAction {
   value: string;
   path: string;
   level: `${IActionLevel}`;
+  projectName: string;
 }
 export interface IPluginAction {
   hookType: `${IHookType}`;
@@ -33,12 +34,14 @@ export interface IPluginAction {
   value: string;
   args?: Record<string, any>;
   level: `${IActionLevel}`;
+  projectName: string;
 }
 export interface IComponentAction {
   hookType: `${IHookType}`;
   actionType: IActionType.COMPONENT;
   value: string;
   level: `${IActionLevel}`;
+  projectName: string;
 }
 
 export type IAction = IRunAction | IPluginAction | IComponentAction;

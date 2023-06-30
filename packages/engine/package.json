@@ -18,6 +18,7 @@
     "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/credential": "workspace:^",
     "@serverless-devs/load-component": "workspace:^",
+    "@serverless-devs/logger": "workspace:^",
     "@serverless-devs/parse-spec": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
     "chalk": "4.x",

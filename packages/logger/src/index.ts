@@ -8,7 +8,7 @@ import { transport } from './engine-logger/utils';
 export { default as EngineLogger } from './engine-logger';
 export { default as ProgressFooter } from './progress-footer';
 
-interface ILoggerInstance extends EngineLogger {
+export interface ILoggerInstance extends EngineLogger {
   progress: (message: string) => void;
 }
 

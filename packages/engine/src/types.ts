@@ -1,15 +1,19 @@
 import { IStep } from '@serverless-devs/parse-spec';
+import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 export interface IEngineOptions {
   argv: string[]; // process.argv.slice(2)
   yamlPath?: string;
+  // TODO:
   env?: Record<string, string>;
   globalArgs?: IGlobalArgs;
   cwd?: string; // 当前工作目录
-
-  // TODO:
-  inputs?: Record<string, any>;
-  logConfig?: ILogConfig;
+  logConfig?: EngineLogger;
 }
+
+export type EngineLogger = ILogConfig & {
+  // TODO:
+  customLogger?: any;
+};
 
 export interface IGlobalArgs {
   debug?: boolean;
@@ -24,15 +28,6 @@ export enum IOutputType {
   JSON = 'json',
   YAML = 'yaml',
   RAW = 'raw',
-}
-
-export interface ILogConfig {
-  logPrefix?: string;
-  // TODO: 临时方案
-  logLevel?: any;
-  ossConfig?: any;
-  customLogger?: any;
-  eol?: string;
 }
 
 export type IStepOptions = IStep & {

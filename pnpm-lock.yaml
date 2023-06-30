@@ -121,6 +121,9 @@ importers:
       '@serverless-devs/load-component':
         specifier: workspace:^
         version: link:../load-component
+      '@serverless-devs/logger':
+        specifier: workspace:^0.0.1
+        version: link:../logger
       '@serverless-devs/parse-spec':
         specifier: workspace:^
         version: link:../parse-spec

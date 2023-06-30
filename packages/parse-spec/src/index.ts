@@ -63,6 +63,7 @@ class ParseSpec {
     debug(`parse argv: ${JSON.stringify(argv)}`);
     const { _, ...rest } = argv;
     this.record.args = rest;
+    // TODO:
     this.record.access = get(argv, 'access');
     if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
@@ -113,6 +114,7 @@ class ParseSpec {
                 actionType: IActionType.RUN,
                 hookType: actionInfo.type,
                 level,
+                projectName: this.record.projectName,
               };
             }
             if (item[IActionType.PLUGIN]) {
@@ -124,6 +126,7 @@ class ParseSpec {
                 actionType: IActionType.PLUGIN,
                 hookType: actionInfo.type,
                 level,
+                projectName: this.record.projectName,
               };
             }
             if (item[IActionType.COMPONENT]) {
@@ -134,6 +137,7 @@ class ParseSpec {
                 actionType: IActionType.COMPONENT,
                 hookType: actionInfo.type,
                 level,
+                projectName: this.record.projectName,
               };
             }
           }),

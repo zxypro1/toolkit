@@ -1,25 +1,11 @@
 import { createMachine, interpret } from 'xstate';
-import {
-  isEmpty,
-  get,
-  each,
-  replace,
-  map,
-  isFunction,
-  values,
-  has,
-  uniqueId,
-  filter,
-  includes,
-  omit,
-} from 'lodash';
+import { isEmpty, get, each, replace, map, isFunction, has, uniqueId, filter, omit } from 'lodash';
 import {
   IStepOptions,
   IRecord,
   IStatus,
   IEngineOptions,
   IContext,
-  ILogConfig,
   STEP_STATUS,
   STEP_IF,
 } from './types';
@@ -43,6 +29,8 @@ import chalk from 'chalk';
 import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
+import Logger, { ILoggerInstance } from '@serverless-devs/logger';
+import * as utils from '@serverless-devs/utils';
 
 export { IEngineOptions, IContext } from './types';
 
@@ -52,24 +40,23 @@ class Engine {
   public context = { status: STEP_STATUS.PENING, completed: false } as IContext;
   private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
-  private logger: any;
+  private glog: Logger;
+  private logger!: ILoggerInstance;
   private parseSpecInstance!: ParseSpec;
   private globalActionInstance!: Actions; // 全局的 action
   private actionInstance!: Actions; // 项目的 action
   constructor(private options: IEngineOptions) {
     debug('engine start');
     debug(`engine options: ${stringify(options)}`);
-
-    // const { inputs, cwd = process.cwd(), logConfig = {} } = options;
-    // this.options.logConfig = logConfig;
-    // // 记录上下文信息
-    // this.context.cwd = cwd;
-    // this.context.inputs = inputs as {};
-    // // logger
-    // this.logger = this.getLogger();
+    this.glog = new Logger({
+      traceId: Math.random().toString(16).slice(2),
+      logDir: path.join(utils.getRootHome(), 'logs'),
+    });
+    this.logger = this.glog.__generate('engine');
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
+    // TODO:解析argv还是通过行参传入
     const globalAccess = get(this.options, 'globalArgs.access');
     this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), this.options.argv);
     this.spec = this.parseSpecInstance.start();
@@ -77,7 +64,10 @@ class Engine {
     const { steps: _steps, yaml } = this.spec;
     const steps = await this.download(_steps);
 
-    this.globalActionInstance = new Actions(yaml.actions);
+    this.globalActionInstance = new Actions(yaml.actions, {
+      hookLevel: IActionLevel.GLOBAL,
+      logger: this.logger,
+    });
     // 获取全局的 access
     const access = globalAccess || yaml.access;
     const credential = await getCredential(access);
@@ -117,7 +107,9 @@ class Engine {
         const target = this.context.steps[index + 1]
           ? get(this.context.steps, `[${index + 1}].stepCount`)
           : 'final';
-        const flowProject = filter(this.context.steps, (o) => o.flowId === item.flowId);
+        const flowProject = isEmpty(yaml.flow)
+          ? [item]
+          : filter(this.context.steps, (o) => o.flowId === item.flowId);
         states[item.stepCount as string] = {
           invoke: {
             id: item.stepCount,
@@ -178,31 +170,22 @@ class Engine {
   private async download(steps: IParseStep[]) {
     const newSteps = [];
     for (const step of steps) {
-      const instance = await loadComponent(step.component);
+      const instance = await loadComponent(step.component, this.glog.__generate(step.projectName));
       newSteps.push({ ...step, instance });
     }
     return newSteps;
   }
-  private getLogger(filePath?: string, itemLogConfig?: any) {
-    const logConfig = this.options.logConfig as ILogConfig;
-    const { customLogger, logPrefix, logLevel, eol } = logConfig;
-    const { inputs } = this.options;
-    if (customLogger) {
-      debug('use custom logger');
-      return (this.logger = customLogger);
-    }
-    const secrets = inputs?.secrets ? values(inputs.secrets) : [];
-    const cloudSecrets = inputs?.cloudSecrets ? values(inputs.cloudSecrets) : [];
-    const newSecrets = [...secrets, ...cloudSecrets];
-    const gitToken = get(inputs, 'git.token');
-    // return new EngineLogger({
-    //   file: logPrefix && path.join(logPrefix, filePath),
-    //   level: logLevel,
-    //   // eol: lodash.get(itemLogConfig, 'eol', eol),
-    //   secrets: gitToken ? [newSecrets, gitToken] : newSecrets,
-    // });
-    // TODO: 临时使用 console
-    return console;
+  private getLogger() {
+    // const  customLogger  = get(this.options, 'logConfig.customLogger');
+    // if (customLogger) {
+    //   debug('use custom logger');
+    //   return (this.logger = customLogger);
+    // }
+    return new Logger({
+      ...omit(get(this.options, 'logConfig'), ['customLogger']),
+      traceId: Math.random().toString(16).slice(2),
+      logDir: path.join(utils.getRootHome(), 'logs'),
+    });
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
     const { status, error, output, process_time, props, done } = options;
@@ -261,6 +244,7 @@ class Engine {
     await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
   }
   private async handleSrc(item: IStepOptions) {
+    this.logger.info(`Start executing project ${item.projectName}`);
     try {
       await this.handleAfterSrc(item);
       // 项目的output, 再次获取魔法变量
@@ -275,17 +259,21 @@ class Engine {
       const newInputs = await this.getProps(item);
       await this.actionInstance.start(IHookType.COMPLETE, newInputs);
     }
+    // 若记录的全局状态为true，则进行输出成功的日志
+    this.record.status === STEP_STATUS.SUCCESS &&
+      this.logger.info(`Project ${item.projectName} successfully to execute`);
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {
       debug(`project item: ${stringify(item)}`);
       item.credential = await getCredential(item.access);
-      const newAction = await this.parseSpecInstance.parseActions(
-        item.actions,
-        IActionLevel.PROJECT,
-      );
+      const newAction = this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
       debug(`project actions: ${JSON.stringify(newAction)}`);
-      this.actionInstance = new Actions(newAction);
+      this.actionInstance = new Actions(newAction, {
+        hookLevel: IActionLevel.PROJECT,
+        projectName: item.projectName,
+        logger: this.logger,
+      });
       this.actionInstance.setValue('magic', this.getFilterContext(item));
       const newInputs = await this.getProps(item);
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
@@ -331,17 +319,9 @@ class Engine {
         this.recordContext(item, { status, process_time });
       } else {
         this.recordContext(item, { status, error, process_time });
-        this.outputErrorLog(error);
+        this.logger.error(error);
         throw error;
       }
-    }
-  }
-  private outputErrorLog(error: Error) {
-    const logConfig = this.options.logConfig as ILogConfig;
-    const { customLogger } = logConfig;
-    // 自定义logger, debug级别输出错误信息
-    if (!isEmpty(customLogger)) {
-      return this.logger.debug(error);
     }
   }
   private async getProps(item: IStepOptions) {
