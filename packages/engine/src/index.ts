@@ -59,7 +59,7 @@ class Engine {
   private actionInstance!: Actions; // 项目的 action
   constructor(private options: IEngineOptions) {
     debug('engine start');
-    this.options.argv = get(this.options, 'argv', process.argv.slice(2));
+    this.options.args = get(this.options, 'args', process.argv.slice(2));
     debug(`engine options: ${stringify(options)}`);
     this.glog = new Logger({
       traceId: Math.random().toString(16).slice(2),
@@ -69,7 +69,7 @@ class Engine {
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
-    this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), this.options.argv);
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), this.options.args);
     this.spec = this.parseSpecInstance.start();
     const { steps: _steps, yaml, access = yaml.access } = this.spec;
     this.validate();
@@ -355,7 +355,7 @@ class Engine {
       access: item.access,
       component: item.component,
       credential: new Credential(),
-      args: filter(this.options.argv, (o) => !includes([projectName, method], o)),
+      args: filter(this.options.args, (o) => !includes([projectName, method], o)),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);

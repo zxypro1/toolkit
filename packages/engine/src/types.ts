@@ -1,10 +1,10 @@
 import { IStep } from '@serverless-devs/parse-spec';
 import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 export interface IEngineOptions {
-  argv: string[]; // process.argv.slice(2)
+  args: string[]; //默认 process.argv.slice(2)
   yamlPath?: string;
   env?: Record<string, string>;
-  cwd?: string; // 当前工作目录
+  cwd?: string; //当前工作目录
   logConfig?: EngineLogger;
 }
 
