@@ -17,7 +17,6 @@ const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class ParseSpec {
-  // yaml
   private yaml = {} as IYaml;
   private record = {} as IRecord;
   constructor(filePath: string = '', private argv: string[] = []) {
@@ -58,13 +57,17 @@ class ParseSpec {
   private parseArgv() {
     const argv = utils.parseArgv(this.argv);
     debug(`parse argv: ${JSON.stringify(argv)}`);
-    const { _, ...rest } = argv;
-    this.record.args = rest;
-    // TODO:
+    const { _ } = argv;
     this.record.access = get(argv, 'access');
+    this.record.version = get(argv, 'version');
+    this.record.help = get(argv, 'help');
+    this.record.output = get(argv, 'output');
+    this.record.skipActions = get(argv, 'skip-actions');
+    this.record.debug = get(argv, 'debug');
     if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
-      return (this.record.method = _[1]);
+      this.record.method = _[1];
+      return;
     }
     this.record.method = _[0];
   }

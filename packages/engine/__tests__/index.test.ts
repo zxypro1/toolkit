@@ -175,3 +175,13 @@ test('flow', async () => {
   console.log(context.error);
   expect(context.status).toBe('success');
 });
+
+test.only('args', async () => {
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/flow.yaml'),
+    argv: ['deploy', '--help', '-a', 'test', '--skip-actions', '--debug', '-o', 'json', '-v' ]
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});

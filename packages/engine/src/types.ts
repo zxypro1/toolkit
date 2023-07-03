@@ -3,9 +3,7 @@ import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 export interface IEngineOptions {
   argv: string[]; // process.argv.slice(2)
   yamlPath?: string;
-  // TODO:
   env?: Record<string, string>;
-  globalArgs?: IGlobalArgs;
   cwd?: string; // 当前工作目录
   logConfig?: EngineLogger;
 }
@@ -14,21 +12,6 @@ export type EngineLogger = ILogConfig & {
   // TODO:
   customLogger?: any;
 };
-
-export interface IGlobalArgs {
-  debug?: boolean;
-  help?: boolean;
-  skipActions?: boolean;
-  access?: string;
-  output?: `${IOutputType}`;
-}
-
-export enum IOutputType {
-  DEFAULT = 'default',
-  JSON = 'json',
-  YAML = 'yaml',
-  RAW = 'raw',
-}
 
 export type IStepOptions = IStep & {
   instance?: any; //组件实例

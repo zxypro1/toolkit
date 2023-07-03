@@ -8,9 +8,11 @@ const DEFAULT_OPTS = {
     help: 'h',
     force: 'f',
     template: 't',
+    version: 'v',
+    output: 'o',
   },
-  boolean: ['help', 'force'],
-  string: ['access', 'template'],
+  boolean: ['debug', 'skip-actions', 'help', 'version', 'force'],
+  string: ['access', 'template', 'output'],
 };
 
 /**

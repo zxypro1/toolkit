@@ -67,8 +67,19 @@ export type ISpec = IRecord & {
   yaml: IYaml;
 };
 export interface IRecord {
-  method: string;
-  access?: string;
   projectName?: string;
-  args: Record<string, any>;
+  method?: string;
+  access?: string;
+  version?: string;
+  output?: `${IOutput}`;
+  skipActions?: boolean;
+  help?: boolean;
+  debug?: boolean;
+}
+
+export enum IOutput {
+  DEFAULT = 'default',
+  JSON = 'json',
+  YAML = 'yaml',
+  RAW = 'raw',
 }

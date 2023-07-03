@@ -1,5 +1,17 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, replace, map, isFunction, has, uniqueId, filter, omit } from 'lodash';
+import {
+  isEmpty,
+  get,
+  each,
+  replace,
+  map,
+  isFunction,
+  has,
+  uniqueId,
+  filter,
+  omit,
+  includes,
+} from 'lodash';
 import {
   IStepOptions,
   IRecord,
@@ -47,6 +59,7 @@ class Engine {
   private actionInstance!: Actions; // 项目的 action
   constructor(private options: IEngineOptions) {
     debug('engine start');
+    this.options.argv = get(this.options, 'argv', process.argv.slice(2));
     debug(`engine options: ${stringify(options)}`);
     this.glog = new Logger({
       traceId: Math.random().toString(16).slice(2),
@@ -56,23 +69,16 @@ class Engine {
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
-    // TODO:解析argv还是通过行参传入
-    const globalAccess = get(this.options, 'globalArgs.access');
     this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), this.options.argv);
     this.spec = this.parseSpecInstance.start();
-
-    const { steps: _steps, yaml } = this.spec;
-    if (isEmpty(_steps)) {
-      throw new Error('steps is empty');
-    }
+    const { steps: _steps, yaml, access = yaml.access } = this.spec;
+    this.validate();
     const steps = await this.download(_steps);
 
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
       logger: this.logger,
     });
-    // 获取全局的 access
-    const access = globalAccess || yaml.access;
     const credential = await getCredential(access);
     await this.globalActionInstance.start(IHookType.PRE, { access, credential });
 
@@ -169,6 +175,15 @@ class Engine {
       stepService.send('INIT');
     });
     return res;
+  }
+  private validate() {
+    const { steps, method } = this.spec;
+    if (isEmpty(steps)) {
+      throw new Error('steps is empty');
+    }
+    if (isEmpty(method)) {
+      throw new Error('method is empty');
+    }
   }
   private async download(steps: IParseStep[]) {
     const newSteps = [];
@@ -330,7 +345,7 @@ class Engine {
     const magic = this.getFilterContext(item);
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
-    const { args, method } = this.spec;
+    const { projectName, method } = this.spec;
     // TODO: inputs数据
     const result = {
       props: newInputs,
@@ -340,15 +355,14 @@ class Engine {
       access: item.access,
       component: item.component,
       credential: new Credential(),
-      args,
-      // argv: filter(args, (o) => !includes([projectName, method], o)),
+      args: filter(this.options.argv, (o) => !includes([projectName, method], o)),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);
     return result;
   }
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
-    const { method, projectName } = this.spec;
+    const { method = '', projectName } = this.spec;
     const newInputs = await this.getProps(item);
     const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
     debug(`component props: ${stringify(componentProps)}`);
