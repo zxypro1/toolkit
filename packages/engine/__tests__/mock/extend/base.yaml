@@ -28,13 +28,6 @@ vars: # 全局变量
 services:
   framework: # 业务名称/模块名称
     component: v3test # 组件名称
-    actions:
-      pre-deploy:
-        # - run: npm install
-        #   path: ./code
-        # - run: npm run build
-        #   path: ./code
-        - plugin: website-fc
     props: # 组件的属性值
       region: ${vars.region}
       service: ${vars.service}
@@ -54,22 +47,6 @@ services:
           name: ${this.name}
           access: ${this.access}
           codeUri: ${this.props.function.codeUri}
-      # triggers:
-      #   - name: httpTrigger
-      #     type: http
-      #     config:
-      #       authType: anonymous
-      #       methods:
-      #         - GET
-      #         - POST
-      #         - PUT
-      #         - DELETE
-      # customDomains:
-      #   - domainName: auto
-      #     protocol: HTTP
-      #     routeConfigs:
-      #       - path: /*
-
   next_function: # 第二个函数的案例，仅供参考
     # 如果在当前项目下执行 s deploy，会同时部署模块：
     #   helloworld：服务hello-world-service，函数cpp-event-function
@@ -78,9 +55,6 @@ services:
     # 如果想单独部署当前函数，可以执行 s + 模块名/业务名 + deploy function，例如：s next-function deploy function
     # 更多命令可参考：https://www.serverless-devs.com/fc/readme#文档相关
     component: v3test
-    actions:
-      pre-deploy:
-        - plugin: website-fc
     props:
       region: ${vars.region}
       service: ${vars.service} # 应用整体的服务配置
@@ -91,18 +65,3 @@ services:
         timeout: 30
         memorySize: 1024
         runtime: nodejs12
-      # triggers:
-      #   - name: httpTrigger
-      #     type: http
-      #     config:
-      #       authType: anonymous
-      #       methods:
-      #         - GET
-      #         - POST
-      #         - PUT
-      #         - DELETE
-      # customDomains:
-      #   - domainName: auto
-      #     protocol: HTTP
-      #     routeConfigs:
-      #       - path: /*

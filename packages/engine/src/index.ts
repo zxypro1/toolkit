@@ -62,6 +62,9 @@ class Engine {
     this.spec = this.parseSpecInstance.start();
 
     const { steps: _steps, yaml } = this.spec;
+    if (isEmpty(_steps)) {
+      throw new Error('steps is empty');
+    }
     const steps = await this.download(_steps);
 
     this.globalActionInstance = new Actions(yaml.actions, {
@@ -107,9 +110,9 @@ class Engine {
         const target = this.context.steps[index + 1]
           ? get(this.context.steps, `[${index + 1}].stepCount`)
           : 'final';
-        const flowProject = isEmpty(yaml.flow)
-          ? [item]
-          : filter(this.context.steps, (o) => o.flowId === item.flowId);
+        const flowProject = yaml.useFlow
+          ? filter(this.context.steps, (o) => o.flowId === item.flowId)
+          : [item];
         states[item.stepCount as string] = {
           invoke: {
             id: item.stepCount,
@@ -319,7 +322,6 @@ class Engine {
         this.recordContext(item, { status, process_time });
       } else {
         this.recordContext(item, { status, error, process_time });
-        this.logger.error(error);
         throw error;
       }
     }

@@ -10,7 +10,7 @@ import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { concat, each, find, get, includes, isEmpty, keys, map, omit, rest, split } from 'lodash';
+import { concat, each, filter, find, get, includes, keys, map, omit, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { IGNORE, REGX } from './contants';
 const extend2 = require('extend2');
@@ -35,6 +35,7 @@ class ParseSpec {
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
+    this.yaml.useFlow = false;
     this.parseArgv();
     debug(`yaml content: ${JSON.stringify(this.yaml.content)}`);
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
@@ -46,17 +47,13 @@ class ParseSpec {
     const actions = get(this.yaml.content, 'actions', {});
     this.yaml.actions = this.parseActions(actions);
     const result = {
-      steps: this.formatSteps(steps),
+      steps: this.record.projectName ? steps : this.doFlow(steps),
       yaml: this.yaml,
       ...this.record,
     };
     debug(`parse result: ${JSON.stringify(result)}`);
     debug('parse end');
     return result;
-  }
-  private formatSteps(steps: IStep[]) {
-    if (this.record.projectName) return steps;
-    return isEmpty(this.yaml.flow) ? order(steps) : this.doFlow(steps);
   }
   private parseArgv() {
     const argv = utils.parseArgv(this.argv);
@@ -74,20 +71,21 @@ class ParseSpec {
   private doFlow(steps: IStep[]) {
     const newSteps: IStep[] = [];
     const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
+    if (!flowObj) return order(steps);
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const fn = (projects: string[] = [], index: number) => {
       for (const project of projects) {
         for (const step of steps) {
           if (includes(project, step.projectName)) {
-            step.flowId = index;
-            newSteps.push({ ...step, flowId: index });
+            newSteps.push({ ...step, flowId: index + 1 });
           }
         }
       }
     };
     each(flowObj, fn);
     debug(`flow steps: ${JSON.stringify(newSteps)}`);
-    return newSteps;
+    this.yaml.useFlow = true;
+    return filter(newSteps, (o) => o.flowId);
   }
   private matchFlow(flow: string) {
     const useMagic = REGX.test(flow);

@@ -60,6 +60,7 @@ export interface IYaml {
   actions?: IAction[];
   access?: string;
   flow?: Record<string, any>;
+  useFlow?: boolean;
 }
 export type ISpec = IRecord & {
   steps: IStep[];
