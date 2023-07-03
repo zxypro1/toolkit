@@ -4,7 +4,7 @@ import path from 'path';
 
 test('未找到yaml文件', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/empty.yaml'),
+    template: path.join(__dirname, './mock/empty.yaml'),
     args: ['deploy']
   });
   expect.assertions(1);
@@ -18,7 +18,7 @@ test('未找到yaml文件', async () => {
 
 test('yaml格式不正确', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/error/exception.yaml'),
+    template: path.join(__dirname, './mock/error/exception.yaml'),
     args: ['deploy']
   });
   expect.assertions(1);
@@ -32,7 +32,7 @@ test('yaml格式不正确', async () => {
 
 test('extend yaml 格式有问题', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/error/extend-error.yaml'),
+    template: path.join(__dirname, './mock/error/extend-error.yaml'),
     args: ['deploy']
   });
   expect.assertions(1);
@@ -46,7 +46,7 @@ test('extend yaml 格式有问题', async () => {
 
 test('魔法变量含中划线报错', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/error/dashed-line.yaml'),
+    template: path.join(__dirname, './mock/error/dashed-line.yaml'),
     args: ['deploy']
   });
   expect.assertions(1);
@@ -60,7 +60,7 @@ test('魔法变量含中划线报错', async () => {
 
 test('basic', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/basic.yaml'),
+    template: path.join(__dirname, './mock/basic.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();
@@ -70,7 +70,7 @@ test('basic', async () => {
 
 test('extend', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/extend/extend.yaml'),
+    template: path.join(__dirname, './mock/extend/extend.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();
@@ -80,7 +80,7 @@ test('extend', async () => {
 
 test('order', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/order.yaml'),
+    template: path.join(__dirname, './mock/order.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();
@@ -92,7 +92,7 @@ test('order', async () => {
 test('指定服务 方法不存在时', async () => {
   const method = 'empty';
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    template: path.join(__dirname, './mock/project.yaml'),
     args: ['framework','empty']
   });
   const context = await engine.start();
@@ -103,7 +103,7 @@ test('指定服务 方法不存在时', async () => {
 
 test('指定服务 方法存在，但是执行报错了', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    template: path.join(__dirname, './mock/project.yaml'),
     args: ['framework','error']
 
   });
@@ -115,7 +115,7 @@ test('指定服务 方法存在，但是执行报错了', async () => {
 
 test('应用级操作 方法不存在时', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    template: path.join(__dirname, './mock/project.yaml'),
     args: ['empty']
     
   });
@@ -126,7 +126,7 @@ test('应用级操作 方法不存在时', async () => {
 
 test('应用级操作，方法执行报错了', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    template: path.join(__dirname, './mock/project.yaml'),
     args: ['error']
   });
   const context = await engine.start();
@@ -137,7 +137,7 @@ test('应用级操作，方法执行报错了', async () => {
 
 test('全局action 成功', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/global-actions/s.yaml'),
+    template: path.join(__dirname, './mock/global-actions/s.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();
@@ -147,7 +147,7 @@ test('全局action 成功', async () => {
 
 test('全局action 失败', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/global-actions/error.yaml'),
+    template: path.join(__dirname, './mock/global-actions/error.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();
@@ -158,7 +158,7 @@ test('全局action 失败', async () => {
 
 test('s projectName deploy', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/project.yaml'),
+    template: path.join(__dirname, './mock/project.yaml'),
     args: ['framework','deploy']
   });
   const context = await engine.start();
@@ -169,7 +169,7 @@ test('s projectName deploy', async () => {
 
 test('flow', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/flow.yaml'),
+    template: path.join(__dirname, './mock/flow.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();
@@ -179,7 +179,7 @@ test('flow', async () => {
 
 test('args', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/flow.yaml'),
+    template: path.join(__dirname, './mock/flow.yaml'),
     args: ['deploy', '--help', '-a', 'test', '--skip-actions', '--debug', '-o', 'json', '-v' ]
   });
   const context = await engine.start();
@@ -189,7 +189,7 @@ test('args', async () => {
 
 test.only('customLogger', async () => {
   const engine = new Engine({
-    yamlPath: path.join(__dirname, './mock/flow.yaml'),
+    template: path.join(__dirname, './mock/flow.yaml'),
     args: ['deploy'],
     logConfig:{
       customLogger: new Logger({

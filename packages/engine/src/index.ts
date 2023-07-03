@@ -64,7 +64,7 @@ class Engine {
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
-    this.parseSpecInstance = new ParseSpec(get(this.options, 'yamlPath'), this.options.args);
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
     this.spec = this.parseSpecInstance.start();
     const { steps: _steps, yaml, access = yaml.access } = this.spec;
     this.validate();
