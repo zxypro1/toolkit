@@ -1,5 +1,6 @@
 import { IStep } from '@serverless-devs/parse-spec';
 import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
+import Logger from '@serverless-devs/logger';
 export interface IEngineOptions {
   args: string[]; //默认 process.argv.slice(2)
   yamlPath?: string;
@@ -8,9 +9,8 @@ export interface IEngineOptions {
   logConfig?: EngineLogger;
 }
 
-export type EngineLogger = ILogConfig & {
-  // TODO:
-  customLogger?: any;
+export type EngineLogger = Partial<ILogConfig> & {
+  customLogger?: Logger;
 };
 
 export type IStepOptions = IStep & {

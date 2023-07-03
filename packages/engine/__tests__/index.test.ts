@@ -1,3 +1,4 @@
+import Logger from '@serverless-devs/logger';
 import Engine from '../src';
 import path from 'path';
 
@@ -176,10 +177,26 @@ test('flow', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('args', async () => {
+test('args', async () => {
   const engine = new Engine({
     yamlPath: path.join(__dirname, './mock/flow.yaml'),
     args: ['deploy', '--help', '-a', 'test', '--skip-actions', '--debug', '-o', 'json', '-v' ]
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
+test.only('customLogger', async () => {
+  const engine = new Engine({
+    yamlPath: path.join(__dirname, './mock/flow.yaml'),
+    args: ['deploy'],
+    logConfig:{
+      customLogger: new Logger({
+        traceId: Math.random().toString(16).slice(2),
+        logDir: path.join(__dirname, 'logs'),
+      })
+    }
   });
   const context = await engine.start();
   console.log(context.error);

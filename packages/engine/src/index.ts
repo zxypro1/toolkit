@@ -52,7 +52,7 @@ class Engine {
   public context = { status: STEP_STATUS.PENING, completed: false } as IContext;
   private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
-  private glog: Logger;
+  private glog!: Logger;
   private logger!: ILoggerInstance;
   private parseSpecInstance!: ParseSpec;
   private globalActionInstance!: Actions; // 全局的 action
@@ -61,11 +61,6 @@ class Engine {
     debug('engine start');
     this.options.args = get(this.options, 'args', process.argv.slice(2));
     debug(`engine options: ${stringify(options)}`);
-    this.glog = new Logger({
-      traceId: Math.random().toString(16).slice(2),
-      logDir: path.join(utils.getRootHome(), 'logs'),
-    });
-    this.logger = this.glog.__generate('engine');
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
@@ -73,6 +68,8 @@ class Engine {
     this.spec = this.parseSpecInstance.start();
     const { steps: _steps, yaml, access = yaml.access } = this.spec;
     this.validate();
+    this.glog = this.getLogger() as Logger;
+    this.logger = this.glog.__generate('engine');
     const steps = await this.download(_steps);
 
     this.globalActionInstance = new Actions(yaml.actions, {
@@ -194,15 +191,19 @@ class Engine {
     return newSteps;
   }
   private getLogger() {
-    // const  customLogger  = get(this.options, 'logConfig.customLogger');
-    // if (customLogger) {
-    //   debug('use custom logger');
-    //   return (this.logger = customLogger);
-    // }
+    const customLogger = get(this.options, 'logConfig.customLogger');
+    if (customLogger) {
+      debug('use custom logger');
+      if (customLogger instanceof Logger) {
+        return customLogger;
+      }
+      throw new Error('customLogger must be instance of Logger');
+    }
     return new Logger({
-      ...omit(get(this.options, 'logConfig'), ['customLogger']),
       traceId: Math.random().toString(16).slice(2),
       logDir: path.join(utils.getRootHome(), 'logs'),
+      ...this.options.logConfig,
+      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),
     });
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
