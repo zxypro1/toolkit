@@ -59,7 +59,7 @@ export default class EngineLogger extends Logger {
     this.setEol(this.eol);
   }
 
-  output(content: Record<string, any>, indent: number, options?: RendererOptions) {
+  output(content: Record<string, any>, indent?: number, options?: RendererOptions) {
     const message = prettyjson.render(content, options || { keysColor: 'bold' }, indent);
     super.write(transport.transportSecrets(message));
   }

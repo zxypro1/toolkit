@@ -11,6 +11,7 @@ import {
   filter,
   omit,
   includes,
+  set,
 } from 'lodash';
 import {
   IStepOptions,
@@ -35,8 +36,10 @@ import ParseSpec, {
   IHookType,
   IStep as IParseStep,
   IActionLevel,
+  IOutput,
 } from '@serverless-devs/parse-spec';
 import path from 'path';
+import yaml from 'js-yaml';
 import chalk from 'chalk';
 import Actions from './actions';
 import Credential from '@serverless-devs/credential';
@@ -172,6 +175,27 @@ class Engine {
       stepService.send('INIT');
     });
     return res;
+  }
+  output() {
+    const { output } = this.spec;
+    debug(`output: ${output}`);
+    if (isEmpty(output)) return;
+    const data = {};
+    each(this.context.steps, (item) => {
+      if (!isEmpty(item.output)) {
+        set(data, item.projectName, item.output);
+      }
+    });
+    if (output === IOutput.JSON) {
+      return console.log(JSON.stringify(data, null, 2));
+    }
+    if (output === IOutput.RAW) {
+      return console.log(JSON.stringify(data));
+    }
+    if (output === IOutput.YAML) {
+      return console.log(yaml.dump(data));
+    }
+    return this.logger.output(data, 0);
   }
   private validate() {
     const { steps, method } = this.spec;

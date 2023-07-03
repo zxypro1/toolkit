@@ -25,12 +25,14 @@
     "execa": "^5.1.1",
     "flatted": "^3.2.7",
     "fs-extra": "^11.1.0",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "string-argv": "^0.3.2",
     "xstate": "^4.37.2"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
+    "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.195"
   }
 }
