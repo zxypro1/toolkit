@@ -48,7 +48,7 @@ importers:
         version: 4.4.1
       ts-jest:
         specifier: ^29.0.5
-        version: 29.1.0(@babel/core@7.22.5)(jest@29.5.0)(typescript@4.9.5)
+        version: 29.1.0(jest@29.5.0)(typescript@4.9.5)
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
@@ -122,7 +122,7 @@ importers:
         specifier: workspace:^
         version: link:../load-component
       '@serverless-devs/logger':
-        specifier: workspace:^0.0.1
+        specifier: workspace:^
         version: link:../logger
       '@serverless-devs/parse-spec':
         specifier: workspace:^
@@ -168,7 +168,7 @@ importers:
   packages/load-application:
     dependencies:
       '@serverless-devs/downloads':
-        specifier: workspace:^0.0.1
+        specifier: workspace:^
         version: link:../downloads
       art-template:
         specifier: ^4.13.2
@@ -353,7 +353,7 @@ importers:
     dependencies:
       '@serverless-devs/ignore-walk':
         specifier: ^0.0.1
-        version: link:../ignore-walk
+        version: 0.0.1
       '@serverless-devs/progress-bar':
         specifier: ^0.0.1
         version: link:../progress-bar
@@ -1058,6 +1058,12 @@ packages:
       kitx: 2.1.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /@serverless-devs/ignore-walk@0.0.1:
+    resolution: {integrity: sha512-Ma0h397U/JDt0YrDcIRkI5G9yDDng1E3RR5z4M5lORYEua4xR7LF1UoG8JvueeeEAhjy4gTbzf1u8uWLWiVmaQ==}
+    dependencies:
+      minimatch: 5.0.0
     dev: false
 
   /@sinclair/typebox@0.25.24:
@@ -3852,7 +3858,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
 
-  /ts-jest@29.1.0(@babel/core@7.22.5)(jest@29.5.0)(typescript@4.9.5):
+  /ts-jest@29.1.0(jest@29.5.0)(typescript@4.9.5):
     resolution: {integrity: sha512-ZhNr7Z4PcYa+JjMl62ir+zPiNJfXJN6E8hSLnaUKhOgqcn8vb3e537cpkd0FuAfRK3sR1LSqM1MOhliXNgOFPA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
@@ -3873,7 +3879,6 @@ packages:
       esbuild:
         optional: true
     dependencies:
-      '@babel/core': 7.22.5
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 29.5.0(@types/node@18.16.18)

@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/component-manager",
-  "version": "0.0.1",
+  "version": "0.0.1-beta.1",
   "description": "ignore-walk for serverless-devs",
   "main": "lib/index.js",
   "scripts": {

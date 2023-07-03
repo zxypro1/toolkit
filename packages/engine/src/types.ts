@@ -2,8 +2,8 @@ import { IStep } from '@serverless-devs/parse-spec';
 import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 import Logger from '@serverless-devs/logger';
 export interface IEngineOptions {
-  args: string[]; //默认 process.argv.slice(2)
-  yamlPath?: string;
+  args?: string[]; //默认 process.argv.slice(2)
+  template?: string;
   env?: Record<string, string>;
   cwd?: string; //当前工作目录
   logConfig?: EngineLogger;
