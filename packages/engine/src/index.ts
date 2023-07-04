@@ -225,11 +225,12 @@ class Engine {
   private async download(steps: IParseStep[]) {
     const newSteps = [];
     for (const step of steps) {
+      const logger = this.glog.__generate(step.projectName);
       const instance = await loadComponent(step.component, {
-        logger: this.glog.__generate(step.projectName),
+        logger,
         engineLogger: this.logger,
       });
-      newSteps.push({ ...step, instance });
+      newSteps.push({ ...step, instance, logger });
     }
     return newSteps;
   }
@@ -334,7 +335,7 @@ class Engine {
       this.actionInstance = new Actions(newAction, {
         hookLevel: IActionLevel.PROJECT,
         projectName: item.projectName,
-        logger: this.logger,
+        logger: item.logger,
         skipActions: this.spec.skipActions,
       });
       this.actionInstance.setValue('magic', this.getFilterContext(item));

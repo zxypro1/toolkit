@@ -40,10 +40,6 @@ services:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
-          # region: ${next-function.props.region}
-          # functionName: ${next-function.props.function.name}
-          # url: ${next_function.output.url.system_url}
-          # token: ${env('token')}
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}

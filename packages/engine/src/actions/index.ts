@@ -111,7 +111,7 @@ class Actions {
     const argv = stringArgv(hook.value);
     const { _ } = utils.parseArgv(argv);
     const [componentName, method] = _;
-    const instance = await loadComponent(componentName);
+    const instance = await loadComponent(componentName, { logger: this.logger });
     if (instance[method]) {
       // 方法存在，执行报错，退出码101
       const newInputs = {

@@ -11,7 +11,7 @@ import { get } from 'lodash';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 
 class Componet {
-  constructor(private name: string, private params?: Record<string, any>) {}
+  constructor(private name: string, private params: Record<string, any> = {}) {}
   async run() {
     if (!this.name) return;
     // 本地路径
@@ -34,7 +34,7 @@ class Componet {
     const zipballUrl = await getZipballUrl(provider, componentName, componentVersion);
     debug(`zipballUrl: ${zipballUrl}`);
     await download(zipballUrl, {
-      logger: get(this.params, 'engineLogger'),
+      logger: get(this.params, 'engineLogger', get(this.params, 'logger')),
       dest: componentCachePath,
       filename: `${provider ? `${provider}_` : ''}${componentName}${
         componentVersion ? `@${componentVersion}` : ''
