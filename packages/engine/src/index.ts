@@ -62,13 +62,20 @@ class Engine {
   private actionInstance!: Actions; // 项目的 action
   constructor(private options: IEngineOptions) {
     debug('engine start');
+    // 初始化参数
     this.options.args = get(this.options, 'args', process.argv.slice(2));
+    this.options.cwd = get(this.options, 'cwd', process.cwd());
+    this.options.template =  utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
     this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
     this.spec = this.parseSpecInstance.start();
+    // 初始化行参环境变量 > .env (parse-spec require .env)
+    each(this.options.env, (value, key) => {
+      process.env[key] = value;
+    });
     const { steps: _steps, yaml, access = yaml.access } = this.spec;
     this.validate();
     this.glog = this.getLogger() as Logger;
