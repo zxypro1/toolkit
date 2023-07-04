@@ -33,21 +33,31 @@ class ParseSpec {
     }
     throw new Error(`The specified template file does not exist: ${filePath}`);
   }
-  start(): ISpec {
-    debug('parse start');
+  private doYamlinit() {
     this.yaml.content = utils.getYamlContent(this.yaml.path);
-    this.yaml.projectNames = keys(get(this.yaml.content, 'services', {}));
-    this.yaml.access = get(this.yaml.content, 'access');
     this.yaml.extend = get(this.yaml.content, 'extend');
+    this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
+    if (this.yaml.useExtend) {
+      const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
+      require('dotenv').config({ path: path.join(extendPath, '.env') });
+      const extendYaml = utils.getYamlContent(extendPath);
+      this.yaml.content = extend2(true, {}, extendYaml, this.yaml.content);
+    }
+    this.yaml.access = get(this.yaml.content, 'access');
+    this.yaml.projectNames = keys(get(this.yaml.content, 'services', {}));
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
-    this.parseArgv();
-    debug(`yaml content: ${JSON.stringify(this.yaml.content)}`);
+    this.yaml.template = get(this.yaml.content, 'template', {});
+    this.yaml.projects = get(this.yaml.content, 'services', {});
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
-    const steps = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path))
-      ? this.doExtend()
-      : this.doNormal();
+  }
+  start(): ISpec {
+    debug('parse start');
+    this.doYamlinit();
+    this.parseArgv();
+    // projectName 存在，说明指定了项目
+    const steps = this.record.projectName ? this.getOneStep() : this.getSteps();
     // 获取到真实值后，重新赋值
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
@@ -171,64 +181,45 @@ class ParseSpec {
       type,
     };
   }
-  private doExtend() {
-    debug('do extend');
-    const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
-    const extendYaml = utils.getYamlContent(extendPath);
-    const extendVars = get(extendYaml, 'vars', {});
-    const extendContent = getInputs(extendYaml, {
-      cwd: path.dirname(extendPath),
-      vars: extend2(true, {}, extendVars, this.yaml.vars),
-      ignore: concat(IGNORE, keys(get(extendYaml, 'services', {}))),
-    });
-    debug(`extend yaml content: ${JSON.stringify(extendContent)}`);
-    const yamlContent = getInputs(omit(this.yaml.content, 'extend'), {
-      cwd: path.dirname(this.yaml.path),
-      vars: extend2(true, {}, extendVars, this.yaml.vars),
-      ignore: concat(IGNORE, this.yaml.projectNames),
-    });
-    debug(`yaml content: ${JSON.stringify(yamlContent)}`);
-    this.yaml.content = extend2(true, {}, extendContent, yamlContent);
-    debug(`merged yaml content: ${JSON.stringify(this.yaml.content)}`);
-    const projects = get(this.yaml.content, 'services', {});
-    debug(`projects: ${JSON.stringify(projects)}`);
-    return this.getSteps(projects);
-  }
-  private doNormal() {
-    debug('do normal');
-    this.yaml.content = getInputs(this.yaml.content, {
-      cwd: path.dirname(this.yaml.path),
-      vars: this.yaml.vars,
-      ignore: concat(IGNORE, this.yaml.projectNames),
-    });
-    const projects = get(this.yaml.content, 'services', {});
-    debug(`projects: ${JSON.stringify(projects)}`);
-    return this.getSteps(projects);
-  }
-  private getOneStep(project: Record<string, any>) {
+  private getOneStep() {
+    const projectName = this.record.projectName as string;
+    const project = get(this.yaml.projects, projectName, {});
     const component = compile(get(project, 'component'), { cwd: path.dirname(this.yaml.path) });
     return [
       {
         ...project,
-        projectName: this.record.projectName,
+        projectName,
         component,
         access: this.getAccess(project),
       },
     ];
   }
-  private getSteps(projects: Record<string, any>) {
-    if (this.record.projectName) return this.getOneStep(get(projects, this.record.projectName, {}));
-    const steps = [];
-    for (const project in projects) {
-      const element = projects[project];
-      const data = projects[project];
+  private getSteps() {
+    this.yaml.content = getInputs(this.yaml.content, {
+      cwd: path.dirname(this.yaml.path),
+      vars: this.yaml.vars,
+      ignore: concat(IGNORE, this.yaml.projectNames),
+    });
 
-      const component = compile(get(data, 'component'), { cwd: path.dirname(this.yaml.path) });
+    const steps = [];
+    for (const project in this.yaml.projects) {
+      const element = this.yaml.projects[project];
+      const component = compile(get(element, 'component'), { cwd: path.dirname(this.yaml.path) });
+      const name = get(this.yaml.template, get(element, 'extend.name'), {});
+      const template = getInputs(omit(name, get(element, 'extend.ignore', [])), {
+        vars: this.yaml.vars,
+      });
+      const props = getInputs(get(element, 'props', {}), {
+        cwd: path.dirname(this.yaml.path),
+        vars: this.yaml.vars,
+        ignore: concat(IGNORE, this.yaml.projectNames),
+      });
       steps.push({
         ...element,
+        props: extend2(true, {}, template, props),
         projectName: project,
         component,
-        access: this.getAccess(data),
+        access: this.getAccess(element),
       });
     }
     return steps;

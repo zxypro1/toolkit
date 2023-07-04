@@ -56,11 +56,14 @@ export interface IYaml {
   content: Record<string, any>;
   projectNames: string[];
   extend?: string;
+  useExtend?: boolean;
   vars?: Record<string, any>;
   actions?: IAction[];
   access?: string;
   flow?: Record<string, any>;
+  template?: Record<string, any>;
   useFlow?: boolean;
+  projects?: Record<string, any>;
 }
 export type ISpec = IRecord & {
   steps: IStep[];

@@ -231,3 +231,23 @@ test('skip-actions', async () => {
   console.log(context.error);
   expect(context.status).toBe('success');
 });
+
+test('project yaml extend', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/template/project-extend.yaml'),
+    args: ['deploy'],
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
+test.only('extend and project yaml extend', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/template/extend-and-project-extend.yaml'),
+    args: ['deploy'],
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
