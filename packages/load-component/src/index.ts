@@ -7,6 +7,7 @@ import {
   getLockFile,
 } from './utils';
 import download from '@serverless-devs/downloads';
+import { get } from 'lodash';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 
 class Componet {
@@ -33,10 +34,11 @@ class Componet {
     const zipballUrl = await getZipballUrl(provider, componentName, componentVersion);
     debug(`zipballUrl: ${zipballUrl}`);
     await download(zipballUrl, {
+      logger: get(this.params, 'engineLogger'),
       dest: componentCachePath,
-      filename: componentVersion
-        ? `${provider}_${componentName}@${componentVersion}.zip`
-        : `${provider}_${componentName}.zip`,
+      filename: `${provider ? `${provider}_` : ''}${componentName}${
+        componentVersion ? `@${componentVersion}` : ''
+      }.zip`,
       extract: true,
       strip: 1,
     });

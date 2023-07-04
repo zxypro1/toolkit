@@ -225,7 +225,10 @@ class Engine {
   private async download(steps: IParseStep[]) {
     const newSteps = [];
     for (const step of steps) {
-      const instance = await loadComponent(step.component, this.glog.__generate(step.projectName));
+      const instance = await loadComponent(step.component, {
+        logger: this.glog.__generate(step.projectName),
+        engineLogger: this.logger,
+      });
       newSteps.push({ ...step, instance });
     }
     return newSteps;

@@ -27,13 +27,13 @@ class Download {
   async run() {
     const { logger } = this.options;
     const uri = new URL(this.url);
-    logger.log(`Downloading[${chalk.green(decodeURIComponent(uri.pathname))}]...`);
+    logger.info(`Downloading[${chalk.green(decodeURIComponent(uri.pathname))}]...`);
     try {
       const filePath = await this.doDownload(this.url);
       await this.doDecompress(filePath);
-      logger.log('Download successfully');
+      logger.info(`Download ${this.options.filename} successfully`);
     } catch (error) {
-      logger.error('Download failed');
+      logger.error(`Download ${this.options.filename} failed`);
     }
   }
   private async doDecompress(filePath: string) {
