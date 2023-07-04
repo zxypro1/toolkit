@@ -71,8 +71,15 @@ class Engine {
   }
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
-    this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
-    this.spec = this.parseSpecInstance.start();
+    // engine应收敛所有的异常，不应该抛出异常
+    try {
+      this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
+      this.spec = this.parseSpecInstance.start();
+    } catch (error) {
+      this.context.error = error as Error;
+      return this.context;
+    }
+
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
@@ -233,8 +240,8 @@ class Engine {
       throw new Error('customLogger must be instance of Logger');
     }
     return new Logger({
-      traceId: get(process.env, 'serverless_devs_trace_id', randomId()) ,
-      logDir: path.join(utils.getRootHome(), 'logs'),  
+      traceId: get(process.env, 'serverless_devs_trace_id', randomId()),
+      logDir: path.join(utils.getRootHome(), 'logs'),
       ...this.options.logConfig,
       level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : 'INFO'),
     });

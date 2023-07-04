@@ -2,18 +2,25 @@ import Logger from '@serverless-devs/logger';
 import Engine from '../src';
 import path from 'path';
 
-test('未找到yaml文件', async () => {
+test('指定 template 不存在', async () => {
   const engine = new Engine({
-    template: path.join(__dirname, './mock/empty.yaml'),
-    args: ['deploy']
+    template: './no.yaml',
+    args: ['deploy'],
+    cwd : path.join(__dirname, './mock')
   });
-  expect.assertions(1);
-  try {
-    await engine.start();
-  } catch (e) {
-    const error = e as Error;
-    expect(error.message).toContain('the s.yaml/s.yml file was not found.');
-  }
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toMatch('The specified template file does not exist');
+});
+
+test('未指定 template', async () => {
+  const engine = new Engine({
+    args: ['deploy'],
+    cwd : path.join(__dirname, './mock')
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toMatch('the s.yaml/s.yml file was not found');
 });
 
 test('yaml格式不正确', async () => {
@@ -21,13 +28,9 @@ test('yaml格式不正确', async () => {
     template: path.join(__dirname, './mock/error/exception.yaml'),
     args: ['deploy']
   });
-  expect.assertions(1);
-  try {
-    await engine.start();
-  } catch (e) {
-    const error = e as Error;
-    expect(error.message).toContain('exception.yaml format is incorrect');
-  }
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toContain('exception.yaml format is incorrect');
 });
 
 test('extend yaml 格式有问题', async () => {
@@ -35,13 +38,9 @@ test('extend yaml 格式有问题', async () => {
     template: path.join(__dirname, './mock/error/extend-error.yaml'),
     args: ['deploy']
   });
-  expect.assertions(1);
-  try {
-    await engine.start();
-  } catch (e) {
-    const error = e as Error;
-    expect(error.message).toContain('base-error.yaml format is incorrect');
-  }
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toContain('base-error.yaml format is incorrect');
 });
 
 test('魔法变量含中划线报错', async () => {
@@ -49,13 +48,9 @@ test('魔法变量含中划线报错', async () => {
     template: path.join(__dirname, './mock/error/dashed-line.yaml'),
     args: ['deploy']
   });
-  expect.assertions(1);
-  try {
-    await engine.start();
-  } catch (e) {
-    const error = e as Error;
-    expect(error.message).toContain(`not support '-' in value`);
-  }
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.error.message).toContain(`not support '-' in value`);
 });
 
 test('basic', async () => {
@@ -221,7 +216,7 @@ test('output', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('skip-actions', async () => {
+test('skip-actions', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/global-actions/s.yaml'),
     args: ['deploy', '--skip-actions'],

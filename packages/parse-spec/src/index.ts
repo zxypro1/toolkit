@@ -10,7 +10,7 @@ import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { concat, each, filter, find, get, includes, keys, map, omit, split } from 'lodash';
+import { concat, each, filter, find, get, includes, isEmpty, keys, map, omit, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { IGNORE, REGX } from './contants';
 const extend2 = require('extend2');
@@ -20,11 +20,18 @@ class ParseSpec {
   private yaml = {} as IYaml;
   private record = {} as IRecord;
   constructor(filePath: string = '', private argv: string[] = []) {
-    this.yaml.path = fs.existsSync(filePath)
-      ? utils.getAbsolutePath(filePath)
-      : (getDefaultYamlPath() as string);
+    this.init(filePath);
     debug(`yaml path: ${this.yaml.path}`);
     debug(`argv: ${JSON.stringify(argv)}`);
+  }
+  private init(filePath: string) {
+    if (isEmpty(filePath)) {
+      return (this.yaml.path = getDefaultYamlPath() as string);
+    }
+    if (fs.existsSync(filePath)) {
+      return (this.yaml.path = utils.getAbsolutePath(filePath));
+    }
+    throw new Error(`The specified template file does not exist: ${filePath}`);
   }
   start(): ISpec {
     debug('parse start');
