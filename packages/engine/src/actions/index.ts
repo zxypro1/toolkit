@@ -30,6 +30,7 @@ interface IOptions {
   hookLevel: `${IActionLevel}`;
   projectName?: string;
   logger: ILoggerInstance;
+  skipActions?: boolean;
 }
 
 class Actions {
@@ -40,9 +41,11 @@ class Actions {
     this.logger = option.logger;
   }
   public setValue(key: string, value: any) {
+    if (this.option.skipActions) return;
     set(this.record, key, value);
   }
   public async start(hookType: `${IHookType}`, inputs: Record<string, any> = {}) {
+    if (this.option.skipActions) return {};
     this.inputs = inputs;
     const hooks = filter(this.actions, (item) => item.hookType === hookType);
     if (isEmpty(hooks)) return {};

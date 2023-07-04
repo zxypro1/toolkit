@@ -29,6 +29,7 @@ import {
   throwError,
   getCredential,
   stringify,
+  randomId,
 } from './utils';
 import ParseSpec, {
   getInputs,
@@ -65,7 +66,7 @@ class Engine {
     // 初始化参数
     this.options.args = get(this.options, 'args', process.argv.slice(2));
     this.options.cwd = get(this.options, 'cwd', process.cwd());
-    this.options.template =  utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
+    this.options.template = utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
   async start() {
@@ -85,6 +86,7 @@ class Engine {
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
       logger: this.logger,
+      skipActions: this.spec.skipActions,
     });
     const credential = await getCredential(access, this.logger);
     await this.globalActionInstance.start(IHookType.PRE, { access, credential });
@@ -231,10 +233,10 @@ class Engine {
       throw new Error('customLogger must be instance of Logger');
     }
     return new Logger({
-      traceId: Math.random().toString(16).slice(2),
-      logDir: path.join(utils.getRootHome(), 'logs'),
+      traceId: get(process.env, 'serverless_devs_trace_id', randomId()) ,
+      logDir: path.join(utils.getRootHome(), 'logs'),  
       ...this.options.logConfig,
-      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),
+      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : 'INFO'),
     });
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
@@ -323,6 +325,7 @@ class Engine {
         hookLevel: IActionLevel.PROJECT,
         projectName: item.projectName,
         logger: this.logger,
+        skipActions: this.spec.skipActions,
       });
       this.actionInstance.setValue('magic', this.getFilterContext(item));
       const newInputs = await this.getProps(item);

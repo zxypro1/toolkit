@@ -203,7 +203,7 @@ test('customLogger', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('output', async () => {
+test('output', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow.yaml'),
     args: ['deploy', '--output', 'default'],
@@ -217,6 +217,22 @@ test.only('output', async () => {
   });
   const context = await engine.start();
   engine.output();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
+test.only('skip-actions', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/global-actions/s.yaml'),
+    args: ['deploy', '--skip-actions'],
+    logConfig:{
+      customLogger: new Logger({
+        traceId: Math.random().toString(16).slice(2),
+        logDir: path.join(__dirname, 'logs'),
+      })
+    }
+  });
+  const context = await engine.start();
   console.log(context.error);
   expect(context.status).toBe('success');
 });

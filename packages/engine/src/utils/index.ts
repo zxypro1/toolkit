@@ -7,6 +7,8 @@ export function getLogPath(filePath: string) {
   return `step_${filePath}.log`;
 }
 
+export const randomId = () => Math.random().toString(16).slice(2);
+
 export function getProcessTime(time: number) {
   return (Math.round((Date.now() - time) / 10) * 10) / 1000;
 }
