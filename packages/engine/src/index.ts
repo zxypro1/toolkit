@@ -79,7 +79,7 @@ class Engine {
       hookLevel: IActionLevel.GLOBAL,
       logger: this.logger,
     });
-    const credential = await getCredential(access);
+    const credential = await getCredential(access, this.logger);
     await this.globalActionInstance.start(IHookType.PRE, { access, credential });
 
     this.context.steps = map(steps, (item) => {
@@ -309,7 +309,7 @@ class Engine {
   private async handleAfterSrc(item: IStepOptions) {
     try {
       debug(`project item: ${stringify(item)}`);
-      item.credential = await getCredential(item.access);
+      item.credential = await getCredential(item.access, this.logger);
       const newAction = this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
       debug(`project actions: ${JSON.stringify(newAction)}`);
       this.actionInstance = new Actions(newAction, {
@@ -379,7 +379,7 @@ class Engine {
       projectName: item.projectName,
       access: item.access,
       component: item.component,
-      credential: new Credential(),
+      credential: new Credential({ logger: this.logger }),
       args: filter(this.options.args, (o) => !includes([projectName, method], o)),
     };
     this.recordContext(item, { props: newInputs });

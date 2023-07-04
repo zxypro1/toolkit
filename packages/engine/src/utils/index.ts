@@ -1,4 +1,5 @@
 import Credential from '@serverless-devs/credential';
+import { ILoggerInstance } from '@serverless-devs/logger';
 import flatted from 'flatted';
 import { get, omit, set, map } from 'lodash';
 
@@ -44,9 +45,9 @@ export function throwError(message: string, tips?: string) {
   throw new Error(JSON.stringify({ message, tips }));
 }
 
-export async function getCredential(access?: string) {
+export async function getCredential(access: string | undefined, logger: ILoggerInstance) {
   try {
-    const instance = new Credential();
+    const instance = new Credential({ logger });
     const res = await instance.get(access);
     return get(res, 'credential', {});
   } catch (error) {

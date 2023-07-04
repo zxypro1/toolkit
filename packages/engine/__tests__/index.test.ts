@@ -211,6 +211,7 @@ test.only('output', async () => {
       customLogger: new Logger({
         traceId: Math.random().toString(16).slice(2),
         logDir: path.join(__dirname, 'logs'),
+        level: 'DEBUG',
       })
     }
   });
