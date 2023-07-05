@@ -37,7 +37,6 @@ import ParseSpec, {
   IHookType,
   IStep as IParseStep,
   IActionLevel,
-  IOutput,
 } from '@serverless-devs/parse-spec';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -120,6 +119,13 @@ class Engine {
               this.context.status = status;
               await this.doCompleted();
               this.context.steps = map(this.context.steps, (item) => omit(item, ['instance']));
+              const output = {};
+              each(this.context.steps, (item) => {
+                if (!isEmpty(item.output)) {
+                  set(output, item.projectName, item.output);
+                }
+              });
+              this.context.output = output;
               debug(`context: ${stringify(this.context)}`);
               debug('engine end');
               resolve(this.context);
@@ -191,27 +197,6 @@ class Engine {
       stepService.send('INIT');
     });
     return res;
-  }
-  output() {
-    const { output } = this.spec;
-    debug(`output: ${output}`);
-    if (isEmpty(output)) return;
-    const data = {};
-    each(this.context.steps, (item) => {
-      if (!isEmpty(item.output)) {
-        set(data, item.projectName, item.output);
-      }
-    });
-    if (output === IOutput.JSON) {
-      return console.log(JSON.stringify(data, null, 2));
-    }
-    if (output === IOutput.RAW) {
-      return console.log(JSON.stringify(data));
-    }
-    if (output === IOutput.YAML) {
-      return console.log(yaml.dump(data));
-    }
-    return this.logger.output(data, 0);
   }
   private validate() {
     const { steps, method } = this.spec;
