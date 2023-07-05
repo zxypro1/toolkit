@@ -208,24 +208,6 @@ test('customLogger', async () => {
   expect(context.status).toBe('success');
 });
 
-test('output', async () => {
-  const engine = new Engine({
-    template: path.join(__dirname, './mock/flow.yaml'),
-    args: ['deploy', '--output', 'default'],
-    logConfig:{
-      customLogger: new Logger({
-        traceId: Math.random().toString(16).slice(2),
-        logDir: path.join(__dirname, 'logs'),
-        level: 'DEBUG',
-      })
-    }
-  });
-  const context = await engine.start();
-  engine.output();
-  console.log(context.error);
-  expect(context.status).toBe('success');
-});
-
 test('skip-actions', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/global-actions/s.yaml'),
@@ -265,9 +247,22 @@ test('extend and project yaml extend', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('plugin update inputs', async () => {
+test('plugin update inputs', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/plugin.yaml'),
+    args: ['deploy'],
+    logConfig:{
+      level: 'DEBUG',
+    }
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
+test.only('allow failture', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/allow-failture.yaml'),
     args: ['deploy'],
     logConfig:{
       level: 'DEBUG',

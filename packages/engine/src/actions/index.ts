@@ -10,13 +10,15 @@ import {
 } from '@serverless-devs/parse-spec';
 import { isEmpty, filter, includes, set } from 'lodash';
 import * as utils from '@serverless-devs/utils';
+import { TipsError } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import execa from 'execa';
 import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
-import { throwError, stringify, throw101Error, throw100Error } from '../utils';
+import { stringify } from '../utils';
 import chalk from 'chalk';
 import { ILoggerInstance } from '@serverless-devs/logger';
+import { EXIT_CODE } from '../constants';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
@@ -24,6 +26,7 @@ interface IRecord {
   magic: Record<string, any>;
   componentProps: Record<string, any>;
   pluginOutput: Record<string, any>;
+  lable: string;
 }
 
 interface IOptions {
@@ -49,13 +52,11 @@ class Actions {
     this.inputs = inputs;
     const hooks = filter(this.actions, (item) => item.hookType === hookType);
     if (isEmpty(hooks)) return {};
-    this.logger.info(
-      `Start the ${hookType}-action in ${
-        this.option.hookLevel === IActionLevel.PROJECT
-          ? `${this.option.projectName} project`
-          : IActionLevel.GLOBAL
-      }`,
-    );
+    this.record.lable =
+      this.option.hookLevel === IActionLevel.PROJECT
+        ? `${this.option.projectName} project`
+        : IActionLevel.GLOBAL;
+    this.logger.info(`Start the ${hookType}-action in ${this.record.lable}`);
     const newHooks = getInputs(hooks, this.record.magic);
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
@@ -89,23 +90,37 @@ class Actions {
         });
       } catch (e) {
         const error = e as Error;
-        // pre hook, throw error
-        if (hook.hookType !== IHookType.PRE) return;
         if (utils.isWindow()) {
           debug('Command run execution environment：CMD');
           debug(
             'Please check whether the actions section of yaml can be executed in the current environment.',
           );
         }
-        throwError('Global pre-action failed to execute:' + error.message);
+        throw new TipsError(error.message, {
+          exitCode: EXIT_CODE.RUN,
+          prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+        });
       }
+      return;
     }
+    throw new TipsError(`The ${hook.path} directory does not exist.`, {
+      exitCode: EXIT_CODE.DEVS,
+      prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+    });
   }
   private async plugin(hook: IPluginAction) {
-    const instance = await loadComponent(hook.value);
-    // TODO: inputs
-    const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
-    this.record.pluginOutput = await instance(inputs, hook.args);
+    try {
+      const instance = await loadComponent(hook.value);
+      // TODO: inputs
+      const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
+      this.record.pluginOutput = await instance(inputs, hook.args);
+    } catch (e) {
+      const error = e as Error;
+      throw new TipsError(error.message, {
+        exitCode: EXIT_CODE.PLUGIN,
+        prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+      });
+    }
   }
   private async component(hook: IComponentAction) {
     const argv = stringArgv(hook.value);
@@ -120,17 +135,22 @@ class Actions {
       };
       try {
         return await instance[method](newInputs);
-      } catch (error) {
-        throw101Error(error as Error, `${hook.actionType}-action failed to execute:`);
+      } catch (e) {
+        const error = e as Error;
+        throw new TipsError(error.message, {
+          exitCode: EXIT_CODE.COMPONENT,
+          prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+        });
       }
     }
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-    throw100Error(
-      `The [${method}] command was not found.`,
-      `Please check the component ${componentName} has the ${method} method. Serverless Devs documents：${chalk.underline(
+    throw new TipsError(`The [${method}] command was not found.`, {
+      exitCode: EXIT_CODE.DEVS,
+      prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+      tips: `Please check the component ${componentName} has the ${method} method. Serverless Devs documents：${chalk.underline(
         'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
       )}`,
-    );
+    });
   }
 }
 

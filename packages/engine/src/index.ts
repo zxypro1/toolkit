@@ -22,15 +22,7 @@ import {
   STEP_STATUS,
   STEP_IF,
 } from './types';
-import {
-  getProcessTime,
-  throw101Error,
-  throw100Error,
-  throwError,
-  getCredential,
-  stringify,
-  randomId,
-} from './utils';
+import { getProcessTime, getCredential, stringify, randomId } from './utils';
 import ParseSpec, {
   getInputs,
   ISpec,
@@ -39,13 +31,14 @@ import ParseSpec, {
   IActionLevel,
 } from '@serverless-devs/parse-spec';
 import path from 'path';
-import yaml from 'js-yaml';
 import chalk from 'chalk';
 import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import * as utils from '@serverless-devs/utils';
+import { TipsError } from '@serverless-devs/utils';
+import { EXIT_CODE } from './constants';
 
 export { IEngineOptions, IContext } from './types';
 
@@ -68,9 +61,10 @@ class Engine {
     this.options.template = utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
+  // engine应收敛所有的异常，不应该抛出异常
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
-    // engine应收敛所有的异常，不应该抛出异常
+    // 初始化 spec
     try {
       this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
       this.spec = this.parseSpecInstance.start();
@@ -78,7 +72,6 @@ class Engine {
       this.context.error = error as Error;
       return this.context;
     }
-
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
@@ -88,14 +81,21 @@ class Engine {
     this.glog = this.getLogger() as Logger;
     this.logger = this.glog.__generate('engine');
     const steps = await this.download(_steps);
-
+    // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
       logger: this.logger,
       skipActions: this.spec.skipActions,
     });
     const credential = await getCredential(access, this.logger);
-    await this.globalActionInstance.start(IHookType.PRE, { access, credential });
+    // 处理 global-pre
+
+    try {
+      await this.globalActionInstance.start(IHookType.PRE, { access, credential });
+    } catch (error) {
+      this.context.error = error as Error;
+      return this.context;
+    }
 
     this.context.steps = map(steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
@@ -145,7 +145,7 @@ class Engine {
           invoke: {
             id: item.stepCount,
             src: async () => {
-              // 并行时如果已经执行过，则跳过。
+              // 并行时如果已经执行，则跳过。
               if (item.done) return;
               this.record.startTime = Date.now();
               // 记录 context
@@ -404,31 +404,39 @@ class Engine {
         // 方法存在，执行报错，退出码101
         try {
           return await item.instance[method](componentProps);
-        } catch (error) {
-          throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
+        } catch (e) {
+          const error = e as Error;
+          throw new TipsError(error.message, {
+            exitCode: EXIT_CODE.COMPONENT,
+            prefix: `Project ${item.projectName} failed to execute:`,
+          });
         }
       }
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-      throw100Error(
-        `The [${method}] command was not found.`,
-        `Please check the component ${
+      throw new TipsError(`The [${method}] command was not found.`, {
+        exitCode: EXIT_CODE.DEVS,
+        tips: `Please check the component ${
           item.component
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
-      );
+      });
     }
     // 应用级操作
     if (isFunction(item.instance[method])) {
       // 方法存在，执行报错，退出码101
       try {
         return await item.instance[method](componentProps);
-      } catch (error) {
-        throw101Error(error as Error, `Project ${item.projectName} failed to execute:`);
+      } catch (e) {
+        const error = e as Error;
+        throw new TipsError(error.message, {
+          exitCode: EXIT_CODE.COMPONENT,
+          prefix: `Project ${item.projectName} failed to execute:`,
+        });
       }
     }
     // 方法不存在，进行警告，但是并不会报错，最终的exit code为0；
-    throwError(
+    this.logger.tips(
       `The [${method}] command was not found.`,
       `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`,
     );

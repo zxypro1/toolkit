@@ -7,6 +7,7 @@ import ConsoleTransport from './console-transport';
 import FileTransport from './file-transport';
 import { transport } from './utils';
 import { IOptions } from './type';
+import chalk from 'chalk';
 
 export default class EngineLogger extends Logger {
   private eol: string;
@@ -63,7 +64,14 @@ export default class EngineLogger extends Logger {
     const message = prettyjson.render(content, options || { keysColor: 'bold' }, indent);
     super.write(transport.transportSecrets(message));
   }
-
+  // TODO: 仅提示但不报错
+  tips(message: string, tips?: string) {
+    let msg = `\n${chalk.hex('#000').bgYellow('WARNING:')}\n\n${message}\n`;
+    if (tips) {
+      msg += `\n${chalk.gray(tips)}\n`;
+    }
+    super.write(msg);
+  }
   private setEol(eol: string = os.EOL) {
     const c = this.get('console') as object;
     const f = this.get('file');

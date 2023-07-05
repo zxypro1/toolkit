@@ -10,6 +10,7 @@ export { default as ProgressFooter } from './progress-footer';
 
 export interface ILoggerInstance extends EngineLogger {
   progress: (message: string) => void;
+  tips: (message: string, tips?: string) => void;
 }
 
 /**
