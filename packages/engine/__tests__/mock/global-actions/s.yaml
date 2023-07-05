@@ -30,19 +30,19 @@ vars: # 全局变量
 actions:
   pre-${regx('.')}:
     - run: echo ${vars.region}-${env('desc')}
-    - plugin: ${path('./pluginA.js')}
+    - plugin: ${path('./plugin/a.js')}
       args:
         testKey: testValue
   success-deploy:
     - run: echo success-deploy
   complete-${regx('deploy')}:
     - run: echo complete-deploy
-    - plugin: ${path('./pluginA.js')}
+    - plugin: ${path('./plugin/a.js')}
       args:
         testKey: testValue
   fail-deploy:
     - run: echo fail-${vars.region}-${env('desc')}
-    - plugin: ${path('./pluginA.js')}
+    - plugin: ${path('./plugin/a.js')}
       args:
         testKey: testValue
 
@@ -53,10 +53,10 @@ services:
     #   pre-${regx('.')}:
     #     # - run: npm run error
     #     - run: echo helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}
-    #     - plugin: ${path('./pluginA.js')}
+    #     - plugin: ${path('./plugin/a.js')}
     #       args:
     #         testKey: testValue
-    #     - plugin: ${path('./pluginB.js')}
+    #     - plugin: ${path('./plugin/b.js')}
 
     #       args:
     #         testKey: testValue
@@ -64,13 +64,13 @@ services:
     #     - run: echo success-deploy
     #   complete-${regx('deploy')}:
     #     - run: echo complete-deploy
-    #     - plugin: ${path('./pluginA.js')}
+    #     - plugin: ${path('./plugin/a.js')}
     #       args:
     #         testKey: testValue
     #     - component: v3test deploy
     #   fail-deploy:
     #     - run: echo fail-${vars.region}-${env('desc')}
-    #     - plugin: ${path('./pluginA.js')}
+    #     - plugin: ${path('./plugin/a.js')}
     #       args:
     #         testKey: testValue
     props:
@@ -105,24 +105,23 @@ services:
       pre-${regx('.')}:
         # - run: npm run error
         - run: echo next-helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}-${helloworld.output.hello}
-        - plugin: ${path('./pluginA.js')}
+        - plugin: ${path('./plugin/a.js')}
           args:
             testKey: testValue
-        - plugin: ${path('./pluginB.js')}
-
+        - plugin: ${path('./plugin/b.js')}
           args:
             testKey: testValue
       success-deploy:
         - run: echo success-deploy--${this.props.service.name}-${this.props.function.name}-${this.output.hello}-${helloworld.output.hello}
       complete-${regx('deploy')}:
         - run: echo complete-deploy
-        - plugin: ${path('./pluginA.js')}
+        - plugin: ${path('./plugin/a.js')}
           args:
             testKey: testValue
         - component: v3test deploy -e '{"word_file":"example.docx"}'
       fail-deploy:
         - run: echo fail-${vars.region}-${env('desc')}
-        - plugin: ${path('./pluginA.js')}
+        - plugin: ${path('./plugin/a.js')}
           args:
             testKey: testValue
     props:

@@ -31,19 +31,19 @@ actions:
   pre-${regx('.')}:
     # - run: npm run error
     - run: echo ${vars.region}-${env('desc')}
-    - plugin: ./pluginA.js
+    - plugin: ${path(./plugin/a.js)}
       args:
         testKey: testValue
   success-deploy:
     - run: echo success-deploy
   complete-${regx('deploy')}:
     - run: echo complete-deploy
-    - plugin: ./pluginA.js
+    - plugin: ${path(./plugin/a.js)}
       args:
         testKey: testValue
   fail-deploy:
     - run: echo fail-${vars.region}-${env('desc')}
-    - plugin: ./pluginA.js
+    - plugin: ${path(./plugin/a.js)}
       args:
         testKey: testValue
 

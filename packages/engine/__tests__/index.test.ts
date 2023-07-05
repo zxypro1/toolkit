@@ -63,10 +63,19 @@ test('basic', async () => {
   expect(context.status).toBe('success');
 });
 
+test('s deploy', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/project.yaml'),
+    args: ['deploy']
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
 test('s projectName deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['framework', 'deploy']
+    args: ['next_function', 'deploy']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -233,7 +242,7 @@ test('skip-actions', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('project yaml extend', async () => {
+test('project yaml extend', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/template/project-extend.yaml'),
     args: ['deploy'],
@@ -250,6 +259,19 @@ test('extend and project yaml extend', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/template/extend-and-project-extend.yaml'),
     args: ['deploy'],
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(context.status).toBe('success');
+});
+
+test.only('plugin update inputs', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/plugin.yaml'),
+    args: ['deploy'],
+    logConfig:{
+      level: 'DEBUG',
+    }
   });
   const context = await engine.start();
   console.log(context.error);

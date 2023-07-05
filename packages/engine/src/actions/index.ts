@@ -77,7 +77,7 @@ class Actions {
           : IActionLevel.GLOBAL
       }`,
     );
-    return this.record.pluginOutput;
+    return this.record;
   }
   private async run(hook: IRunAction) {
     if (fs.existsSync(hook.path) && fs.lstatSync(hook.path).isDirectory()) {

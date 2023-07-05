@@ -41,8 +41,7 @@ services:
         environmentVariables:
           region: ${next_function.props.region}
           functionName: ${next_function.props.function.name}
-          url: ${next_function.output.hello}
-          token: ${env.token}
+          hello: ${next_function.output.hello}
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}

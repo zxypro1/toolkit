@@ -30,10 +30,7 @@ services:
     component: v3test # 组件名称
     props: # 组件的属性值
       region: ${vars.region}
-      # service: ${vars.service}
-      service:
-        name: website-wof2
-        description: Serverless Devs Website Service
+      service: ${vars.service}
       function:
         name: vuepress
         description: Serverless Devs Website vuepress Function
@@ -42,27 +39,14 @@ services:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
+          region: ${next_function.props.region}
+          functionName: ${next_function.props.function.name}
+          hello: ${next_function.output.hello}
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}
           codeUri: ${this.props.function.codeUri}
-      # triggers:
-      #   - name: httpTrigger
-      #     type: http
-      #     config:
-      #       authType: anonymous
-      #       methods:
-      #         - GET
-      #         - POST
-      #         - PUT
-      #         - DELETE
-      # customDomains:
-      #   - domainName: auto
-      #     protocol: HTTP
-      #     routeConfigs:
-      #       - path: /*
-
-  next-function: # 第二个函数的案例，仅供参考
+  next_function: # 第二个函数的案例，仅供参考
     # 如果在当前项目下执行 s deploy，会同时部署模块：
     #   helloworld：服务hello-world-service，函数cpp-event-function
     #   next-function：服务hello-world-service，函数next-function-example
@@ -80,18 +64,3 @@ services:
         timeout: 30
         memorySize: 1024
         runtime: nodejs12
-      # triggers:
-      #   - name: httpTrigger
-      #     type: http
-      #     config:
-      #       authType: anonymous
-      #       methods:
-      #         - GET
-      #         - POST
-      #         - PUT
-      #         - DELETE
-      # customDomains:
-      #   - domainName: auto
-      #     protocol: HTTP
-      #     routeConfigs:
-      #       - path: /*
