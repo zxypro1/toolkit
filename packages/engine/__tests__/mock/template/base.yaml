@@ -35,7 +35,7 @@ vars: # 全局变量
     name: website-wof2
     description: Serverless Devs Website Service
     internetAccess: true
-services:
+resources:
   framework: # 业务名称/模块名称
     component: v3test # 组件名称
     extend: 

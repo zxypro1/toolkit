@@ -5,7 +5,7 @@
 #   Yaml参考文档：https://www.serverless-devs.com/fc/yaml/readme
 extend: base-error.yaml
 
-services:
+resources:
   framework: # 业务名称/模块名称
     props: # 组件的属性值
       service:

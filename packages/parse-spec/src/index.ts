@@ -44,12 +44,12 @@ class ParseSpec {
       this.yaml.content = extend2(true, {}, extendYaml, this.yaml.content);
     }
     this.yaml.access = get(this.yaml.content, 'access');
-    this.yaml.projectNames = keys(get(this.yaml.content, 'services', {}));
+    this.yaml.projectNames = keys(get(this.yaml.content, 'resources', {}));
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
     this.yaml.template = get(this.yaml.content, 'template', {});
-    this.yaml.projects = get(this.yaml.content, 'services', {});
+    this.yaml.projects = get(this.yaml.content, 'resources', {});
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
   }
   start(): ISpec {

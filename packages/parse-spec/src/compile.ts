@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
 import { REGX } from './contants';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 artTemplate.defaults.escape = false;
 artTemplate.defaults.rules.push({
@@ -32,11 +32,12 @@ const compile = (value: string, context: Record<string, any> = {}) => {
     throw new Error(`config('${value}') not found`);
   };
   artTemplate.defaults.imports.path = (value: string) => {
-    try {
-      return path.isAbsolute(value) ? value : path.join(cwd, value);
-    } catch (error) {
-      throw new Error(`path('${value}') parse error`);
+    if (isEmpty(value)) {
+      throw new Error(`path value is empty`);
     }
+    const res = path.isAbsolute(value) ? value : path.join(cwd, value);
+    if (fs.existsSync(res)) return res;
+    throw new Error(`path value not found`);
   };
   artTemplate.defaults.imports.json = (value: string) => {
     try {

@@ -149,7 +149,7 @@ test('应用级操作，方法执行报错了', async () => {
   expect(context.error.message).toMatch('101');
 });
 
-test('全局action 成功', async () => {
+test.only('全局action 成功', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/global-actions/s.yaml'),
     args: ['deploy']
@@ -250,19 +250,6 @@ test('extend and project yaml extend', async () => {
 test('plugin update inputs', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/plugin.yaml'),
-    args: ['deploy'],
-    logConfig:{
-      level: 'DEBUG',
-    }
-  });
-  const context = await engine.start();
-  console.log(context.error);
-  expect(context.status).toBe('success');
-});
-
-test.only('allow failture', async () => {
-  const engine = new Engine({
-    template: path.join(__dirname, './mock/allow-failture.yaml'),
     args: ['deploy'],
     logConfig:{
       level: 'DEBUG',

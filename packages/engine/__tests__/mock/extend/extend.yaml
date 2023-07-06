@@ -13,7 +13,7 @@ vars: # 全局变量
     internetAccess: true
 
 
-services:
+resources:
   framework: # 业务名称/模块名称
     props: # 组件的属性值
       service:

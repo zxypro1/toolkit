@@ -27,7 +27,7 @@ vars: # 全局变量
     name: hello-world-service
     description: hello world by serverless devs
 
-services:
+resources:
  next-helloworld: # 业务名称/模块名称
     component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
     actions:
