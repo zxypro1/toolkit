@@ -119,13 +119,7 @@ class Engine {
               this.context.status = status;
               await this.doCompleted();
               this.context.steps = map(this.context.steps, (item) => omit(item, ['instance']));
-              const output = {};
-              each(this.context.steps, (item) => {
-                if (!isEmpty(item.output)) {
-                  set(output, item.projectName, item.output);
-                }
-              });
-              this.context.output = output;
+              this.context.output = this.getOutput();
               debug(`context: ${stringify(this.context)}`);
               debug('engine end');
               resolve(this.context);
@@ -197,6 +191,15 @@ class Engine {
       stepService.send('INIT');
     });
     return res;
+  }
+  private getOutput() {
+    const output = {};
+    each(this.context.steps, (item) => {
+      if (!isEmpty(item.output)) {
+        set(output, item.projectName, item.output);
+      }
+    });
+    return output;
   }
   private validate() {
     const { steps, method } = this.spec;
@@ -377,16 +380,21 @@ class Engine {
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
     const { projectName, method } = this.spec;
-    // TODO: inputs数据
     const result = {
+      cwd: this.options.cwd,
       props: newInputs,
-      method,
-      yaml: this.spec.yaml,
-      projectName: item.projectName,
-      access: item.access,
-      component: item.component,
-      credential: new Credential({ logger: this.logger }),
+      command: method,
       args: filter(this.options.args, (o) => !includes([projectName, method], o)),
+      yaml: {
+        path: this.spec.yaml.path,
+      },
+      resource: {
+        name: item.projectName,
+        component: item.component,
+        access: item.access,
+      },
+      outputs: this.getOutput(),
+      getCredential: async () => await new Credential({ logger: this.logger }).get(item.access),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);

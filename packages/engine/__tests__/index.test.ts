@@ -63,7 +63,7 @@ test('basic', async () => {
   expect(context.status).toBe('success');
 });
 
-test('s deploy', async () => {
+test.only('s deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['deploy']
@@ -149,10 +149,13 @@ test('应用级操作，方法执行报错了', async () => {
   expect(context.error.message).toMatch('101');
 });
 
-test.only('全局action 成功', async () => {
+test('全局action 成功', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/global-actions/s.yaml'),
-    args: ['deploy']
+    args: ['deploy'],
+    logConfig:{
+      logDir: path.join(__dirname, './mock/global-actions/logs')
+    }
   });
   const context = await engine.start();
   console.log(context.error);
