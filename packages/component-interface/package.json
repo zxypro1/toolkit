@@ -1,0 +1,17 @@
+{
+  "name": "@serverless-devs/component-interface",
+  "version": "0.0.1",
+  "description": "request for serverless-devs",
+  "main": "lib/index.js",
+  "scripts": {
+    "clean": "rimraf lib node_modules",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "wss-git",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
