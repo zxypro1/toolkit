@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/component-interface",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {

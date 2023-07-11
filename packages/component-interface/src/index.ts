@@ -5,7 +5,7 @@ export interface ICredentials {
   SecurityToken?: string;
 }
 
-export interface InputProps {
+export interface IInputs {
   props: any; // 用户自定义输入
   command: string; // 执行指令
   yaml: {
