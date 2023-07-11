@@ -54,6 +54,7 @@ export enum IActionLevel {
 export interface IYaml {
   path: string;
   content: Record<string, any>;
+  use3x: boolean;
   projectNames: string[];
   extend?: string;
   useExtend?: boolean;

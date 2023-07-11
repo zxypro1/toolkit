@@ -12,7 +12,7 @@
 #   更多函数计算案例，可参考：https://github.com/devsapp/awesome/
 #   有问题快来钉钉群问一下吧：33947367
 # ------------------------------------
-edition: 1.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+edition: 3.0.0 #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
 name: framework #  项目名称
 # access 是当前应用所需要的密钥信息配置：
 # 密钥配置可以参考：https://www.serverless-devs.com/serverless-devs/command/config
@@ -35,6 +35,7 @@ vars: # 全局变量
     internetAccess: true
 resources:
   framework: # 业务名称/模块名称
+    # component: ${path('./fc.js')} # 组件名称
     component: v3test # 组件名称
     props: # 组件的属性值
       region: ${vars.region}

@@ -19,7 +19,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 class ParseSpec {
   private yaml = {} as IYaml;
   private record = {} as IRecord;
-  constructor(filePath: string = '', private argv: string[] = []) {
+  constructor(filePath: string = '', private argv: string[] = process.argv.slice(2)) {
     this.init(filePath);
     debug(`yaml path: ${this.yaml.path}`);
     debug(`argv: ${JSON.stringify(argv)}`);
@@ -44,12 +44,15 @@ class ParseSpec {
       this.yaml.content = extend2(true, {}, extendYaml, this.yaml.content);
     }
     this.yaml.access = get(this.yaml.content, 'access');
-    this.yaml.projectNames = keys(get(this.yaml.content, 'resources', {}));
+    const use3x = String(get(this.yaml.content, 'edition')) === '3.0.0';
+    const projectKey = use3x ? 'resources' : 'services';
+    this.yaml.use3x = use3x;
+    this.yaml.projectNames = keys(get(this.yaml.content, projectKey, {}));
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
     this.yaml.template = get(this.yaml.content, 'template', {});
-    this.yaml.projects = get(this.yaml.content, 'resources', {});
+    this.yaml.projects = get(this.yaml.content, projectKey, {});
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
   }
   start(): ISpec {
