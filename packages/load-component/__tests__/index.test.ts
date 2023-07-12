@@ -1,6 +1,7 @@
 import { get } from 'lodash';
 import loadComponent from '../src';
 import path from 'path';
+import fs from 'fs-extra';
 const env = process.env;
 
 beforeEach(() => {
@@ -14,10 +15,17 @@ test('本地路径', async () => {
   expect(get(instance, '__path')).toBe(componentPath);
 });
 
-test.only('fc', async () => {
+test.only('v3test', async () => {
   const instance = await loadComponent('v3test', { logger: console, a: '123' });
   console.log(instance);
-  // expect(get(instance, '__path')).toBe(componentPath);
+  expect(fs.existsSync(get(instance, '__path'))).toBe(true);
+
+});
+
+test.only('v3test@0.0.16', async () => {
+  const instance = await loadComponent('v3test@0.0.16', { logger: console, a: '123' });
+  console.log(instance);
+  expect(fs.existsSync(get(instance, '__path'))).toBe(true);
 });
 
 test('fc@0.1.72', async () => {

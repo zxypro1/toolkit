@@ -40,7 +40,6 @@ class Componet {
         componentVersion ? `@${componentVersion}` : ''
       }.zip`,
       extract: true,
-      strip: 1,
     });
     fs.writeFileSync(lockPath, JSON.stringify({ version: componentVersion }, null, 2));
     return await buildComponentInstance(componentCachePath, this.params);
