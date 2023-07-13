@@ -56,7 +56,7 @@ class Actions {
       this.option.hookLevel === IActionLevel.PROJECT
         ? `${this.option.projectName} project`
         : IActionLevel.GLOBAL;
-    this.logger.info(`Start the ${hookType}-action in ${this.record.lable}`);
+    this.logger.debug(`Start the ${hookType}-action in ${this.record.lable}`);
     const newHooks = getInputs(hooks, this.record.magic);
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
@@ -75,7 +75,7 @@ class Actions {
     if (hookType === IHookType.PRE) {
       this.record.pluginOutput = {};
     }
-    this.logger.info(
+    this.logger.debug(
       `End the ${hookType}-action in ${
         this.option.hookLevel === IActionLevel.PROJECT
           ? `${this.option.projectName} project`

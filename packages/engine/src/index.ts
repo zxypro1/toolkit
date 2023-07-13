@@ -295,7 +295,7 @@ class Engine {
     await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
   }
   private async handleSrc(item: IStepOptions) {
-    this.logger.info(`Start executing project ${item.projectName}`);
+    this.logger.debug(`Start executing project ${item.projectName}`);
     try {
       await this.handleAfterSrc(item);
       // 项目的output, 再次获取魔法变量
@@ -321,7 +321,7 @@ class Engine {
     }
     // 若记录的全局状态为true，则进行输出成功的日志
     this.record.status === STEP_STATUS.SUCCESS &&
-      this.logger.info(`Project ${item.projectName} successfully to execute`);
+      this.logger.debug(`Project ${item.projectName} successfully to execute`);
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {
