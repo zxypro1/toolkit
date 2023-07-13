@@ -318,9 +318,9 @@ class Engine {
     try {
       debug(`project item: ${stringify(item)}`);
       item.credential = await getCredential(item.access, this.logger);
-      each(item.credential, v => {
-        this.glog.__setSecret([v])
-      })
+      each(item.credential, (v) => {
+        this.glog.__setSecret([v]);
+      });
       const newAction = this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
       debug(`project actions: ${JSON.stringify(newAction)}`);
       this.actionInstance = new Actions(newAction, {
@@ -398,8 +398,8 @@ class Engine {
       },
       outputs: this.getOutput(),
       getCredential: async () => {
-        const res = await new Credential({ logger: this.logger }).get(item.access)
-        return get(res, 'credential', {})
+        const res = await new Credential({ logger: this.logger }).get(item.access);
+        return get(res, 'credential', {});
       },
     };
     this.recordContext(item, { props: newInputs });
@@ -429,10 +429,11 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new TipsError(`The [${method}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${item.component
-          } has the ${method} method. Serverless Devs documents：${chalk.underline(
-            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-          )}`,
+        tips: `Please check the component ${
+          item.component
+        } has the ${method} method. Serverless Devs documents：${chalk.underline(
+          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+        )}`,
       });
     }
     // 应用级操作
