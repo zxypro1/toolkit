@@ -301,14 +301,23 @@ class Engine {
       // 项目的output, 再次获取魔法变量
       this.actionInstance.setValue('magic', this.getFilterContext(item));
       const newInputs = await this.getProps(item);
-      await this.actionInstance.start(IHookType.SUCCESS, newInputs);
+      const res = await this.actionInstance.start(IHookType.SUCCESS, {
+        ...newInputs,
+        output: get(item, 'output', {}),
+      });
+      this.recordContext(item, get(res, 'pluginOutput', {}));
     } catch (error) {
       const newInputs = await this.getProps(item);
-      await this.actionInstance.start(IHookType.FAIL, newInputs);
+      const res = await this.actionInstance.start(IHookType.FAIL, newInputs);
+      this.recordContext(item, get(res, 'pluginOutput', {}));
     } finally {
       this.recordContext(item, { done: true });
       const newInputs = await this.getProps(item);
-      await this.actionInstance.start(IHookType.COMPLETE, newInputs);
+      const res = await this.actionInstance.start(IHookType.COMPLETE, {
+        ...newInputs,
+        output: get(item, 'output', {}),
+      });
+      this.recordContext(item, get(res, 'pluginOutput', {}));
     }
     // 若记录的全局状态为true，则进行输出成功的日志
     this.record.status === STEP_STATUS.SUCCESS &&

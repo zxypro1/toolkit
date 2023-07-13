@@ -28,7 +28,7 @@ vars: # 全局变量
     description: hello world by serverless devs
 
 resources:
- next-helloworld: # 业务名称/模块名称
+  next-helloworld: # 业务名称/模块名称
     component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
     actions:
       pre-${regx('.')}:
@@ -36,6 +36,10 @@ resources:
           args:
             testKey: testValue
         - plugin: ${path('./plugin/b.js')}
+          args:
+            testKey: testValue
+      complete-deploy:
+        - plugin: ${path('./plugin/o.js')}
           args:
             testKey: testValue
     props:
@@ -49,18 +53,16 @@ resources:
         handler: index.handler
         memorySize: 128
         timeout: 60
-      triggers:
-        - name: httpTrigger
-          type: http
-          config:
-            authType: anonymous
-            methods:
-              - GET
-      customDomains:
-        - domainName: auto
-          protocol: HTTP
-          routeConfigs:
-            - path: /*
-              methods:
-                - GET
-                - POST
+  website: # 业务名称/模块名称
+    component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    props:
+      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
+      service: ${vars.service}
+      function:
+        name: B
+        description: hello world by serverless devs
+        runtime: nodejs14
+        codeUri: ./code
+        handler: index.handler
+        memorySize: 128
+        timeout: 60

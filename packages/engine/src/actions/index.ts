@@ -71,6 +71,10 @@ class Actions {
         await this.component(hook);
       }
     }
+    // pre-action执行完毕，清空pluginOutput, post-action应获取componentProps
+    if (hookType === IHookType.PRE) {
+      this.record.pluginOutput = {};
+    }
     this.logger.info(
       `End the ${hookType}-action in ${
         this.option.hookLevel === IActionLevel.PROJECT
@@ -111,7 +115,6 @@ class Actions {
   private async plugin(hook: IPluginAction) {
     try {
       const instance = await loadComponent(hook.value);
-      // TODO: inputs
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
       this.record.pluginOutput = await instance(inputs, hook.args);
     } catch (e) {

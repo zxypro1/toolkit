@@ -63,7 +63,7 @@ test('basic', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('credential secret', async () => {
+test('credential secret', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/credential.yaml'),
     args: ['deploy'],
@@ -263,7 +263,7 @@ test('extend and project yaml extend', async () => {
   expect(context.status).toBe('success');
 });
 
-test('plugin update inputs', async () => {
+test.only('plugin update inputs', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/plugin.yaml'),
     args: ['deploy'],
