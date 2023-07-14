@@ -67,7 +67,7 @@ test('showSimpleDiffString', () => {
   console.log(show);
 })
 
-test.only('showCompleteDiffString', () => {
+test('showCompleteDiffString', () => {
   const a = {
     a: 1,
     b: '2',

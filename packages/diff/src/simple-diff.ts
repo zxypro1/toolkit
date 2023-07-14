@@ -1,8 +1,14 @@
 import { diff } from 'just-diff';
 import { get, isEmpty, set, isPlainObject, cloneDeep } from 'lodash';
 import { red, yellow, green } from 'chalk';
-import { toString } from './utils';
-import { IOpts } from './typs';
+import { IOpts } from './types';
+
+function toString(value: any): string {
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return value;
+}
 
 function arrayToString(array: any[], deep: number, len: number): string[] {
   const pre = new Array(deep * len).join(' ');
