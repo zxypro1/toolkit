@@ -1,12 +1,14 @@
 import Logger from '@serverless-devs/logger';
 import Engine from '../src';
 import path from 'path';
+import { TipsError } from '@serverless-devs/utils';
+import { AssertionError } from 'assert';
 
 test('指定 template 不存在', async () => {
   const engine = new Engine({
     template: './no.yaml',
     args: ['deploy'],
-    cwd : path.join(__dirname, './mock')
+    cwd: path.join(__dirname, './mock')
   });
   const context = await engine.start();
   console.log(context.error);
@@ -16,7 +18,7 @@ test('指定 template 不存在', async () => {
 test('未指定 template', async () => {
   const engine = new Engine({
     args: ['deploy'],
-    cwd : path.join(__dirname, './mock')
+    cwd: path.join(__dirname, './mock')
   });
   const context = await engine.start();
   console.log(context.error);
@@ -67,7 +69,7 @@ test('credential secret', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/credential.yaml'),
     args: ['deploy'],
-    logConfig:{
+    logConfig: {
       level: 'DEBUG',
     }
   });
@@ -120,7 +122,7 @@ test('指定服务 方法不存在时', async () => {
   const method = 'empty';
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['framework','empty']
+    args: ['framework', 'empty']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -131,20 +133,19 @@ test('指定服务 方法不存在时', async () => {
 test('指定服务 方法存在，但是执行报错了', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['framework','error']
-
+    args: ['next_function', 'error']
   });
   const context = await engine.start();
-  console.log(context.error);
-  expect(context.error.message).toMatch(`error test`);
-  expect(context.error.message).toMatch('101');
+  const error = context.error as TipsError;
+  expect(error.message).toBe(`error test`);
+  expect(error.exitCode).toBe(101);
 });
 
 test('应用级操作 方法不存在时', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['empty']
-    
+
   });
   const context = await engine.start();
   console.log(context.error);
@@ -166,7 +167,7 @@ test('全局action 成功', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/global-actions/s.yaml'),
     args: ['deploy'],
-    logConfig:{
+    logConfig: {
       logDir: path.join(__dirname, './mock/global-actions/logs')
     }
   });
@@ -201,7 +202,7 @@ test('flow', async () => {
 test('args', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow.yaml'),
-    args: ['deploy', '--help', '-a', 'test', '--skip-actions', '--debug', '-o', 'json', '-v' ]
+    args: ['deploy', '--help', '-a', 'test', '--skip-actions', '--debug', '-o', 'json', '-v']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -212,7 +213,7 @@ test('customLogger', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow.yaml'),
     args: ['deploy'],
-    logConfig:{
+    logConfig: {
       customLogger: new Logger({
         traceId: Math.random().toString(16).slice(2),
         logDir: path.join(__dirname, 'logs'),
@@ -228,7 +229,7 @@ test('skip-actions', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/global-actions/s.yaml'),
     args: ['deploy', '--skip-actions'],
-    logConfig:{
+    logConfig: {
       customLogger: new Logger({
         traceId: Math.random().toString(16).slice(2),
         logDir: path.join(__dirname, 'logs'),
@@ -263,15 +264,38 @@ test('extend and project yaml extend', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('plugin update inputs', async () => {
+test('plugin update inputs', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/plugin.yaml'),
     args: ['deploy'],
-    logConfig:{
+    logConfig: {
       level: 'DEBUG',
     }
   });
   const context = await engine.start();
   console.log(context.error);
   expect(context.status).toBe('success');
+});
+
+test('utils_2.TipsError is not a constructor', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/project.yaml'),
+    args: ['error']
+  });
+  const context = await engine.start();
+  const error = context.error as TipsError;
+  console.log(error);
+  expect(error.message).toBe(`error test`);
+  expect(error.exitCode).toBe(101);
+});
+
+test.only('validate', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/project.yaml'),
+  });
+  const context = await engine.start();
+  console.log(context);
+  const error = context.error as AssertionError;
+  expect(error.message).toBe('method is required');
+  expect(error.code).toBe('ERR_ASSERTION');
 });

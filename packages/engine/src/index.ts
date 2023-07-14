@@ -39,6 +39,7 @@ import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import * as utils from '@serverless-devs/utils';
 import { TipsError } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
+import assert from 'assert';
 
 export { IEngineOptions, IContext } from './types';
 
@@ -69,6 +70,8 @@ class Engine {
       this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
       this.spec = this.parseSpecInstance.start();
     } catch (error) {
+      this.context.status = STEP_STATUS.FAILURE;
+      this.context.completed = true;
       this.context.error = error as Error;
       return this.context;
     }
@@ -77,7 +80,16 @@ class Engine {
       process.env[key] = value;
     });
     const { steps: _steps, yaml, access = yaml.access } = this.spec;
-    this.validate();
+    // 参数校验
+    try {
+      this.validate();
+    } catch (error) {
+      this.context.status = STEP_STATUS.FAILURE;
+      this.context.completed = true;
+      this.context.error = error as Error;
+      return this.context;
+    }
+    // 初始化 logger
     this.glog = this.getLogger() as Logger;
     this.logger = this.glog.__generate('engine');
     const steps = await this.download(_steps);
@@ -89,11 +101,12 @@ class Engine {
     });
     const credential = await getCredential(access, this.logger);
     // 处理 global-pre
-
     try {
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
       this.context.error = error as Error;
+      this.context.status = STEP_STATUS.FAILURE;
+      await this.doCompleted();
       return this.context;
     }
 
@@ -203,12 +216,8 @@ class Engine {
   }
   private validate() {
     const { steps, method } = this.spec;
-    if (isEmpty(steps)) {
-      throw new Error('steps is empty');
-    }
-    if (isEmpty(method)) {
-      throw new Error('method is empty');
-    }
+    assert(!isEmpty(steps), 'steps is required');
+    assert(method, 'method is required');
   }
   private async download(steps: IParseStep[]) {
     const newSteps = [];
@@ -286,42 +295,77 @@ class Engine {
   }
   private async doCompleted() {
     this.context.completed = true;
-    if (this.context.status === STEP_STATUS.SUCCESS) {
-      await this.globalActionInstance.start(IHookType.SUCCESS, this.context);
-    }
     if (this.context.status === STEP_STATUS.FAILURE) {
-      await this.globalActionInstance.start(IHookType.FAIL, this.context);
+      try {
+        await this.globalActionInstance.start(IHookType.FAIL, this.context);
+      } catch (error) {
+        this.context.status = STEP_STATUS.FAILURE;
+        this.context.error = error as Error;
+      }
     }
-    await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
+    if (this.context.status === STEP_STATUS.SUCCESS) {
+      try {
+        await this.globalActionInstance.start(IHookType.SUCCESS, this.context);
+      } catch (error) {
+        this.context.status = STEP_STATUS.FAILURE;
+        this.context.error = error as Error;
+      }
+    }
+    try {
+      await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
+    } catch (error) {
+      this.context.status = STEP_STATUS.FAILURE;
+      this.context.error = error as Error;
+    }
   }
   private async handleSrc(item: IStepOptions) {
     this.logger.debug(`Start executing project ${item.projectName}`);
     try {
+      // project pre hook and project component
       await this.handleAfterSrc(item);
-      // 项目的output, 再次获取魔法变量
-      this.actionInstance.setValue('magic', this.getFilterContext(item));
-      const newInputs = await this.getProps(item);
-      const res = await this.actionInstance.start(IHookType.SUCCESS, {
-        ...newInputs,
-        output: get(item, 'output', {}),
-      });
-      this.recordContext(item, get(res, 'pluginOutput', {}));
     } catch (error) {
-      const newInputs = await this.getProps(item);
-      const res = await this.actionInstance.start(IHookType.FAIL, newInputs);
-      this.recordContext(item, get(res, 'pluginOutput', {}));
-    } finally {
-      this.recordContext(item, { done: true });
+      // project fail hook
+      try {
+        const newInputs = await this.getProps(item);
+        const res = await this.actionInstance.start(IHookType.FAIL, newInputs);
+        this.recordContext(item, get(res, 'pluginOutput', {}));
+      } catch (error) {
+        this.record.status = STEP_STATUS.FAILURE;
+        this.recordContext(item, { error });
+      }
+    }
+    // 若记录的全局状态为true，则进行输出成功的日志
+    if (this.record.status === STEP_STATUS.SUCCESS) {
+      // project success hook
+      try {
+        // 项目的output, 再次获取魔法变量
+        this.actionInstance.setValue('magic', this.getFilterContext(item));
+        const newInputs = await this.getProps(item);
+        const res = await this.actionInstance.start(IHookType.SUCCESS, {
+          ...newInputs,
+          output: get(item, 'output', {}),
+        });
+        this.recordContext(item, get(res, 'pluginOutput', {}));
+      } catch (error) {
+        this.record.status = STEP_STATUS.FAILURE;
+        this.recordContext(item, { error });
+      }
+    }
+    // project complete hook
+    try {
       const newInputs = await this.getProps(item);
       const res = await this.actionInstance.start(IHookType.COMPLETE, {
         ...newInputs,
         output: get(item, 'output', {}),
       });
       this.recordContext(item, get(res, 'pluginOutput', {}));
+    } catch (error) {
+      this.record.status = STEP_STATUS.FAILURE;
+      this.recordContext(item, { error, done: true });
     }
-    // 若记录的全局状态为true，则进行输出成功的日志
-    this.record.status === STEP_STATUS.SUCCESS &&
+    if (this.record.status === STEP_STATUS.SUCCESS) {
       this.logger.debug(`Project ${item.projectName} successfully to execute`);
+    }
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {

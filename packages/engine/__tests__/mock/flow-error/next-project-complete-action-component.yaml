@@ -33,14 +33,14 @@ actions:
       args:
         testKey: testValue
     - run: echo global pre ${vars.region}-${env('desc')}
-  success-deploy:
+  success-${regx('.')}:
     - run: echo success-deploy
-  complete-${regx('deploy')}:
+  complete-${regx('.')}:
     - run: echo complete-deploy
     - plugin: ${path('../plugin/a.js')}
       args:
         testKey: testValue
-  fail-deploy:
+  fail-${regx('.')}:
     - run: echo fail-${vars.region}-${env('desc')}
     - plugin: ${path('../plugin/a.js')}
       args:
@@ -58,18 +58,14 @@ resources:
         - plugin: ${path('../plugin/b.js')}
           args:
             testKey: testValue
-      success-deploy:
+      success-${regx('.')}:
         - run: echo success-deploy
-        - run: npm run error
-          path: './'
-      complete-${regx('deploy')}:
+      complete-${regx('.')}:
         - run: echo complete-deploy
         - plugin: ${path('../plugin/a.js')}
           args:
             testKey: testValue
-        - component: v3test deploy
-      fail-deploy:
-        - run: echo fail-${vars.region}-${env('desc')}
+      fail-${regx('.')}:
         - plugin: ${path('../plugin/a.js')}
           args:
             testKey: testValue
@@ -118,6 +114,7 @@ resources:
         - plugin: ${path('../plugin/a.js')}
           args:
             testKey: testValue
+        - component: v3test error
         - component: v3test deploy -e '{"word_file":"example.docx"}'
       fail-deploy:
         - run: echo fail-${vars.region}-${env('desc')}
