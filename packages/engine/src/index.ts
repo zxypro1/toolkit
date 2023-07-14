@@ -23,7 +23,7 @@ import {
   STEP_STATUS,
   STEP_IF,
 } from './types';
-import { getProcessTime, getCredential, stringify, randomId } from './utils';
+import { getProcessTime, getCredential, stringify, randomId, getAllowFailure } from './utils';
 import ParseSpec, {
   getInputs,
   ISpec,
@@ -95,9 +95,16 @@ class Engine {
       return this.context;
     }
     // 初始化 logger
-    this.glog = this.getLogger() as Logger;
-    this.logger = this.glog.__generate('engine');
-    const steps = await this.download(_steps);
+    try {
+      this.glog = this.getLogger() as Logger;
+      this.logger = this.glog.__generate('engine');
+      this.context.steps = await this.download(_steps);
+    } catch (error) {
+      this.context.status = STEP_STATUS.FAILURE;
+      this.context.completed = true;
+      this.context.error.push(error as Error);
+      return this.context;
+    }
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -115,7 +122,7 @@ class Engine {
       return this.context;
     }
 
-    this.context.steps = map(steps, (item) => {
+    this.context.steps = map(this.context.steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
     });
     const res: IContext = await new Promise(async (resolve) => {
@@ -477,6 +484,11 @@ class Engine {
         try {
           return await item.instance[method](componentProps);
         } catch (e) {
+          const useAllowFailure = getAllowFailure(item.allow_failure, {
+            exitCode: EXIT_CODE.COMPONENT,
+            command: method,
+          });
+          if (useAllowFailure) return;
           const error = e as Error;
           throw new TipsError(error.message, {
             exitCode: EXIT_CODE.COMPONENT,
@@ -484,6 +496,11 @@ class Engine {
           });
         }
       }
+      const useAllowFailure = getAllowFailure(item.allow_failure, {
+        exitCode: EXIT_CODE.DEVS,
+        command: method,
+      });
+      if (useAllowFailure) return;
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new TipsError(`The [${method}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
@@ -500,6 +517,11 @@ class Engine {
       try {
         return await item.instance[method](componentProps);
       } catch (e) {
+        const useAllowFailure = getAllowFailure(item.allow_failure, {
+          exitCode: EXIT_CODE.COMPONENT,
+          command: method,
+        });
+        if (useAllowFailure) return;
         const error = e as Error;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,

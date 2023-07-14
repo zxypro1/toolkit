@@ -15,7 +15,7 @@ import fs from 'fs-extra';
 import execa from 'execa';
 import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
-import { stringify } from '../utils';
+import { getAllowFailure, stringify } from '../utils';
 import chalk from 'chalk';
 import { ILoggerInstance } from '@serverless-devs/logger';
 import { EXIT_CODE } from '../constants';
@@ -94,6 +94,7 @@ class Actions {
             'Please check whether the actions section of yaml can be executed in the current environment.',
           );
         }
+        if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.RUN })) return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.RUN,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
@@ -101,6 +102,7 @@ class Actions {
       }
       return;
     }
+    if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.DEVS })) return;
     throw new TipsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
@@ -113,6 +115,7 @@ class Actions {
       this.record.pluginOutput = await instance(inputs, hook.args);
     } catch (e) {
       const error = e as Error;
+      if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.PLUGIN })) return;
       throw new TipsError(error.message, {
         exitCode: EXIT_CODE.PLUGIN,
         prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
@@ -134,12 +137,14 @@ class Actions {
         return await instance[method](newInputs);
       } catch (e) {
         const error = e as Error;
+        if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.COMPONENT })) return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
         });
       }
     }
+    if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.DEVS })) return;
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
     throw new TipsError(`The [${method}] command was not found.`, {
       exitCode: EXIT_CODE.DEVS,

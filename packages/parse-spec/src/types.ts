@@ -6,6 +6,7 @@ export interface IStep {
   order: number;
   access: string | undefined;
   flowId?: number;
+  allow_failure?: boolean | IAllowFailure;
 }
 
 export enum IHookType {
@@ -27,6 +28,7 @@ export interface IRunAction {
   path: string;
   level: `${IActionLevel}`;
   projectName: string;
+  allow_failure?: boolean | IAllowFailure;
 }
 export interface IPluginAction {
   hookType: `${IHookType}`;
@@ -35,6 +37,7 @@ export interface IPluginAction {
   args?: Record<string, any>;
   level: `${IActionLevel}`;
   projectName: string;
+  allow_failure?: boolean | IAllowFailure;
 }
 export interface IComponentAction {
   hookType: `${IHookType}`;
@@ -42,9 +45,14 @@ export interface IComponentAction {
   value: string;
   level: `${IActionLevel}`;
   projectName: string;
+  allow_failure?: boolean | IAllowFailure;
 }
 
 export type IAction = IRunAction | IPluginAction | IComponentAction;
+export interface IAllowFailure {
+  exit_code?: number[];
+  command?: string[];
+}
 
 export enum IActionLevel {
   PROJECT = 'project',
