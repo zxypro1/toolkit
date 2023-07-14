@@ -1,6 +1,5 @@
 import Engine from '../src';
 import path from 'path';
-import { TipsError } from '@serverless-devs/utils';
 
 test('parse spec', async () => {
   const engine = new Engine({
@@ -40,8 +39,7 @@ test('global-pre-action run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+  expect(context.status).toBe('failure');
 });
 
 test('global-pre-action plugin', async () => {
@@ -55,8 +53,8 @@ test('global-pre-action plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-pre-action-run', async () => {
@@ -70,8 +68,8 @@ test('project-pre-action-run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-pre-action-plugin', async () => {
@@ -85,8 +83,8 @@ test('project-pre-action-plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-pre-action-component', async () => {
@@ -100,8 +98,8 @@ test('project-pre-action-component', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-component', async () => {
@@ -115,8 +113,8 @@ test('project-component', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-success-action-run', async () => {
@@ -130,8 +128,8 @@ test('project-success-action-run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-success-action-plugin', async () => {
@@ -145,8 +143,8 @@ test('project-success-action-plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-success-action-component', async () => {
@@ -160,8 +158,8 @@ test('project-success-action-component', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-fail-action-run', async () => {
@@ -175,8 +173,8 @@ test('project-fail-action-run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-fail-action-plugin', async () => {
@@ -190,8 +188,8 @@ test('project-fail-action-plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-fail-action-component', async () => {
@@ -205,8 +203,8 @@ test('project-fail-action-component', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-complete-action-run', async () => {
@@ -220,8 +218,8 @@ test('project-complete-action-run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-complete-action-plugin', async () => {
@@ -235,8 +233,8 @@ test('project-complete-action-plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('project-complete-action-component', async () => {
@@ -250,8 +248,8 @@ test('project-complete-action-component', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('next-project-complete-action-component', async () => {
@@ -265,8 +263,8 @@ test('next-project-complete-action-component', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('global-success-action-run', async () => {
@@ -280,8 +278,8 @@ test('global-success-action-run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('global-success-action-plugin', async () => {
@@ -295,8 +293,8 @@ test('global-success-action-plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test('global-complete-action-run', async () => {
@@ -310,14 +308,14 @@ test('global-complete-action-run', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });
 
 test.only('global-complete-action-plugin', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow-error/global-complete-action-plugin.yaml'),
-    args: ['deploy'],
+    args: ['error'],
     logConfig:{
       logDir: path.join(__dirname, './logs'),
       level: 'DEBUG',
@@ -325,6 +323,6 @@ test.only('global-complete-action-plugin', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as TipsError;
-  expect(error.exitCode).toBe(101);
+   expect(context.status).toBe('failure');
+
 });

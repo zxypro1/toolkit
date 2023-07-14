@@ -45,7 +45,7 @@ actions:
         testKey: testValue
   fail-${regx('.')}:
     - run: echo fail-${vars.region}-${env('desc')}
-    - plugin: ${path('../plugin/a.js')}
+    - plugin: ${path('../plugin/e.js')}
       args:
         testKey: testValue
 
@@ -62,10 +62,13 @@ resources:
           args:
             testKey: testValue
       success-${regx('.')}:
-        - run: echo success-deploy
+        - run: npm run error
+        - plugin: ${path('../plugin/e.js')}
+          args:
+            testKey: testValue
       complete-${regx('.')}:
         - run: echo complete-deploy
-        - plugin: ${path('../plugin/a.js')}
+        - plugin: ${path('../plugin/e.js')}
           args:
             testKey: testValue
       fail-${regx('.')}:

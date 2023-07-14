@@ -19,6 +19,7 @@ import {
   IStatus,
   IEngineOptions,
   IContext,
+  IEngineError,
   STEP_STATUS,
   STEP_IF,
 } from './types';
@@ -39,14 +40,18 @@ import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import * as utils from '@serverless-devs/utils';
 import { TipsError } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
-import assert from 'assert';
+import assert, { AssertionError } from 'assert';
 
 export { IEngineOptions, IContext } from './types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
 class Engine {
-  public context = { status: STEP_STATUS.PENING, completed: false } as IContext;
+  public context = {
+    status: STEP_STATUS.PENING,
+    completed: false,
+    error: [] as IEngineError[],
+  } as IContext;
   private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
   private glog!: Logger;
@@ -72,7 +77,7 @@ class Engine {
     } catch (error) {
       this.context.status = STEP_STATUS.FAILURE;
       this.context.completed = true;
-      this.context.error = error as Error;
+      this.context.error.push(error as Error);
       return this.context;
     }
     // 初始化行参环境变量 > .env (parse-spec require .env)
@@ -86,7 +91,7 @@ class Engine {
     } catch (error) {
       this.context.status = STEP_STATUS.FAILURE;
       this.context.completed = true;
-      this.context.error = error as Error;
+      this.context.error.push(error as AssertionError);
       return this.context;
     }
     // 初始化 logger
@@ -104,7 +109,7 @@ class Engine {
     try {
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
-      this.context.error = error as Error;
+      this.context.error.push(error as TipsError);
       this.context.status = STEP_STATUS.FAILURE;
       await this.doCompleted();
       return this.context;
@@ -257,7 +262,7 @@ class Engine {
         }
         if (error) {
           obj.error = error;
-          this.context.error = error;
+          this.context.error.push(error);
         }
         if (props) {
           obj.props = props;
@@ -300,7 +305,7 @@ class Engine {
         await this.globalActionInstance.start(IHookType.FAIL, this.context);
       } catch (error) {
         this.context.status = STEP_STATUS.FAILURE;
-        this.context.error = error as Error;
+        this.context.error.push(error as TipsError);
       }
     }
     if (this.context.status === STEP_STATUS.SUCCESS) {
@@ -308,14 +313,14 @@ class Engine {
         await this.globalActionInstance.start(IHookType.SUCCESS, this.context);
       } catch (error) {
         this.context.status = STEP_STATUS.FAILURE;
-        this.context.error = error as Error;
+        this.context.error.push(error as TipsError);
       }
     }
     try {
       await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
     } catch (error) {
       this.context.status = STEP_STATUS.FAILURE;
-      this.context.error = error as Error;
+      this.context.error.push(error as TipsError);
     }
   }
   private async handleSrc(item: IStepOptions) {

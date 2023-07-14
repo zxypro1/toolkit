@@ -1,6 +1,8 @@
 import { IStep } from '@serverless-devs/parse-spec';
 import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
+import { AssertionError } from 'assert';
+import { TipsError } from '@serverless-devs/utils';
 export interface IEngineOptions {
   args?: string[]; //默认 process.argv.slice(2)
   template?: string;
@@ -67,6 +69,8 @@ export interface IContext {
   status: IStatus; // 记录task的状态
   completed: boolean; // 记录task是否执行完成
   inputs: Record<string, any>; // 记录inputs的输入(魔法变量)
-  error: Error; // 记录step的错误信息
+  error: IEngineError[]; // 记录step的错误信息
   output: Record<string, any>; // 记录step的输出
 }
+
+export type IEngineError = Error | AssertionError | TipsError;
