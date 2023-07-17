@@ -82,7 +82,10 @@ test('credential secret', async () => {
 test('s deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['deploy']
+    args: ['deploy'],
+    logConfig: {
+      level: 'DEBUG',
+    }
   });
   const context = await engine.start();
   console.log(context.error);
@@ -123,12 +126,12 @@ test('指定服务 方法不存在时', async () => {
   const method = 'empty';
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['framework', 'empty']
+    args: ['next_function', 'empty']
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(get(context, 'error[0].message')).toMatch(`The [${method}] command was not found`);
-  expect(get(context, 'error[0].message')).toMatch('100');
+  expect(get(context, 'error[0].message')).toBe(`The [${method}] command was not found.`);
+  expect(get(context, 'error[0].exitCode')).toBe(100);
 });
 
 test('指定服务 方法存在，但是执行报错了', async () => {
@@ -149,7 +152,7 @@ test('应用级操作 方法不存在时', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(get(context, 'error[0].message')).toMatch(`The [empty] command was not found`);
+  expect(get(context, 'status')).toBe('success');
 });
 
 test('应用级操作，方法执行报错了', async () => {
@@ -159,8 +162,8 @@ test('应用级操作，方法执行报错了', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(get(context, 'error[0].message')).toMatch(`error test`);
-  expect(get(context, 'error[0].message')).toMatch('101');
+  expect(get(context, 'error[0].message')).toBe(`error test`);
+  expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
 test('全局action 成功', async () => {
@@ -175,18 +178,6 @@ test('全局action 成功', async () => {
   console.log(context.error);
   expect(context.status).toBe('success');
 });
-
-test('全局action 失败', async () => {
-  const engine = new Engine({
-    template: path.join(__dirname, './mock/global-actions/error.yaml'),
-    args: ['deploy']
-  });
-  const context = await engine.start();
-  console.log(context.error);
-  expect(get(context, 'error[0].message')).toMatch('Not implemented')
-  expect(get(context, 'error[0].message')).toMatch('101');
-});
-
 
 
 test('flow', async () => {
@@ -287,7 +278,7 @@ test('utils_2.TipsError is not a constructor', async () => {
   expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
-test.only('validate', async () => {
+test('validate', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
   });

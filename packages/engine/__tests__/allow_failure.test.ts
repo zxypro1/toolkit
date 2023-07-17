@@ -31,7 +31,7 @@ test('global-pre-action plugin', async () => {
 
 });
 
-test.only('project-pre-action-run', async () => {
+test('project-pre-action-run', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/allow-failure/project-pre-action-run.yaml'),
     args: ['deploy'],

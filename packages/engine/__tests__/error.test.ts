@@ -177,7 +177,7 @@ test('project-fail-action-run', async () => {
 
 });
 
-test.only('project-fail-action-plugin', async () => {
+test('project-fail-action-plugin', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow-error/project-fail-action-plugin.yaml'),
     args: ['helloworld', 'error'],

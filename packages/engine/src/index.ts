@@ -262,15 +262,15 @@ class Engine {
       vars: this.spec.yaml.vars,
     } as Record<string, any>;
     for (const obj of this.context.steps) {
-      data[obj.projectName] = { output: obj.output || {} };
+      data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
     }
     if (item) {
-      data.credentials = item.credential;
+      data.credential = item.credential;
       data.that = {
         name: item.projectName,
         access: item.access,
         component: item.component,
-        props: item.props,
+        props: data[item.projectName].props,
         output: data[item.projectName].output,
       };
     }
@@ -368,9 +368,8 @@ class Engine {
         logger: item.logger,
         skipActions: this.spec.skipActions,
       });
-      const newInputs = await this.getProps(item);
-      item.props = get(newInputs, 'props', {});
       this.actionInstance.setValue('magic', this.getFilterContext(item));
+      const newInputs = await this.getProps(item);
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
       // 记录全局的执行状态

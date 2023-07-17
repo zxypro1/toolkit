@@ -49,20 +49,20 @@ export const getAllowFailure = (
   allowFailure: boolean | IAllowFailure | undefined,
   data: { exitCode?: number; command?: string },
 ): boolean => {
-  if (!allowFailure) return false;
   if (typeof allowFailure === 'boolean') {
     return allowFailure;
   }
-  if ('exitCode' in data && 'command' in data) {
+  if (typeof allowFailure !== 'object') return false;
+  if ('exit_code' in allowFailure && 'command' in allowFailure) {
     return (
       includes(get(allowFailure, 'exit_code'), get(data, 'exitCode')) &&
       includes(get(allowFailure, 'command'), get(data, 'command'))
     );
   }
-  if ('exitCode' in data) {
+  if ('exit_code' in allowFailure) {
     return includes(get(allowFailure, 'exit_code'), get(data, 'exitCode'));
   }
-  if ('command' in data) {
+  if ('command' in allowFailure) {
     return includes(get(allowFailure, 'command'), get(data, 'command'));
   }
   return false;
