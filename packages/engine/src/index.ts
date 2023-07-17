@@ -216,7 +216,7 @@ class Engine {
     const customLogger = get(this.options, 'logConfig.customLogger');
     if (customLogger) {
       debug('use custom logger');
-      if (customLogger?.CODE  === Logger.CODE) {
+      if (customLogger?.CODE === Logger.CODE) {
         return customLogger;
       }
       throw new Error('customLogger must be instance of Logger');
