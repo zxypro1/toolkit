@@ -67,44 +67,34 @@ class Engine {
     this.options.template = utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
-  // engine应收敛所有的异常，不应该抛出异常
-  async start() {
-    this.context.status = STEP_STATUS.RUNNING;
+  private async beforeStart() {
     // 初始化 spec
-    try {
-      this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
-      this.spec = this.parseSpecInstance.start();
-    } catch (error) {
-      this.context.status = STEP_STATUS.FAILURE;
-      this.context.completed = true;
-      this.context.error.push(error as Error);
-      return this.context;
-    }
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
+    this.spec = this.parseSpecInstance.start();
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
     });
-    const { steps: _steps, yaml, access = yaml.access } = this.spec;
+    const { steps: _steps } = this.spec;
     // 参数校验
-    try {
-      this.validate();
-    } catch (error) {
-      this.context.status = STEP_STATUS.FAILURE;
-      this.context.completed = true;
-      this.context.error.push(error as AssertionError);
-      return this.context;
-    }
+    this.validate();
     // 初始化 logger
+    this.glog = this.getLogger() as Logger;
+    this.logger = this.glog.__generate('engine');
+    this.context.steps = await this.download(_steps);
+  }
+  // engine应收敛所有的异常，不应该抛出异常
+  async start() {
+    this.context.status = STEP_STATUS.RUNNING;
     try {
-      this.glog = this.getLogger() as Logger;
-      this.logger = this.glog.__generate('engine');
-      this.context.steps = await this.download(_steps);
+      await this.beforeStart();
     } catch (error) {
       this.context.status = STEP_STATUS.FAILURE;
       this.context.completed = true;
-      this.context.error.push(error as Error);
+      this.context.error.push(error as IEngineError);
       return this.context;
     }
+    const { steps: _steps, yaml, access = yaml.access } = this.spec;
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -169,26 +159,6 @@ class Engine {
               this.record.startTime = Date.now();
               // 记录 context
               this.recordContext(item, { status: STEP_STATUS.RUNNING });
-              // 先判断if条件，成功则执行该步骤。
-              if (item.if) {
-                // 替换 failure()
-                item.if = replace(
-                  item.if,
-                  STEP_IF.FAILURE,
-                  this.record.status === STEP_STATUS.FAILURE ? 'true' : 'false',
-                );
-                // 替换 success()
-                item.if = replace(
-                  item.if,
-                  STEP_IF.SUCCESS,
-                  this.record.status !== STEP_STATUS.FAILURE ? 'true' : 'false',
-                );
-                // 替换 always()
-                item.if = replace(item.if, STEP_IF.ALWAYS, 'true');
-                return item.if === 'true'
-                  ? await Promise.all(map(flowProject, (o) => this.handleSrc(o)))
-                  : await Promise.all(map(flowProject, (o) => this.doSkip(o)));
-              }
               // 检查全局的执行状态，如果是failure，则不执行该步骤, 并记录状态为 skipped
               if (this.record.status === STEP_STATUS.FAILURE) {
                 return await Promise.all(map(flowProject, (o) => this.doSkip(o)));
