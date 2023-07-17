@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
+    "watch": "tsc -w",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },

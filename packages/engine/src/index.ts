@@ -38,9 +38,9 @@ import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import * as utils from '@serverless-devs/utils';
 import { TipsError } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
-import assert, { AssertionError } from 'assert';
+import assert from 'assert';
 
-export { IEngineOptions, IContext } from './types';
+export { IEngineOptions, IContext, IEngineError } from './types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
@@ -216,7 +216,7 @@ class Engine {
     const customLogger = get(this.options, 'logConfig.customLogger');
     if (customLogger) {
       debug('use custom logger');
-      if (customLogger instanceof Logger) {
+      if (customLogger?.CODE  === Logger.CODE) {
         return customLogger;
       }
       throw new Error('customLogger must be instance of Logger');
@@ -262,7 +262,7 @@ class Engine {
       vars: this.spec.yaml.vars,
     } as Record<string, any>;
     for (const obj of this.context.steps) {
-      data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
+      data[obj.projectName] = { output: obj.output || {} };
     }
     if (item) {
       data.credentials = item.credential;
@@ -270,7 +270,7 @@ class Engine {
         name: item.projectName,
         access: item.access,
         component: item.component,
-        props: data[item.projectName].props,
+        props: item.props,
         output: data[item.projectName].output,
       };
     }
@@ -302,7 +302,8 @@ class Engine {
     }
   }
   private async handleSrc(item: IStepOptions) {
-    this.logger.debug(`Start executing project ${item.projectName}`);
+    const { method } = this.spec;
+    this.logger.write(`⌛ Steps for [${method}] of [${item.projectName}]\n====================`);
     try {
       // project pre hook and project component
       await this.handleAfterSrc(item);
@@ -349,6 +350,8 @@ class Engine {
     if (this.record.status === STEP_STATUS.SUCCESS) {
       this.logger.debug(`Project ${item.projectName} successfully to execute`);
     }
+    // const msg = `${this.record.status === STEP_STATUS.SUCCESS ? '🚀' : chalk.red('✖')} Result for [${method}] of [${item.projectName}]\n====================`;;
+    // this.logger.write(msg);
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {
@@ -365,8 +368,9 @@ class Engine {
         logger: item.logger,
         skipActions: this.spec.skipActions,
       });
-      this.actionInstance.setValue('magic', this.getFilterContext(item));
       const newInputs = await this.getProps(item);
+      item.props = get(newInputs, 'props', {});
+      this.actionInstance.setValue('magic', this.getFilterContext(item));
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
       // 记录全局的执行状态
@@ -480,6 +484,7 @@ class Engine {
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
+        prefix: `Project ${item.projectName} failed to execute:`,
       });
     }
     // 应用级操作

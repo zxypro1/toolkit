@@ -54,7 +54,7 @@ class Actions {
     if (isEmpty(hooks)) return {};
     this.record.lable =
       this.option.hookLevel === IActionLevel.PROJECT
-        ? `${this.option.projectName} project`
+        ? `project ${this.option.projectName}`
         : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
     const newHooks = getInputs(hooks, this.record.magic);
