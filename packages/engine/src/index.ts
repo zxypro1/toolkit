@@ -481,10 +481,11 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new TipsError(`The [${method}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${item.component
-          } has the ${method} method. Serverless Devs documents：${chalk.underline(
-            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-          )}`,
+        tips: `Please check the component ${
+          item.component
+        } has the ${method} method. Serverless Devs documents：${chalk.underline(
+          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+        )}`,
         prefix: `Project ${item.projectName} failed to execute:`,
       });
     }
