@@ -3,7 +3,6 @@ import {
   isEmpty,
   get,
   each,
-  replace,
   map,
   isFunction,
   has,
@@ -21,7 +20,6 @@ import {
   IContext,
   IEngineError,
   STEP_STATUS,
-  STEP_IF,
 } from './types';
 import { getProcessTime, getCredential, stringify, randomId, getAllowFailure } from './utils';
 import ParseSpec, {
@@ -104,6 +102,7 @@ class Engine {
     const credential = await getCredential(access, this.logger);
     // 处理 global-pre
     try {
+      this.globalActionInstance.setValue('magic', this.getFilterContext());
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
       this.context.error.push(error as TipsError);
@@ -257,22 +256,24 @@ class Engine {
       return obj;
     });
   }
-  private getFilterContext(item: IStepOptions) {
+  private getFilterContext(item?: IStepOptions) {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
-      credential: item.credential,
     } as Record<string, any>;
     for (const obj of this.context.steps) {
       data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
     }
-    data.that = {
-      name: item.projectName,
-      access: item.access,
-      component: item.component,
-      props: data[item.projectName].props,
-      output: data[item.projectName].output,
-    };
+    if (item) {
+      data.credentials = item.credential;
+      data.that = {
+        name: item.projectName,
+        access: item.access,
+        component: item.component,
+        props: data[item.projectName].props,
+        output: data[item.projectName].output,
+      }
+    }
     return data;
   }
   private async doCompleted() {
@@ -474,11 +475,10 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new TipsError(`The [${method}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${
-          item.component
-        } has the ${method} method. Serverless Devs documents：${chalk.underline(
-          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-        )}`,
+        tips: `Please check the component ${item.component
+          } has the ${method} method. Serverless Devs documents：${chalk.underline(
+            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+          )}`,
       });
     }
     // 应用级操作

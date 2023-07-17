@@ -177,10 +177,10 @@ test('project-fail-action-run', async () => {
 
 });
 
-test('project-fail-action-plugin', async () => {
+test.only('project-fail-action-plugin', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow-error/project-fail-action-plugin.yaml'),
-    args: ['error'],
+    args: ['helloworld', 'error'],
     logConfig:{
       logDir: path.join(__dirname, './logs'),
       level: 'DEBUG',
@@ -312,7 +312,7 @@ test('global-complete-action-run', async () => {
 
 });
 
-test.only('global-complete-action-plugin', async () => {
+test('global-complete-action-plugin', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow-error/global-complete-action-plugin.yaml'),
     args: ['error'],
