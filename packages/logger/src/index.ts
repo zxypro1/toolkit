@@ -19,6 +19,8 @@ export interface ILoggerInstance extends EngineLogger {
  * 测试书写
  */
 export default class Logger {
+  readonly CODE = 'DevsLogger';
+  static readonly CODE = 'DevsLogger';
   private __options: IOptions;
   __progressFooter: ProgressFooter;
 
