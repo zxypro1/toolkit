@@ -10,7 +10,7 @@ import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { concat, each, filter, find, get, includes, isEmpty, keys, map, omit, split } from 'lodash';
+import { concat, each, find, get, includes, isEmpty, keys, map, omit, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { IGNORE, REGX } from './contants';
 const extend2 = require('extend2');
@@ -94,13 +94,16 @@ class ParseSpec {
   private doFlow(steps: IStep[]) {
     const newSteps: IStep[] = [];
     const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
-    if (!flowObj) return order(steps);
+    const { steps: orderSteps, dependencies } = order(steps)
+    if (!flowObj) return orderSteps;
     debug(`find flow: ${JSON.stringify(flowObj)}`);
+    const projectOrder = {} as Record<string, number>;
     const fn = (projects: string[] = [], index: number) => {
       for (const project of projects) {
         for (const step of steps) {
           if (includes(project, step.projectName)) {
-            newSteps.push({ ...step, flowId: index + 1 });
+            newSteps.push({ ...step, flowId: index });
+            projectOrder[step.projectName] = index;
           }
         }
       }
@@ -108,7 +111,21 @@ class ParseSpec {
     each(flowObj, fn);
     debug(`flow steps: ${JSON.stringify(newSteps)}`);
     this.yaml.useFlow = true;
-    return filter(newSteps, (o) => o.flowId);
+    debug(`flow projectOrder: ${JSON.stringify(projectOrder)}`);
+    // 指定flow后，如果存在依赖关系，校验是否可以正常执行
+    if (!isEmpty(dependencies)) {
+      debug(`project dependencies: ${JSON.stringify(dependencies)}`);
+      for (const p1 in dependencies) {
+        const ele = dependencies[p1];
+        for (const p2 in ele) {
+          if (projectOrder[p2] >= projectOrder[p1]) {
+            throw new Error(`flow is invalid, ${p2} must be executed before ${p1}`);
+          }
+        }
+      }
+
+    }
+    return newSteps;
   }
   private matchFlow(flow: string) {
     const useMagic = REGX.test(flow);

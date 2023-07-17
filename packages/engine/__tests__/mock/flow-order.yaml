@@ -21,8 +21,8 @@ access: default
 
 flow:
   ${regx('deploy')}: # 支持正则
-    - [framework, website]
     - [next-function]
+    - [framework, website]
   info: # 支持正则
     - [framework]
     - [next-function]
