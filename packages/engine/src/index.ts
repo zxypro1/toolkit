@@ -359,6 +359,7 @@ class Engine {
   private async handleAfterSrc(item: IStepOptions) {
     try {
       debug(`project item: ${stringify(item)}`);
+      const { method } = this.spec;
       item.credential = await getCredential(item.access, this.logger);
       each(item.credential, (v) => {
         this.glog.__setSecret([v]);
@@ -372,6 +373,8 @@ class Engine {
         skipActions: this.spec.skipActions,
       });
       this.actionInstance.setValue('magic', this.getFilterContext(item));
+      this.actionInstance.setValue('step', item);
+      this.actionInstance.setValue('method', method);
       const newInputs = await this.getProps(item);
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);

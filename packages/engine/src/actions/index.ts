@@ -2,13 +2,14 @@ import {
   IAction,
   IActionLevel,
   IActionType,
+  IAllowFailure,
   IComponentAction,
   IHookType,
   IPluginAction,
   IRunAction,
   getInputs,
 } from '@serverless-devs/parse-spec';
-import { isEmpty, filter, includes, set } from 'lodash';
+import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import { TipsError } from '@serverless-devs/utils';
 import fs from 'fs-extra';
@@ -19,14 +20,18 @@ import { getAllowFailure, stringify } from '../utils';
 import chalk from 'chalk';
 import { ILoggerInstance } from '@serverless-devs/logger';
 import { EXIT_CODE } from '../constants';
+import { IStepOptions } from '../types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
 interface IRecord {
-  magic: Record<string, any>;
-  componentProps: Record<string, any>;
-  pluginOutput: Record<string, any>;
-  lable: string;
+  magic: Record<string, any>; // 记录魔法变量
+  componentProps: Record<string, any>; // 记录组件的inputs
+  pluginOutput: Record<string, any>; // 记录plugin的outputs
+  lable: string; // 记录执行的label
+  step: IStepOptions; // 记录当前step是
+  allowFailure: boolean | IAllowFailure; // step allow_failure > action allow_failure
+  method: string; // 记录当前执行的method
 }
 
 interface IOptions {
@@ -60,6 +65,10 @@ class Actions {
     const newHooks = getInputs(hooks, this.record.magic);
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
+      this.record.allowFailure =
+        this.record.step && 'allow_failure' in this.record.step
+          ? get(this.record, 'step.allow_failure')
+          : hook.allow_failure;
       if (hook.actionType === IActionType.RUN) {
         await this.run(hook);
       }
@@ -94,7 +103,14 @@ class Actions {
             'Please check whether the actions section of yaml can be executed in the current environment.',
           );
         }
-        if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.RUN })) return;
+        console.log(this.record);
+        if (
+          getAllowFailure(this.record.allowFailure, {
+            exitCode: EXIT_CODE.RUN,
+            command: this.record.method,
+          })
+        )
+          return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.RUN,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
@@ -102,7 +118,13 @@ class Actions {
       }
       return;
     }
-    if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.DEVS })) return;
+    if (
+      getAllowFailure(this.record.allowFailure, {
+        exitCode: EXIT_CODE.DEVS,
+        command: this.record.method,
+      })
+    )
+      return;
     throw new TipsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
@@ -115,7 +137,13 @@ class Actions {
       this.record.pluginOutput = await instance(inputs, hook.args);
     } catch (e) {
       const error = e as Error;
-      if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.PLUGIN })) return;
+      if (
+        getAllowFailure(this.record.allowFailure, {
+          exitCode: EXIT_CODE.PLUGIN,
+          command: this.record.method,
+        })
+      )
+        return;
       throw new TipsError(error.message, {
         exitCode: EXIT_CODE.PLUGIN,
         prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
@@ -137,14 +165,26 @@ class Actions {
         return await instance[method](newInputs);
       } catch (e) {
         const error = e as Error;
-        if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.COMPONENT })) return;
+        if (
+          getAllowFailure(this.record.allowFailure, {
+            exitCode: EXIT_CODE.COMPONENT,
+            command: this.record.method,
+          })
+        )
+          return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
         });
       }
     }
-    if (getAllowFailure(hook.allow_failure, { exitCode: EXIT_CODE.DEVS })) return;
+    if (
+      getAllowFailure(this.record.allowFailure, {
+        exitCode: EXIT_CODE.DEVS,
+        command: this.record.method,
+      })
+    )
+      return;
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
     throw new TipsError(`The [${method}] command was not found.`, {
       exitCode: EXIT_CODE.DEVS,

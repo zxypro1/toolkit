@@ -27,6 +27,10 @@ vars: # 全局变量
     name: hello-world-service
     description: hello world by serverless devs
 
+flow: 
+  progress:
+    - [helloworld, next-helloworld]
+
 actions:
   pre-${regx('.')}:
     - plugin: ${path('../plugin/a.js')}
