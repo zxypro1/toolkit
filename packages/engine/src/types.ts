@@ -8,12 +8,11 @@ export interface IEngineOptions {
   template?: string;
   env?: Record<string, string>;
   cwd?: string; //当前工作目录
-  logConfig?: EngineLogger;
+  logConfig?: Partial<ILogConfig> & {
+    customLogger?: Logger;
+  };
 }
 
-export type EngineLogger = Partial<ILogConfig> & {
-  customLogger?: Logger;
-};
 
 export type IStepOptions = IStep & {
   logger: ILoggerInstance; // logger实例

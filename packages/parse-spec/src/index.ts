@@ -53,6 +53,7 @@ class ParseSpec {
     this.yaml.useFlow = false;
     this.yaml.template = get(this.yaml.content, 'template', {});
     this.yaml.projects = get(this.yaml.content, projectKey, {});
+    this.yaml.appName = get(this.yaml.content, 'name');
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
   }
   start(): ISpec {

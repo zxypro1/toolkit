@@ -61,6 +61,7 @@ export enum IActionLevel {
 
 export interface IYaml {
   path: string;
+  appName: string;
   content: Record<string, any>;
   use3x: boolean;
   projectNames: string[];

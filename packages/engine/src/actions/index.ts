@@ -103,7 +103,6 @@ class Actions {
             'Please check whether the actions section of yaml can be executed in the current environment.',
           );
         }
-        console.log(this.record);
         if (
           getAllowFailure(this.record.allowFailure, {
             exitCode: EXIT_CODE.RUN,

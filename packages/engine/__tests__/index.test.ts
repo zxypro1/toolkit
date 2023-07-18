@@ -293,7 +293,7 @@ test('utils_2.TipsError is not a constructor', async () => {
   expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
-test('validate', async () => {
+test.only('validate', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
   });

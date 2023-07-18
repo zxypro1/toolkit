@@ -92,7 +92,7 @@ class Engine {
       this.context.error.push(error as IEngineError);
       return this.context;
     }
-    const { steps: _steps, yaml, access = yaml.access } = this.spec;
+    const { steps: _steps, yaml, command, access = yaml.access } = this.spec;
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -114,6 +114,7 @@ class Engine {
     this.context.steps = map(this.context.steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
     });
+   this.logger.write(`⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`);
     const res: IContext = await new Promise(async (resolve) => {
       const states: any = {
         init: {
@@ -303,7 +304,6 @@ class Engine {
   }
   private async handleSrc(item: IStepOptions) {
     const { command } = this.spec;
-    this.logger.debug(`⌛ Steps for [${command}] of [${item.projectName}]\n====================`);
     try {
       // project pre hook and project component
       await this.handleAfterSrc(item);
@@ -348,13 +348,17 @@ class Engine {
       this.recordContext(item, { error });
     }
     // 记录项目已经执行完成
-    this.recordContext(item, { done: true });
+    const process_time = getProcessTime(this.record.startTime);
+    this.recordContext(item, { done: true, process_time });
 
     if (this.record.status === STEP_STATUS.SUCCESS) {
-      this.logger.debug(`Project ${item.projectName} successfully to execute`);
+      this.logger.write(`${chalk.green('✔')} ${chalk.gray(`[${item.projectName}] completed (${process_time}s)`)}`);
     }
-    // const msg = `${this.record.status === STEP_STATUS.SUCCESS ? '🚀' : chalk.red('✖')} Result for [${command}] of [${item.projectName}]\n====================`;;
-    // this.logger.write(msg);
+    if (this.record.status === STEP_STATUS.FAILURE) {
+      this.logger.write(`${chalk.red('✖')} ${chalk.gray(`[${item.projectName}] failed to [${command}] (${process_time}s)`)}`);
+    }
+    // step执行完成后，释放logger
+    this.glog.__unset(item.projectName);
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {
@@ -392,8 +396,7 @@ class Engine {
           },
         };
       }
-      const process_time = getProcessTime(this.record.startTime);
-      this.recordContext(item, { status: STEP_STATUS.SUCCESS, output: response, process_time });
+      this.recordContext(item, { status: STEP_STATUS.SUCCESS, output: response });
     } catch (e) {
       const error = e as Error;
       const status =
@@ -414,11 +417,10 @@ class Engine {
           },
         };
       }
-      const process_time = getProcessTime(this.record.startTime);
       if (item['continue-on-error']) {
-        this.recordContext(item, { status, process_time });
+        this.recordContext(item, { status });
       } else {
-        this.recordContext(item, { status, error, process_time });
+        this.recordContext(item, { status, error });
         throw error;
       }
     }
