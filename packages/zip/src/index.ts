@@ -8,7 +8,6 @@ import ProgressService, { ProgressType } from '@serverless-devs/progress-bar';
 import { IOptions, IResult } from './types';
 
 const isWindows = process.platform === 'win32';
-const logger = console;
 
 class Zip {
   private codeUri: string;
@@ -18,6 +17,7 @@ class Zip {
   private outputFilePath: string;
   private level: number;
   private prefix: string | undefined;
+  private logger: any;
 
   constructor(options: IOptions) {
     this.codeUri = options.codeUri;
@@ -27,6 +27,7 @@ class Zip {
     this.outputFilePath = options.outputFilePath || process.cwd();
     this.level = options.level || 9;
     this.prefix = options.prefix;
+    this.logger = options.logger || console;
 
     this.checkOptions();
   }
@@ -61,7 +62,7 @@ class Zip {
     const zipArchiver = archiver('zip', {
       zlib: { level: this.level },
     })
-      .on('warning', (err) => logger.warn(err))
+      .on('warning', (err) => this.logger.warn(err))
       .on('error', (err) => {
         throw err;
       });
@@ -90,7 +91,7 @@ class Zip {
       });
       output.on('close', () => {
         const compressedSize = zipArchiver.pointer();
-        logger.debug('Package complete.');
+        this.logger.debug('Package complete.');
         resolve({ count, compressedSize, outputFile });
       });
 
@@ -129,7 +130,7 @@ class Zip {
       try {
         s = await fs.lstat(fPath);
       } catch (error) {
-        logger.log(
+        this.logger.warn(
           `Before zip: could not found fPath ${fPath}, absolute fPath is ${path.resolve(
             fPath,
           )}, exception is ${error}, skipping`,

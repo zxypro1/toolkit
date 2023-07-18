@@ -36,6 +36,10 @@ export interface IOptions {
    *
    */
   prefix?: string;
+  /**
+   * 自定义 logger
+   */
+  logger?: any;
 }
 
 export interface IResult {
