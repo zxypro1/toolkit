@@ -114,7 +114,11 @@ class Engine {
     this.context.steps = map(this.context.steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
     });
-   this.logger.write(`⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`);
+    this.logger.write(
+      `⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray(
+        '====================',
+      )}`,
+    );
     const res: IContext = await new Promise(async (resolve) => {
       const states: any = {
         init: {
@@ -352,10 +356,16 @@ class Engine {
     this.recordContext(item, { done: true, process_time });
 
     if (this.record.status === STEP_STATUS.SUCCESS) {
-      this.logger.write(`${chalk.green('✔')} ${chalk.gray(`[${item.projectName}] completed (${process_time}s)`)}`);
+      this.logger.write(
+        `${chalk.green('✔')} ${chalk.gray(`[${item.projectName}] completed (${process_time}s)`)}`,
+      );
     }
     if (this.record.status === STEP_STATUS.FAILURE) {
-      this.logger.write(`${chalk.red('✖')} ${chalk.gray(`[${item.projectName}] failed to [${command}] (${process_time}s)`)}`);
+      this.logger.write(
+        `${chalk.red('✖')} ${chalk.gray(
+          `[${item.projectName}] failed to [${command}] (${process_time}s)`,
+        )}`,
+      );
     }
     // step执行完成后，释放logger
     this.glog.__unset(item.projectName);

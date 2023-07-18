@@ -13,7 +13,6 @@ export interface IEngineOptions {
   };
 }
 
-
 export type IStepOptions = IStep & {
   logger: ILoggerInstance; // logger实例
   instance?: any; //组件实例
