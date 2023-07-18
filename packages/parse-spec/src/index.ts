@@ -94,7 +94,7 @@ class ParseSpec {
   private doFlow(steps: IStep[]) {
     const newSteps: IStep[] = [];
     const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
-    const { steps: orderSteps, dependencies } = order(steps)
+    const { steps: orderSteps, dependencies } = order(steps);
     if (!flowObj) return orderSteps;
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const projectOrder = {} as Record<string, number>;
@@ -123,7 +123,6 @@ class ParseSpec {
           }
         }
       }
-
     }
     return newSteps;
   }
