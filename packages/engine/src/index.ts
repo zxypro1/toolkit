@@ -196,9 +196,9 @@ class Engine {
     return output;
   }
   private validate() {
-    const { steps, method } = this.spec;
+    const { steps, command } = this.spec;
     assert(!isEmpty(steps), 'steps is required');
-    assert(method, 'method is required');
+    assert(command, 'command is required');
   }
   private async download(steps: IParseStep[]) {
     const newSteps = [];
@@ -302,8 +302,8 @@ class Engine {
     }
   }
   private async handleSrc(item: IStepOptions) {
-    const { method } = this.spec;
-    this.logger.debug(`⌛ Steps for [${method}] of [${item.projectName}]\n====================`);
+    const { command } = this.spec;
+    this.logger.debug(`⌛ Steps for [${command}] of [${item.projectName}]\n====================`);
     try {
       // project pre hook and project component
       await this.handleAfterSrc(item);
@@ -353,13 +353,13 @@ class Engine {
     if (this.record.status === STEP_STATUS.SUCCESS) {
       this.logger.debug(`Project ${item.projectName} successfully to execute`);
     }
-    // const msg = `${this.record.status === STEP_STATUS.SUCCESS ? '🚀' : chalk.red('✖')} Result for [${method}] of [${item.projectName}]\n====================`;;
+    // const msg = `${this.record.status === STEP_STATUS.SUCCESS ? '🚀' : chalk.red('✖')} Result for [${command}] of [${item.projectName}]\n====================`;;
     // this.logger.write(msg);
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {
       debug(`project item: ${stringify(item)}`);
-      const { method } = this.spec;
+      const { command } = this.spec;
       item.credential = await getCredential(item.access, this.logger);
       each(item.credential, (v) => {
         this.glog.__setSecret([v]);
@@ -374,7 +374,7 @@ class Engine {
       });
       this.actionInstance.setValue('magic', this.getFilterContext(item));
       this.actionInstance.setValue('step', item);
-      this.actionInstance.setValue('method', method);
+      this.actionInstance.setValue('command', command);
       const newInputs = await this.getProps(item);
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
@@ -427,12 +427,12 @@ class Engine {
     const magic = this.getFilterContext(item);
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
-    const { projectName, method } = this.spec;
+    const { projectName, command } = this.spec;
     const result = {
       cwd: this.options.cwd,
       props: newInputs,
-      command: method,
-      args: filter(this.options.args, (o) => !includes([projectName, method], o)),
+      command,
+      args: filter(this.options.args, (o) => !includes([projectName, command], o)),
       yaml: {
         path: this.spec.yaml.path,
       },
@@ -452,21 +452,21 @@ class Engine {
     return result;
   }
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
-    const { method = '', projectName } = this.spec;
+    const { command = '', projectName } = this.spec;
     const newInputs = await this.getProps(item);
     const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
     debug(`component props: ${stringify(componentProps)}`);
     this.actionInstance.setValue('componentProps', componentProps);
     // 服务级操作
     if (projectName) {
-      if (isFunction(item.instance[method])) {
+      if (isFunction(item.instance[command])) {
         // 方法存在，执行报错，退出码101
         try {
-          return await item.instance[method](componentProps);
+          return await item.instance[command](componentProps);
         } catch (e) {
           const useAllowFailure = getAllowFailure(item.allow_failure, {
             exitCode: EXIT_CODE.COMPONENT,
-            command: method,
+            command,
           });
           if (useAllowFailure) return;
           const error = e as Error;
@@ -478,29 +478,29 @@ class Engine {
       }
       const useAllowFailure = getAllowFailure(item.allow_failure, {
         exitCode: EXIT_CODE.DEVS,
-        command: method,
+        command,
       });
       if (useAllowFailure) return;
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-      throw new TipsError(`The [${method}] command was not found.`, {
+      throw new TipsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
         tips: `Please check the component ${
           item.component
-        } has the ${method} method. Serverless Devs documents：${chalk.underline(
+        } has the ${command} command. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
         prefix: `Project ${item.projectName} failed to execute:`,
       });
     }
     // 应用级操作
-    if (isFunction(item.instance[method])) {
+    if (isFunction(item.instance[command])) {
       // 方法存在，执行报错，退出码101
       try {
-        return await item.instance[method](componentProps);
+        return await item.instance[command](componentProps);
       } catch (e) {
         const useAllowFailure = getAllowFailure(item.allow_failure, {
           exitCode: EXIT_CODE.COMPONENT,
-          command: method,
+          command,
         });
         if (useAllowFailure) return;
         const error = e as Error;
@@ -512,8 +512,8 @@ class Engine {
     }
     // 方法不存在，进行警告，但是并不会报错，最终的exit code为0；
     this.logger.tips(
-      `The [${method}] command was not found.`,
-      `Please check the component ${item.component} has the ${method} method. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`,
+      `The [${command}] command was not found.`,
+      `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`,
     );
   }
   private async doSkip(item: IStepOptions) {

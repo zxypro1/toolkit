@@ -56,7 +56,7 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   };
   artTemplate.defaults.imports.regx = (value: string) => {
     const r = new RegExp(value);
-    return r.test(context.method);
+    return r.test(context.command);
   };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');

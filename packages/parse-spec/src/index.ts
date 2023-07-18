@@ -86,10 +86,10 @@ class ParseSpec {
     this.record.debug = get(argv, 'debug');
     if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
-      this.record.method = _[1];
+      this.record.command = _[1];
       return;
     }
-    this.record.method = _[0];
+    this.record.command = _[0];
   }
   private doFlow(steps: IStep[]) {
     const newSteps: IStep[] = [];
@@ -129,9 +129,9 @@ class ParseSpec {
   private matchFlow(flow: string) {
     const useMagic = REGX.test(flow);
     if (useMagic) {
-      return compile(flow, { method: this.record.method });
+      return compile(flow, { command: this.record.command });
     }
-    return flow === this.record.method;
+    return flow === this.record.command;
   }
   parseActions(actions: Record<string, any> = {}, level: string = IActionLevel.GLOBAL) {
     const actionList = [];
@@ -187,16 +187,16 @@ class ParseSpec {
   private matchAction(action: string) {
     const useMagic = REGX.test(action);
     if (useMagic) {
-      const newAction = compile(action, { method: this.record.method });
-      const [type, method] = split(newAction, '-');
+      const newAction = compile(action, { command: this.record.command });
+      const [type, command] = split(newAction, '-');
       return {
-        validate: method === 'true',
+        validate: command === 'true',
         type,
       };
     }
-    const [type, method] = split(action, '-');
+    const [type, command] = split(action, '-');
     return {
-      validate: method === this.record.method,
+      validate: command === this.record.command,
       type,
     };
   }

@@ -31,7 +31,7 @@ interface IRecord {
   lable: string; // 记录执行的label
   step: IStepOptions; // 记录当前step是
   allowFailure: boolean | IAllowFailure; // step allow_failure > action allow_failure
-  method: string; // 记录当前执行的method
+  command: string; // 记录当前执行的command
 }
 
 interface IOptions {
@@ -107,7 +107,7 @@ class Actions {
         if (
           getAllowFailure(this.record.allowFailure, {
             exitCode: EXIT_CODE.RUN,
-            command: this.record.method,
+            command: this.record.command,
           })
         )
           return;
@@ -121,7 +121,7 @@ class Actions {
     if (
       getAllowFailure(this.record.allowFailure, {
         exitCode: EXIT_CODE.DEVS,
-        command: this.record.method,
+        command: this.record.command,
       })
     )
       return;
@@ -140,7 +140,7 @@ class Actions {
       if (
         getAllowFailure(this.record.allowFailure, {
           exitCode: EXIT_CODE.PLUGIN,
-          command: this.record.method,
+          command: this.record.command,
         })
       )
         return;
@@ -153,22 +153,22 @@ class Actions {
   private async component(hook: IComponentAction) {
     const argv = stringArgv(hook.value);
     const { _ } = utils.parseArgv(argv);
-    const [componentName, method] = _;
+    const [componentName, command] = _;
     const instance = await loadComponent(componentName, { logger: this.logger });
-    if (instance[method]) {
+    if (instance[command]) {
       // 方法存在，执行报错，退出码101
       const newInputs = {
         ...this.record.componentProps,
-        argv: filter(argv.slice(2), (o) => !includes([componentName, method], o)),
+        argv: filter(argv.slice(2), (o) => !includes([componentName, command], o)),
       };
       try {
-        return await instance[method](newInputs);
+        return await instance[command](newInputs);
       } catch (e) {
         const error = e as Error;
         if (
           getAllowFailure(this.record.allowFailure, {
             exitCode: EXIT_CODE.COMPONENT,
-            command: this.record.method,
+            command: this.record.command,
           })
         )
           return;
@@ -181,15 +181,15 @@ class Actions {
     if (
       getAllowFailure(this.record.allowFailure, {
         exitCode: EXIT_CODE.DEVS,
-        command: this.record.method,
+        command: this.record.command,
       })
     )
       return;
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-    throw new TipsError(`The [${method}] command was not found.`, {
+    throw new TipsError(`The [${command}] command was not found.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
-      tips: `Please check the component ${componentName} has the ${method} method. Serverless Devs documents：${chalk.underline(
+      tips: `Please check the component ${componentName} has the ${command} command. Serverless Devs documents：${chalk.underline(
         'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
       )}`,
     });

@@ -15,7 +15,7 @@ test('parse spec', async () => {
   expect(context.status).toBe('failure');
 });
 
-test('method is required', async () => {
+test('command is required', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow-error/basic.yaml'),
     logConfig:{

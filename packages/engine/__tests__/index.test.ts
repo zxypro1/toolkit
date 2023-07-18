@@ -122,14 +122,14 @@ test('order', async () => {
 });
 
 test('指定服务 方法不存在时', async () => {
-  const method = 'empty';
+  const command = 'empty';
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['next_function', 'empty']
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(get(context, 'error[0].message')).toBe(`The [${method}] command was not found.`);
+  expect(get(context, 'error[0].message')).toBe(`The [${command}] command was not found.`);
   expect(get(context, 'error[0].exitCode')).toBe(100);
 });
 
@@ -192,7 +192,7 @@ test('flow', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('flow-order', async () => {
+test('flow-order', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow-order.yaml'),
     args: ['deploy'],
@@ -300,7 +300,7 @@ test('validate', async () => {
   const context = await engine.start();
   console.log(context);
   expect(get(context, 'error[0]')).toBeInstanceOf(AssertionError);
-  expect(get(context, 'error[0].message')).toBe(`method is required`);
+  expect(get(context, 'error[0].message')).toBe(`command is required`);
   expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
 
 

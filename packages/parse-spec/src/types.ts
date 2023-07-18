@@ -80,7 +80,7 @@ export type ISpec = IRecord & {
 };
 export interface IRecord {
   projectName?: string;
-  method?: string;
+  command?: string;
   access?: string;
   version?: string;
   output?: `${IOutput}`;

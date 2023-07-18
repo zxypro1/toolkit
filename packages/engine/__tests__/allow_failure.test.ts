@@ -76,7 +76,7 @@ test('project-pre-action-component', async () => {
 
 });
 
-test.only('project-component', async () => {
+test('project-component', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/allow-failure/project-component.yaml'),
     args: ['error'],
