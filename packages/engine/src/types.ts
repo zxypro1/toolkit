@@ -57,6 +57,7 @@ export interface IRecord {
   steps: Record<string, any>; // 记录每个 step 的执行状态以及输出，后续step可以通过steps[$step_id].output使用该数据
   status: IStatus; // 记录step的状态
   startTime: number; // 记录step的开始时间
+  componentProps: Record<string, any>; // 记录组件的inputs
 }
 
 export interface IContext {

@@ -63,6 +63,10 @@ class Actions {
         : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
     const newHooks = getInputs(hooks, this.record.magic);
+    // post-action应获取componentProps, 先清空pluginOutput
+    if (hookType !== IHookType.PRE) {
+      this.record.pluginOutput = {};
+    }
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
       this.record.allowFailure =
@@ -79,10 +83,6 @@ class Actions {
       if (hook.actionType === IActionType.COMPONENT && hook.level === IActionLevel.PROJECT) {
         await this.component(hook);
       }
-    }
-    // pre-action执行完毕，清空pluginOutput, post-action应获取componentProps
-    if (hookType === IHookType.PRE) {
-      this.record.pluginOutput = {};
     }
     this.logger.debug(`The ${hookType}-action successfully to execute in ${this.record.lable}`);
     return this.record;

@@ -270,7 +270,7 @@ test('extend and project yaml extend', async () => {
   expect(context.status).toBe('success');
 });
 
-test('plugin update inputs', async () => {
+test.only('plugin update inputs', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/plugin.yaml'),
     args: ['deploy'],
@@ -293,7 +293,7 @@ test('utils_2.TipsError is not a constructor', async () => {
   expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
-test.only('validate', async () => {
+test('validate', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
   });

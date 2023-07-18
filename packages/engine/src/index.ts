@@ -314,8 +314,7 @@ class Engine {
     } catch (error) {
       // project fail hook
       try {
-        const newInputs = await this.getProps(item);
-        const res = await this.actionInstance.start(IHookType.FAIL, newInputs);
+        const res = await this.actionInstance.start(IHookType.FAIL, this.record.componentProps);
         this.recordContext(item, get(res, 'pluginOutput', {}));
       } catch (error) {
         this.record.status = STEP_STATUS.FAILURE;
@@ -328,9 +327,8 @@ class Engine {
       try {
         // 项目的output, 再次获取魔法变量
         this.actionInstance.setValue('magic', this.getFilterContext(item));
-        const newInputs = await this.getProps(item);
         const res = await this.actionInstance.start(IHookType.SUCCESS, {
-          ...newInputs,
+          ...this.record.componentProps,
           output: get(item, 'output', {}),
         });
         this.recordContext(item, get(res, 'pluginOutput', {}));
@@ -341,9 +339,8 @@ class Engine {
     }
     // project complete hook
     try {
-      const newInputs = await this.getProps(item);
       const res = await this.actionInstance.start(IHookType.COMPLETE, {
-        ...newInputs,
+        ...this.record.componentProps,
         output: get(item, 'output', {}),
       });
       this.recordContext(item, get(res, 'pluginOutput', {}));
@@ -466,15 +463,15 @@ class Engine {
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
     const { command = '', projectName } = this.spec;
     const newInputs = await this.getProps(item);
-    const componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
-    debug(`component props: ${stringify(componentProps)}`);
-    this.actionInstance.setValue('componentProps', componentProps);
+    this.record.componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
+    debug(`component props: ${stringify(this.record.componentProps)}`);
+    this.actionInstance.setValue('componentProps', this.record.componentProps);
     // 服务级操作
     if (projectName) {
       if (isFunction(item.instance[command])) {
         // 方法存在，执行报错，退出码101
         try {
-          return await item.instance[command](componentProps);
+          return await item.instance[command](this.record.componentProps);
         } catch (e) {
           const useAllowFailure = getAllowFailure(item.allow_failure, {
             exitCode: EXIT_CODE.COMPONENT,
@@ -496,11 +493,10 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new TipsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${
-          item.component
-        } has the ${command} command. Serverless Devs documents：${chalk.underline(
-          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-        )}`,
+        tips: `Please check the component ${item.component
+          } has the ${command} command. Serverless Devs documents：${chalk.underline(
+            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+          )}`,
         prefix: `Project ${item.projectName} failed to execute:`,
       });
     }
@@ -508,7 +504,7 @@ class Engine {
     if (isFunction(item.instance[command])) {
       // 方法存在，执行报错，退出码101
       try {
-        return await item.instance[command](componentProps);
+        return await item.instance[command](this.record.componentProps);
       } catch (e) {
         const useAllowFailure = getAllowFailure(item.allow_failure, {
           exitCode: EXIT_CODE.COMPONENT,
