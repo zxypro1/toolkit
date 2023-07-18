@@ -4,11 +4,13 @@ import { IOptions } from './type';
 import EngineLogger from './engine-logger';
 import ProgressFooter from './progress-footer';
 import { transport } from './engine-logger/utils';
+import * as stdoutFormatter from './stdout-formatter';
 
 export { default as EngineLogger } from './engine-logger';
 export { default as ProgressFooter } from './progress-footer';
 
 export interface ILoggerInstance extends EngineLogger {
+  spin: (type: "getting" | "setting" | "creating" | "updating" | "removing" | "checking" | "got" | "set" | "created" | "updated" | "removed" | "checked" | "using" | "retrying", ...rest: any[]) => void;
   progress: (message: string) => void;
   tips: (message: string, tips?: string) => void;
 }
@@ -38,6 +40,16 @@ export default class Logger {
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 
     logger.progress = (message: string) => {
+      this.__progressFooter.upsert(instanceKey, message);
+    };
+
+    logger.spin = (type: keyof typeof stdoutFormatter, ...rest: any[]) => {
+      const formatFunction = stdoutFormatter[type];
+      let message = rest.join('');
+      if (typeof formatFunction === 'function') {
+        // @ts-ignore
+        message = formatFunction(...rest);
+      }
       this.__progressFooter.upsert(instanceKey, message);
     };
 
