@@ -1,16 +1,16 @@
 import { includes, map, split, set, sortBy, isEmpty, get } from 'lodash';
-import { REGX } from './contants';
+import { REGXG } from './contants';
 import { IStep } from './types';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
   private orderMap = {} as Record<string, any>;
-  constructor(private steps: IStep[]) {}
+  constructor(private steps: IStep[]) { }
   run() {
     const dependencies = this.getDependencies();
-    if (isEmpty(dependencies)) return this.steps;
+    if (isEmpty(dependencies)) return { steps: this.steps, dependencies };
     this.analysis(dependencies);
-    return this.sort();
+    return { steps: this.sort(), dependencies };
   }
   sort() {
     const newSteps = map(this.steps, (item) => ({
@@ -46,11 +46,14 @@ class Order {
           let val = obj[i];
 
           if (typeof val === 'string') {
-            const matchResult = val.match(REGX);
+            const matchResult = val.match(REGXG);
             if (matchResult) {
-              const projectName = split(matchResult[1], '.')[0];
-              if (includes(projectNameList, projectName)) {
-                set(dependencies, topKey, { [projectName]: 1 });
+              for (const item of matchResult) {
+                const newItem = item.replace(REGXG, '$1');
+                const projectName = split(newItem, '.')[0];
+                if (includes(projectNameList, projectName)) {
+                  set(dependencies, topKey, { ...dependencies[topKey], [projectName]: 1 });
+                }
               }
             }
           }

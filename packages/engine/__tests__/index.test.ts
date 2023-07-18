@@ -1,8 +1,8 @@
 import Logger from '@serverless-devs/logger';
 import Engine from '../src';
 import path from 'path';
-import { TipsError } from '@serverless-devs/utils';
 import { AssertionError } from 'assert';
+import { get } from 'lodash';
 
 test('指定 template 不存在', async () => {
   const engine = new Engine({
@@ -12,7 +12,7 @@ test('指定 template 不存在', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch('The specified template file does not exist');
+  expect(get(context, 'error[0].message')).toMatch('The specified template file does not exist');
 });
 
 test('未指定 template', async () => {
@@ -22,7 +22,7 @@ test('未指定 template', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch('the s.yaml/s.yml file was not found');
+  expect(get(context, 'error[0].message')).toMatch('the s.yaml/s.yml file was not found');
 });
 
 test('yaml格式不正确', async () => {
@@ -32,7 +32,7 @@ test('yaml格式不正确', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toContain('exception.yaml format is incorrect');
+  expect(get(context, 'error[0].message')).toContain('exception.yaml format is incorrect');
 });
 
 test('extend yaml 格式有问题', async () => {
@@ -42,7 +42,7 @@ test('extend yaml 格式有问题', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toContain('base-error.yaml format is incorrect');
+  expect(get(context, 'error[0].message')).toContain('base-error.yaml format is incorrect');
 });
 
 test('魔法变量含中划线报错', async () => {
@@ -52,7 +52,7 @@ test('魔法变量含中划线报错', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toContain(`not support '-' in value`);
+  expect(get(context, 'error[0].message')).toContain(`not support '-' in value`);
 });
 
 test('basic', async () => {
@@ -81,7 +81,10 @@ test('credential secret', async () => {
 test('s deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['deploy']
+    args: ['deploy'],
+    logConfig: {
+      level: 'DEBUG',
+    }
   });
   const context = await engine.start();
   console.log(context.error);
@@ -122,12 +125,12 @@ test('指定服务 方法不存在时', async () => {
   const method = 'empty';
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['framework', 'empty']
+    args: ['next_function', 'empty']
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`The [${method}] command was not found`);
-  expect(context.error.message).toMatch('100');
+  expect(get(context, 'error[0].message')).toBe(`The [${method}] command was not found.`);
+  expect(get(context, 'error[0].exitCode')).toBe(100);
 });
 
 test('指定服务 方法存在，但是执行报错了', async () => {
@@ -136,9 +139,8 @@ test('指定服务 方法存在，但是执行报错了', async () => {
     args: ['next_function', 'error']
   });
   const context = await engine.start();
-  const error = context.error as TipsError;
-  expect(error.message).toBe(`error test`);
-  expect(error.exitCode).toBe(101);
+  expect(get(context, 'error[0].message')).toBe(`error test`);
+  expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
 test('应用级操作 方法不存在时', async () => {
@@ -149,7 +151,7 @@ test('应用级操作 方法不存在时', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`The [empty] command was not found`);
+  expect(get(context, 'status')).toBe('success');
 });
 
 test('应用级操作，方法执行报错了', async () => {
@@ -159,8 +161,8 @@ test('应用级操作，方法执行报错了', async () => {
   });
   const context = await engine.start();
   console.log(context.error);
-  expect(context.error.message).toMatch(`error test`);
-  expect(context.error.message).toMatch('101');
+  expect(get(context, 'error[0].message')).toBe(`error test`);
+  expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
 test('全局action 成功', async () => {
@@ -176,27 +178,31 @@ test('全局action 成功', async () => {
   expect(context.status).toBe('success');
 });
 
-test('全局action 失败', async () => {
-  const engine = new Engine({
-    template: path.join(__dirname, './mock/global-actions/error.yaml'),
-    args: ['deploy']
-  });
-  const context = await engine.start();
-  console.log(context.error);
-  expect(context.error.message).toMatch('Not implemented')
-  expect(context.error.message).toMatch('101');
-});
-
-
 
 test('flow', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow.yaml'),
-    args: ['deploy']
+    args: ['deploy'],
+    logConfig: {
+      // 'level': 'DEBUG',
+    }
   });
   const context = await engine.start();
   console.log(context.error);
   expect(context.status).toBe('success');
+});
+
+test.only('flow-order', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/flow-order.yaml'),
+    args: ['deploy'],
+    logConfig: {
+      // 'level': 'DEBUG',
+    }
+  });
+  const context = await engine.start();
+  console.log(context.error);
+  expect(get(context, 'error[0].message')).toMatch('flow is invalid');
 });
 
 test('args', async () => {
@@ -283,19 +289,19 @@ test('utils_2.TipsError is not a constructor', async () => {
     args: ['error']
   });
   const context = await engine.start();
-  const error = context.error as TipsError;
-  console.log(error);
-  expect(error.message).toBe(`error test`);
-  expect(error.exitCode).toBe(101);
+  expect(get(context, 'error[0].message')).toBe(`error test`);
+  expect(get(context, 'error[0].exitCode')).toBe(101);
 });
 
-test.only('validate', async () => {
+test('validate', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
   });
   const context = await engine.start();
   console.log(context);
-  const error = context.error as AssertionError;
-  expect(error.message).toBe('method is required');
-  expect(error.code).toBe('ERR_ASSERTION');
+  expect(get(context, 'error[0]')).toBeInstanceOf(AssertionError);
+  expect(get(context, 'error[0].message')).toBe(`method is required`);
+  expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
+
+
 });

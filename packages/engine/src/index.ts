@@ -3,7 +3,6 @@ import {
   isEmpty,
   get,
   each,
-  replace,
   map,
   isFunction,
   has,
@@ -21,9 +20,8 @@ import {
   IContext,
   IEngineError,
   STEP_STATUS,
-  STEP_IF,
 } from './types';
-import { getProcessTime, getCredential, stringify, randomId } from './utils';
+import { getProcessTime, getCredential, stringify, randomId, getAllowFailure } from './utils';
 import ParseSpec, {
   getInputs,
   ISpec,
@@ -40,9 +38,9 @@ import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import * as utils from '@serverless-devs/utils';
 import { TipsError } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
-import assert, { AssertionError } from 'assert';
+import assert from 'assert';
 
-export { IEngineOptions, IContext } from './types';
+export { IEngineOptions, IContext, IEngineError } from './types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
@@ -67,37 +65,34 @@ class Engine {
     this.options.template = utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
-  // engine应收敛所有的异常，不应该抛出异常
-  async start() {
-    this.context.status = STEP_STATUS.RUNNING;
+  private async beforeStart() {
     // 初始化 spec
-    try {
-      this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
-      this.spec = this.parseSpecInstance.start();
-    } catch (error) {
-      this.context.status = STEP_STATUS.FAILURE;
-      this.context.completed = true;
-      this.context.error.push(error as Error);
-      return this.context;
-    }
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
+    this.spec = this.parseSpecInstance.start();
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
     });
-    const { steps: _steps, yaml, access = yaml.access } = this.spec;
+    const { steps: _steps } = this.spec;
     // 参数校验
-    try {
-      this.validate();
-    } catch (error) {
-      this.context.status = STEP_STATUS.FAILURE;
-      this.context.completed = true;
-      this.context.error.push(error as AssertionError);
-      return this.context;
-    }
+    this.validate();
     // 初始化 logger
     this.glog = this.getLogger() as Logger;
     this.logger = this.glog.__generate('engine');
-    const steps = await this.download(_steps);
+    this.context.steps = await this.download(_steps);
+  }
+  // engine应收敛所有的异常，不应该抛出异常
+  async start() {
+    this.context.status = STEP_STATUS.RUNNING;
+    try {
+      await this.beforeStart();
+    } catch (error) {
+      this.context.status = STEP_STATUS.FAILURE;
+      this.context.completed = true;
+      this.context.error.push(error as IEngineError);
+      return this.context;
+    }
+    const { steps: _steps, yaml, access = yaml.access } = this.spec;
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -107,6 +102,7 @@ class Engine {
     const credential = await getCredential(access, this.logger);
     // 处理 global-pre
     try {
+      this.globalActionInstance.setValue('magic', this.getFilterContext());
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
       this.context.error.push(error as TipsError);
@@ -115,7 +111,7 @@ class Engine {
       return this.context;
     }
 
-    this.context.steps = map(steps, (item) => {
+    this.context.steps = map(this.context.steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
     });
     const res: IContext = await new Promise(async (resolve) => {
@@ -162,26 +158,6 @@ class Engine {
               this.record.startTime = Date.now();
               // 记录 context
               this.recordContext(item, { status: STEP_STATUS.RUNNING });
-              // 先判断if条件，成功则执行该步骤。
-              if (item.if) {
-                // 替换 failure()
-                item.if = replace(
-                  item.if,
-                  STEP_IF.FAILURE,
-                  this.record.status === STEP_STATUS.FAILURE ? 'true' : 'false',
-                );
-                // 替换 success()
-                item.if = replace(
-                  item.if,
-                  STEP_IF.SUCCESS,
-                  this.record.status !== STEP_STATUS.FAILURE ? 'true' : 'false',
-                );
-                // 替换 always()
-                item.if = replace(item.if, STEP_IF.ALWAYS, 'true');
-                return item.if === 'true'
-                  ? await Promise.all(map(flowProject, (o) => this.handleSrc(o)))
-                  : await Promise.all(map(flowProject, (o) => this.doSkip(o)));
-              }
               // 检查全局的执行状态，如果是failure，则不执行该步骤, 并记录状态为 skipped
               if (this.record.status === STEP_STATUS.FAILURE) {
                 return await Promise.all(map(flowProject, (o) => this.doSkip(o)));
@@ -240,7 +216,7 @@ class Engine {
     const customLogger = get(this.options, 'logConfig.customLogger');
     if (customLogger) {
       debug('use custom logger');
-      if (customLogger instanceof Logger) {
+      if (customLogger?.CODE === Logger.CODE) {
         return customLogger;
       }
       throw new Error('customLogger must be instance of Logger');
@@ -280,22 +256,24 @@ class Engine {
       return obj;
     });
   }
-  private getFilterContext(item: IStepOptions) {
+  private getFilterContext(item?: IStepOptions) {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
-      credential: item.credential,
     } as Record<string, any>;
     for (const obj of this.context.steps) {
       data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
     }
-    data.that = {
-      name: item.projectName,
-      access: item.access,
-      component: item.component,
-      props: data[item.projectName].props,
-      output: data[item.projectName].output,
-    };
+    if (item) {
+      data.credential = item.credential;
+      data.that = {
+        name: item.projectName,
+        access: item.access,
+        component: item.component,
+        props: data[item.projectName].props,
+        output: data[item.projectName].output,
+      };
+    }
     return data;
   }
   private async doCompleted() {
@@ -324,7 +302,8 @@ class Engine {
     }
   }
   private async handleSrc(item: IStepOptions) {
-    this.logger.debug(`Start executing project ${item.projectName}`);
+    const { method } = this.spec;
+    this.logger.debug(`⌛ Steps for [${method}] of [${item.projectName}]\n====================`);
     try {
       // project pre hook and project component
       await this.handleAfterSrc(item);
@@ -366,11 +345,16 @@ class Engine {
       this.recordContext(item, get(res, 'pluginOutput', {}));
     } catch (error) {
       this.record.status = STEP_STATUS.FAILURE;
-      this.recordContext(item, { error, done: true });
+      this.recordContext(item, { error });
     }
+    // 记录项目已经执行完成
+    this.recordContext(item, { done: true });
+
     if (this.record.status === STEP_STATUS.SUCCESS) {
       this.logger.debug(`Project ${item.projectName} successfully to execute`);
     }
+    // const msg = `${this.record.status === STEP_STATUS.SUCCESS ? '🚀' : chalk.red('✖')} Result for [${method}] of [${item.projectName}]\n====================`;;
+    // this.logger.write(msg);
   }
   private async handleAfterSrc(item: IStepOptions) {
     try {
@@ -477,6 +461,11 @@ class Engine {
         try {
           return await item.instance[method](componentProps);
         } catch (e) {
+          const useAllowFailure = getAllowFailure(item.allow_failure, {
+            exitCode: EXIT_CODE.COMPONENT,
+            command: method,
+          });
+          if (useAllowFailure) return;
           const error = e as Error;
           throw new TipsError(error.message, {
             exitCode: EXIT_CODE.COMPONENT,
@@ -484,6 +473,11 @@ class Engine {
           });
         }
       }
+      const useAllowFailure = getAllowFailure(item.allow_failure, {
+        exitCode: EXIT_CODE.DEVS,
+        command: method,
+      });
+      if (useAllowFailure) return;
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new TipsError(`The [${method}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
@@ -492,6 +486,7 @@ class Engine {
         } has the ${method} method. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
+        prefix: `Project ${item.projectName} failed to execute:`,
       });
     }
     // 应用级操作
@@ -500,6 +495,11 @@ class Engine {
       try {
         return await item.instance[method](componentProps);
       } catch (e) {
+        const useAllowFailure = getAllowFailure(item.allow_failure, {
+          exitCode: EXIT_CODE.COMPONENT,
+          command: method,
+        });
+        if (useAllowFailure) return;
         const error = e as Error;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,

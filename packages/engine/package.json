@@ -1,10 +1,11 @@
 {
   "name": "@serverless-devs/engine",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.11",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
+    "watch": "tsc -w",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },

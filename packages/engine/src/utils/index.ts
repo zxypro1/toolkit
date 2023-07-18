@@ -1,7 +1,8 @@
 import Credential from '@serverless-devs/credential';
 import { ILoggerInstance } from '@serverless-devs/logger';
+import { IAllowFailure } from '@serverless-devs/parse-spec';
 import flatted from 'flatted';
-import { get, omit, set, map } from 'lodash';
+import { get, omit, set, map, includes } from 'lodash';
 
 export function getLogPath(filePath: string) {
   return `step_${filePath}.log`;
@@ -42,4 +43,27 @@ export const stringify = (value: any) => {
   } catch (error) {
     return flatted.stringify(value);
   }
+};
+
+export const getAllowFailure = (
+  allowFailure: boolean | IAllowFailure | undefined,
+  data: { exitCode?: number; command?: string },
+): boolean => {
+  if (typeof allowFailure === 'boolean') {
+    return allowFailure;
+  }
+  if (typeof allowFailure !== 'object') return false;
+  if ('exit_code' in allowFailure && 'command' in allowFailure) {
+    return (
+      includes(get(allowFailure, 'exit_code'), get(data, 'exitCode')) &&
+      includes(get(allowFailure, 'command'), get(data, 'command'))
+    );
+  }
+  if ('exit_code' in allowFailure) {
+    return includes(get(allowFailure, 'exit_code'), get(data, 'exitCode'));
+  }
+  if ('command' in allowFailure) {
+    return includes(get(allowFailure, 'command'), get(data, 'command'));
+  }
+  return false;
 };
