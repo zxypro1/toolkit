@@ -80,6 +80,8 @@ test('showCompleteDiffString', () => {
       }
     },
     e: null,
+    emptyString: '',
+    deleteEmptyString: '',
   };
 
   const b = {
@@ -94,19 +96,25 @@ test('showCompleteDiffString', () => {
       df: {
         dbb: 4
       }
-    }
+    },
+    emptyString: '234',
+    addEmptyString: '',
   }
 
   const { show, diffResult } = simpleDiff(a, b, { complete: true });
+  console.log(diffResult)
+  console.log(show);
   expect(diffResult).toEqual([
     { op: 'remove', path: [ 'd', 'db', 'dba' ] },
     { op: 'remove', path: [ 'c1' ] },
     { op: 'remove', path: [ 'e' ] },
+    { op: 'remove', path: [ 'deleteEmptyString' ] },
     { op: 'remove', path: [ 'c', 3 ] },
     { op: 'replace', path: [ 'b' ], value: 2 },
     { op: 'replace', path: [ 'c', 2 ], value: 4 },
+    { op: 'replace', path: [ 'emptyString' ], value: '234' },
     { op: 'add', path: [ 'd', 'db', 'dbb' ], value: 4 },
-    { op: 'add', path: [ 'd', 'df' ], value: { dbb: 4 } }
+    { op: 'add', path: [ 'd', 'df' ], value: { dbb: 4 } },
+    { op: 'add', path: [ 'addEmptyString' ], value: '' }
   ])
-  console.log(show);
 })
