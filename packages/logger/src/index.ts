@@ -57,6 +57,7 @@ export default class Logger {
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 
     logger.progress = (message: string) => {
+      logger.debug(message);
       this.__progressFooter.upsert(instanceKey, message);
     };
 
@@ -67,6 +68,7 @@ export default class Logger {
         // @ts-ignore
         message = formatFunction(...rest);
       }
+      logger.debug(message);
       this.__progressFooter.upsert(instanceKey, message);
     };
 

@@ -93,6 +93,11 @@ class Engine {
       return this.context;
     }
     const { steps: _steps, yaml, command, access = yaml.access } = this.spec;
+    this.logger.write(
+      `⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray(
+        '====================',
+      )}`,
+    );
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -103,6 +108,7 @@ class Engine {
     // 处理 global-pre
     try {
       this.globalActionInstance.setValue('magic', this.getFilterContext());
+      this.globalActionInstance.setValue('command', command);
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
       this.context.error.push(error as TipsError);
@@ -110,15 +116,9 @@ class Engine {
       await this.doCompleted();
       return this.context;
     }
-
     this.context.steps = map(this.context.steps, (item) => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
     });
-    this.logger.write(
-      `⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray(
-        '====================',
-      )}`,
-    );
     const res: IContext = await new Promise(async (resolve) => {
       const states: any = {
         init: {
