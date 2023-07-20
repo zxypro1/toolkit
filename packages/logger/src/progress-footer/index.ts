@@ -1,24 +1,21 @@
-// @ts-ignore
-import CliProgressFooter from 'cli-progress-footer';
 import cliSpinners from 'cli-spinners';
-import ee from 'event-emitter';
 import { isString, get } from 'lodash';
 import { IPropsOptions, IMateValue, IShowList, IFormatOptions } from './types';
 import defaultOptions from './default-options';
+const CliProgressFooter = require('cli-progress-footer');
 
 export default class ProgressFooter {
-  private progress: CliProgressFooter;
+  private progress: typeof CliProgressFooter;
   private intervalId: NodeJS.Timer | undefined;
   private showList: IShowList;
   private spinner: cliSpinners.Spinner;
   private openRefresh: boolean;
-
-  public emitter: ee.Emitter;
-
   /**
    * 自定义渲染内容
    */
-  public format: (showList: IShowList, frames: IFormatOptions) => string[];
+  private format: (showList: IShowList, frames: IFormatOptions) => string[];
+
+  
 
   constructor(options: IPropsOptions = {}) {
     this.progress = CliProgressFooter();
@@ -37,12 +34,7 @@ export default class ProgressFooter {
     this.stop = this.stop.bind(this);
     this.clear = this.clear.bind(this);
     this.upsert = this.upsert.bind(this);
-    this.upsert = this.upsert.bind(this);
     this.removeItem = this.removeItem.bind(this);
-
-    this.emitter = ee();
-    this.emitter.on('progress:upsert', this.upsert);
-    this.emitter.on('progress:removeItem', this.removeItem);
   }
 
   public getKeys() {
@@ -88,8 +80,6 @@ export default class ProgressFooter {
    * 清理输出：将定时器、事件监听、动态输出都清理掉
    */
   public clear() {
-    this.emitter.off('progress:upsert', this.upsert);
-    this.emitter.off('progress:removeItem', this.removeItem);
     this.progress.updateProgress();
     this.showList.clear();
     this.stop();
@@ -115,11 +105,10 @@ export default class ProgressFooter {
     }
 
     this.reader();
-
     // 新增输入时，如果不存在定时器则开启定时器
-    if (!this.intervalId && this.openRefresh) {
-      this.intervalId = setInterval(this.reader, this.spinner.interval);
-    }
+    // if (!this.intervalId && this.openRefresh) {
+    //   this.intervalId = setInterval(this.reader, this.spinner.interval);
+    // }
   }
 
   /**

@@ -46,6 +46,7 @@ export default class Logger {
   constructor(options: IOptions) {
     this.__options = options;
     this.__progressFooter = new ProgressFooter();
+
     if (options?.instanceKeys) {
       each(options.instanceKeys, (value: string) => {
         this.__generate(value);

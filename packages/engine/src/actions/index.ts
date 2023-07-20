@@ -60,7 +60,9 @@ class Actions {
       if (this.option.hookLevel === IActionLevel.GLOBAL) {
         this.logger.write(
           `${chalk.red('✖')} ${chalk.gray(
-            `Global ${hookType}-action failed to [${this.record.command}] (${getProcessTime(this.record.startTime)}s)`,
+            `Global ${hookType}-action failed to [${this.record.command}] (${getProcessTime(
+              this.record.startTime,
+            )}s)`,
           )}`,
         );
       }
@@ -104,7 +106,9 @@ class Actions {
 
     if (this.option.hookLevel === IActionLevel.GLOBAL) {
       this.logger.write(
-        `${chalk.green('✔')} ${chalk.gray(`Global ${hookType}-action completed (${getProcessTime(this.record.startTime)})`)}`,
+        `${chalk.green('✔')} ${chalk.gray(
+          `Global ${hookType}-action completed (${getProcessTime(this.record.startTime)})`,
+        )}`,
       );
     }
     return this.record;
@@ -140,7 +144,7 @@ class Actions {
     const useAllowFailure = getAllowFailure(this.record.allowFailure, {
       exitCode: EXIT_CODE.DEVS,
       command: this.record.command,
-    })
+    });
     if (useAllowFailure) return;
     throw new TipsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
@@ -157,7 +161,7 @@ class Actions {
       const useAllowFailure = getAllowFailure(this.record.allowFailure, {
         exitCode: EXIT_CODE.PLUGIN,
         command: this.record.command,
-      })
+      });
       if (useAllowFailure) return;
       throw new TipsError(error.message, {
         exitCode: EXIT_CODE.PLUGIN,
@@ -183,7 +187,7 @@ class Actions {
         const useAllowFailure = getAllowFailure(this.record.allowFailure, {
           exitCode: EXIT_CODE.COMPONENT,
           command: this.record.command,
-        })
+        });
         if (useAllowFailure) return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
@@ -194,7 +198,7 @@ class Actions {
     const useAllowFailure = getAllowFailure(this.record.allowFailure, {
       exitCode: EXIT_CODE.DEVS,
       command: this.record.command,
-    })
+    });
     if (useAllowFailure) return;
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
     throw new TipsError(`The [${command}] command was not found.`, {

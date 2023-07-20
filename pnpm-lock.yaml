@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -253,11 +257,8 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
       egg-logger:
-        specifier: ^3.3.0
+        specifier: ^3.3.1
         version: 3.3.1
-      event-emitter:
-        specifier: ^0.3.5
-        version: 0.3.5
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -265,9 +266,6 @@ importers:
         specifier: ^1.2.5
         version: 1.2.5
     devDependencies:
-      '@types/event-emitter':
-        specifier: ^0.3.3
-        version: 0.3.3
       '@types/prettyjson':
         specifier: ^0.0.30
         version: 0.0.30
@@ -1135,10 +1133,6 @@ packages:
     resolution: {integrity: sha512-/C8kTMRTNiNuWGl5nEyKbPiMv6HA+0RbEXzFhFBEzASM6+oa4tJro9b8nj7eRlOFfuLdzUU+DS/GPDlvvzMOhA==}
     dependencies:
       '@types/node': 18.16.18
-    dev: true
-
-  /@types/event-emitter@0.3.3:
-    resolution: {integrity: sha512-UfnOK1pIxO7P+EgPRZXD9jMpimd8QEFcEZ5R67R1UhGbv4zghU5+NE7U8M8G9H5Jc8FI51rqDWQs6FtUfq2e/Q==}
     dev: true
 
   /@types/fs-extra@11.0.1:

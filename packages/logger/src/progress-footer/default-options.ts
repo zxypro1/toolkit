@@ -16,8 +16,7 @@ export default {
       const runTime = Math.floor((new Date().getTime() - timer) / 1000);
       const frameIndex = runTime % framesLength;
 
-      const showMessage = `${blackBright(key)} ${frames[frameIndex]} ${green(`${runTime}s`)}
-    ${greenBright(message)}`;
+      const showMessage = `${blackBright(key)} \n ${greenBright(message)}`;
 
       show.push(showMessage);
     });
