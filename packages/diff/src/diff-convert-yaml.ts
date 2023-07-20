@@ -61,7 +61,7 @@ export default function (
 ): { diffResult: any[]; show: string } {
   const diffResult = diff(oldObject, newObject);
 
-  if (isEmpty(diffResult)) {
+  if (isEmpty(diffResult) && !opts?.complete) {
     return {
       diffResult,
       show: '',

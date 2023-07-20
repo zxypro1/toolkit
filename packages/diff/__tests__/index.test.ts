@@ -1,4 +1,4 @@
-import { diff, simpleDiff } from '../src';
+import { diff, diffConvertYaml } from '../src';
 
 test('diff', () => {
   const obj1 = { a: 4, b: 5 };
@@ -55,7 +55,7 @@ test('showSimpleDiffString', () => {
     }
   }
 
-  const { show, diffResult } = simpleDiff(a, b);
+  const { show, diffResult } = diffConvertYaml(a, b);
   expect(diffResult).toEqual([
     { op: 'remove', path: [ 'd', 'db', 'dba' ] },
     { op: 'remove', path: [ 'e' ] },
@@ -101,7 +101,7 @@ test('showCompleteDiffString', () => {
     addEmptyString: '',
   }
 
-  const { show, diffResult } = simpleDiff(a, b, { complete: true });
+  const { show, diffResult } = diffConvertYaml(a, b, { complete: true });
   console.log(diffResult)
   console.log(show);
   expect(diffResult).toEqual([
@@ -117,4 +117,43 @@ test('showCompleteDiffString', () => {
     { op: 'add', path: [ 'd', 'df' ], value: { dbb: 4 } },
     { op: 'add', path: [ 'addEmptyString' ], value: '' }
   ])
+})
+
+test.only('diff null, complete true', () => {
+  const a = {
+    a: 1,
+    b: '2',
+    c1: [null],
+    c: ['1', '2', '3', null],
+    d: {
+      da: 1,
+      db: {
+        dba: 2
+      }
+    },
+    e: null,
+    emptyString: '',
+    deleteEmptyString: '',
+  };
+
+  const b = {
+    a: 1,
+    b: '2',
+    c1: [null],
+    c: ['1', '2', '3', null],
+    d: {
+      da: 1,
+      db: {
+        dba: 2
+      }
+    },
+    e: null,
+    emptyString: '',
+    deleteEmptyString: '',
+  };
+
+  const { show, diffResult } = diffConvertYaml(a, b, { complete: true });
+  console.log(diffResult)
+  console.log(show);
+  expect(diffResult).toEqual([])
 })
