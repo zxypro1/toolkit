@@ -10,12 +10,7 @@ export default class ProgressFooter {
   private showList: IShowList;
   private spinner: cliSpinners.Spinner;
   private openRefresh: boolean;
-  /**
-   * 自定义渲染内容
-   */
   private format: (showList: IShowList, frames: IFormatOptions) => string[];
-
-  
 
   constructor(options: IPropsOptions = {}) {
     this.progress = CliProgressFooter();
