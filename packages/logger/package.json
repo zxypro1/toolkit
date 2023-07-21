@@ -16,7 +16,6 @@
     "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",
     "cli-progress-footer": "^2.3.2",
-    "cli-spinners": "^2.9.0",
     "egg-logger": "^3.3.1",
     "lodash": "^4.17.21",
     "prettyjson": "^1.2.5"

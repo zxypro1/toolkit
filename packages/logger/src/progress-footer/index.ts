@@ -1,32 +1,21 @@
-import cliSpinners from 'cli-spinners';
-import { isString, get } from 'lodash';
-import { IPropsOptions, IMateValue, IShowList, IFormatOptions } from './types';
+import { IPropsOptions, IMateValue, IShowList } from './types';
 import defaultOptions from './default-options';
 const CliProgressFooter = require('cli-progress-footer');
 
 export default class ProgressFooter {
   private progress: typeof CliProgressFooter;
-  private intervalId: NodeJS.Timer | undefined;
   private showList: IShowList;
-  private spinner: cliSpinners.Spinner;
-  private openRefresh: boolean;
-  private format: (showList: IShowList, frames: IFormatOptions) => string[];
+  private format: (showList: IShowList) => string[];
 
   constructor(options: IPropsOptions = {}) {
     this.progress = CliProgressFooter();
     this.showList = new Map();
 
     const o = { ...defaultOptions, ...options };
-    this.spinner = isString(o.spinner)
-      ? get(cliSpinners, o.spinner, defaultOptions.spinner)
-      : o.spinner;
     this.format = o.format;
-    this.openRefresh = o.openRefresh;
 
     // 确保 this 指向
     this.reader = this.reader.bind(this);
-    this.start = this.start.bind(this);
-    this.stop = this.stop.bind(this);
     this.clear = this.clear.bind(this);
     this.upsert = this.upsert.bind(this);
     this.removeItem = this.removeItem.bind(this);
@@ -43,33 +32,13 @@ export default class ProgressFooter {
     // 如果不存在输出时，清空定时器
     if (this.showList.size === 0) {
       this.progress.updateProgress();
-      this.stop();
       return;
     }
     // 存在输出时再处理显示
-    const show = this.format(this.showList, { frames: this.spinner.frames });
+    const show = this.format(this.showList);
     this.progress.updateProgress(show);
   }
 
-  /**
-   * 启动定时渲染
-   * @param flag 如果为 true 强制启动
-   */
-  public start(flag?: boolean): void {
-    if (flag || (this.openRefresh && this.showList.size)) {
-      this.intervalId = setInterval(this.reader, this.spinner.interval);
-    }
-  }
-
-  /**
-   * 暂停定时器
-   */
-  public stop() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = undefined;
-    }
-  }
 
   /**
    * 清理输出：将定时器、事件监听、动态输出都清理掉
@@ -77,7 +46,6 @@ export default class ProgressFooter {
   public clear() {
     this.progress.updateProgress();
     this.showList.clear();
-    this.stop();
   }
 
   /**
@@ -100,10 +68,6 @@ export default class ProgressFooter {
     }
 
     this.reader();
-    // 新增输入时，如果不存在定时器则开启定时器
-    // if (!this.intervalId && this.openRefresh) {
-    //   this.intervalId = setInterval(this.reader, this.spinner.interval);
-    // }
   }
 
   /**

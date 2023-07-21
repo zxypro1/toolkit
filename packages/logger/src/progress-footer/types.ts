@@ -1,6 +1,4 @@
-import cliSpinners from 'cli-spinners';
 
-type ISpinner = cliSpinners.SpinnerName | cliSpinners.Spinner;
 
 export type IShowList = Map<string, IMateValue>;
 
@@ -12,19 +10,6 @@ export interface IFormatOptions {
 }
 
 export interface IPropsOptions {
-  /**
-   * 开启刷新
-   *
-   * @default true
-   */
-  openRefresh?: boolean;
-  /**
-   * 动态效果
-   */
-  spinner?: ISpinner;
-  /**
-   * 自定义格式化输出
-   */
   format?: (showList: IShowList) => string[];
 }
 
