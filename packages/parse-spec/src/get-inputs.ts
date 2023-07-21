@@ -1,5 +1,5 @@
 import compile from './compile';
-import { every, includes, isEmpty, map, join } from 'lodash';
+import { every, includes, isEmpty, map, join, get } from 'lodash';
 import { REGXG } from './contants';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -16,7 +16,8 @@ export const getInputs = (inputs: Record<string, any> = {}, context: Record<stri
         if (
           typeof val === 'string' &&
           REGXG.test(val) &&
-          includes(join(val.match(REGXG), ','), '-')
+          includes(join(val.match(REGXG), ','), '-') &&
+          get(context, 'use3x')
         ) {
           throw new Error(`Invalid value: ${val}, not support '-' in value`);
         }

@@ -70,7 +70,10 @@ const compile = (value: string, context: Record<string, any> = {}) => {
     return res;
   } catch (e) {
     const error = e as Error;
-    throw new Error(`compile error, ${error.message}`);
+    if (get(context, 'use3x')) {
+      throw new Error(`compile error, ${error.message}`);
+    }
+    return value;
   }
 };
 

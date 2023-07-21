@@ -219,6 +219,7 @@ class ParseSpec {
       cwd: path.dirname(this.yaml.path),
       vars: this.yaml.vars,
       ignore: concat(IGNORE, this.yaml.projectNames),
+      use3x: this.yaml.use3x,
     });
 
     const steps = [];
@@ -233,6 +234,7 @@ class ParseSpec {
         cwd: path.dirname(this.yaml.path),
         vars: this.yaml.vars,
         ignore: concat(IGNORE, this.yaml.projectNames),
+        use3x: this.yaml.use3x,
       });
       steps.push({
         ...element,
