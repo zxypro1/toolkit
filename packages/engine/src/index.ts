@@ -439,11 +439,12 @@ class Engine {
     const { projectName, command } = this.spec;
     const result = {
       cwd: this.options.cwd,
+      name: get(this.spec, 'yaml.appName'),
       props: newInputs,
       command,
       args: filter(this.options.args, (o) => !includes([projectName, command], o)),
       yaml: {
-        path: this.spec.yaml.path,
+        path: get(this.spec, 'yaml.path'),
       },
       resource: {
         name: item.projectName,
