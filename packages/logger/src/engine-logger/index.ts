@@ -49,13 +49,10 @@ export default class EngineLogger extends Logger {
    * @param message 输入日志
    * @param level 输出的级别，默认 INFO
    */
-  append(message: string, level: LoggerLevel = 'INFO') {
+  append(message: string, level: LoggerLevel = 'NONE') {
     // 将行尾符修改为 ''
     this.setEol('');
-
-    // @ts-ignore: 输出
-    super.log(level, [transport.transportSecrets(message)]);
-
+    super.write(message);
     // 修改为初始实例时的行尾
     this.setEol(this.eol);
   }

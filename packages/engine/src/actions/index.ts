@@ -13,7 +13,7 @@ import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import { TipsError } from '@serverless-devs/utils';
 import fs from 'fs-extra';
-import execa from 'execa';
+import { command } from 'execa';
 import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
 import { getAllowFailure, getProcessTime, stringify } from '../utils';
@@ -113,14 +113,32 @@ class Actions {
     }
     return this.record;
   }
+  private onFinish(cp: any) {
+    return new Promise((resolve, reject) => {
+      const stdout: Buffer[] = [];
+      const stderr: Buffer[] = [];
+      cp.stdout.on('data', (chunk: Buffer) => {
+        this.logger.append(chunk.toString());
+        stdout.push(chunk);
+      });
+
+      cp.stderr.on('data', (chunk: Buffer) => {
+        this.logger.append(chunk.toString());
+        stderr.push(chunk);
+      });
+      cp.on('exit', (code: number) => {
+        code === 0 ? resolve({}) : reject(new Error(Buffer.concat(stderr).toString()));
+      });
+    });
+  }
   private async run(hook: IRunAction) {
     if (fs.existsSync(hook.path) && fs.lstatSync(hook.path).isDirectory()) {
       try {
-        execa.sync(hook.value, {
+        const cp = command(hook.value, {
           cwd: hook.path,
-          stdio: 'inherit',
           shell: true,
         });
+        await this.onFinish(cp);
       } catch (e) {
         const error = e as Error;
         if (utils.isWindow()) {

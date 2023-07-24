@@ -1,5 +1,3 @@
-
-
 export interface IPropsOptions {
   format?: (data: IterableIterator<[string, IMateValue]>) => string[];
 }
