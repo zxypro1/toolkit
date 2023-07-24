@@ -1,4 +1,3 @@
-export { default as use3version } from './use3version';
 export { default as compile } from './compile';
 export { default as order } from './order';
 export { default as getInputs } from './get-inputs';

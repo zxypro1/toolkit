@@ -60,9 +60,9 @@ class Actions {
       if (this.option.hookLevel === IActionLevel.GLOBAL) {
         this.logger.write(
           `${chalk.red('✖')} ${chalk.gray(
-            `${IActionLevel.GLOBAL} ${hookType}-action failed to [${this.record.command}] (${getProcessTime(
-              this.record.startTime,
-            )}s)`,
+            `${IActionLevel.GLOBAL} ${hookType}-action failed to [${
+              this.record.command
+            }] (${getProcessTime(this.record.startTime)}s)`,
           )}`,
         );
       }
@@ -107,7 +107,9 @@ class Actions {
     if (this.option.hookLevel === IActionLevel.GLOBAL) {
       this.logger.write(
         `${chalk.green('✔')} ${chalk.gray(
-          `${IActionLevel.GLOBAL} ${hookType}-action completed (${getProcessTime(this.record.startTime)})`,
+          `${IActionLevel.GLOBAL} ${hookType}-action completed (${getProcessTime(
+            this.record.startTime,
+          )})`,
         )}`,
       );
     }
@@ -167,7 +169,6 @@ class Actions {
     throw new TipsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
-
     });
   }
   private async plugin(hook: IPluginAction) {
