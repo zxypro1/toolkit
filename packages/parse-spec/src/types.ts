@@ -55,8 +55,8 @@ export interface IAllowFailure {
 }
 
 export enum IActionLevel {
-  PROJECT = 'project',
-  GLOBAL = 'global',
+  PROJECT = 'Project',
+  GLOBAL = 'Global',
 }
 
 export interface IYaml {

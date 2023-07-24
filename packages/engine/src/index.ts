@@ -481,7 +481,7 @@ class Engine {
           const error = e as Error;
           throw new TipsError(error.message, {
             exitCode: EXIT_CODE.COMPONENT,
-            prefix: `Project ${item.projectName} failed to execute:`,
+            prefix: `[${item.projectName}] failed to [${command}]:`,
           });
         }
       }
@@ -498,7 +498,7 @@ class Engine {
         } has the ${command} command. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
-        prefix: `Project ${item.projectName} failed to execute:`,
+        prefix: `[${item.projectName}] failed to [${command}]:`,
       });
     }
     // 应用级操作
@@ -515,7 +515,7 @@ class Engine {
         const error = e as Error;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
-          prefix: `Project ${item.projectName} failed to execute:`,
+          prefix: `[${item.projectName}] failed to [${command}]:`,
         });
       }
     }

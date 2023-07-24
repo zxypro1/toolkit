@@ -60,7 +60,7 @@ class Actions {
       if (this.option.hookLevel === IActionLevel.GLOBAL) {
         this.logger.write(
           `${chalk.red('✖')} ${chalk.gray(
-            `Global ${hookType}-action failed to [${this.record.command}] (${getProcessTime(
+            `${IActionLevel.GLOBAL} ${hookType}-action failed to [${this.record.command}] (${getProcessTime(
               this.record.startTime,
             )}s)`,
           )}`,
@@ -77,7 +77,7 @@ class Actions {
     this.record.startTime = Date.now();
     this.record.lable =
       this.option.hookLevel === IActionLevel.PROJECT
-        ? `project ${this.option.projectName}`
+        ? `[${this.option.projectName}]`
         : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
     const newHooks = getInputs(hooks, this.record.magic);
@@ -107,7 +107,7 @@ class Actions {
     if (this.option.hookLevel === IActionLevel.GLOBAL) {
       this.logger.write(
         `${chalk.green('✔')} ${chalk.gray(
-          `Global ${hookType}-action completed (${getProcessTime(this.record.startTime)})`,
+          `${IActionLevel.GLOBAL} ${hookType}-action completed (${getProcessTime(this.record.startTime)})`,
         )}`,
       );
     }
@@ -154,7 +154,7 @@ class Actions {
         if (useAllowFailure) return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.RUN,
-          prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+          prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
         });
       }
       return;
@@ -166,7 +166,8 @@ class Actions {
     if (useAllowFailure) return;
     throw new TipsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
-      prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+      prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+
     });
   }
   private async plugin(hook: IPluginAction) {
@@ -183,7 +184,7 @@ class Actions {
       if (useAllowFailure) return;
       throw new TipsError(error.message, {
         exitCode: EXIT_CODE.PLUGIN,
-        prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+        prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
       });
     }
   }
@@ -209,7 +210,7 @@ class Actions {
         if (useAllowFailure) return;
         throw new TipsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
-          prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+          prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
         });
       }
     }
@@ -221,7 +222,7 @@ class Actions {
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
     throw new TipsError(`The [${command}] command was not found.`, {
       exitCode: EXIT_CODE.DEVS,
-      prefix: `${this.record.lable} ${hook.hookType}-action failed to execute:`,
+      prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
       tips: `Please check the component ${componentName} has the ${command} command. Serverless Devs documents：${chalk.underline(
         'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
       )}`,
