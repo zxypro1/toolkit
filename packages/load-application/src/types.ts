@@ -35,4 +35,5 @@ export interface IOptions {
 
 export enum IProvider {
   DEVSAPP = 'devsapp',
+  PERSONAL = 'personal',
 }

@@ -6,17 +6,20 @@
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
+    "watch": "tsc -w",
     "prepublishOnly": "npm run build"
   },
   "author": "xsahxl",
   "license": "MIT",
   "dependencies": {
+    "@serverless-devs/art-template": "^4.13.2",
     "@serverless-devs/downloads": "workspace:^",
+    "@serverless-devs/utils": "workspace:^",
     "art-template": "^4.13.2",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21",
     "node-fetch": "2.x",
-    "yaml": "^2.2.1"
+    "yaml": "^2.3.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",

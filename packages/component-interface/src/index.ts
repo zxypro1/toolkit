@@ -7,7 +7,7 @@ export interface ICredentials {
 
 export interface IInputs {
   props: Record<string, any>; // 用户自定义输入
-  name: string; 
+  name: string;
   command: string; // 执行指令
   yaml: {
     path: string; // 配置路径

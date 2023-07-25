@@ -2,12 +2,15 @@ import path from 'path';
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import download from '@serverless-devs/downloads';
-import artTemplate from 'art-template';
+import artTemplate from '@serverless-devs/art-template';
+import { getYamlContent } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, find, has, set } from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
 import { REGISTRY } from './constants';
-import { getYamlPath, getYamlContent } from './utils';
+import { getYamlPath, getInputs } from './utils';
+import assert from 'assert';
+import YAML from 'yaml';
 
 class LoadApplication {
   private provider: IProvider.DEVSAPP;
@@ -49,9 +52,7 @@ class LoadApplication {
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
   private validate() {
-    if (isEmpty(this.template)) {
-      throw new Error('template is required');
-    }
+    assert(this.template, 'template is required');
   }
   private formatProvider() {
     const useProvider = includes(this.template, '/');
@@ -63,15 +64,12 @@ class LoadApplication {
       };
     }
     return {
-      provider: IProvider.DEVSAPP,
+      provider: IProvider.PERSONAL,
       componentName: this.template,
     };
   }
   private format() {
     const { provider, componentName } = this.formatProvider();
-    if (provider !== IProvider.DEVSAPP) {
-      throw new Error(`provider ${provider} is not supported, only support ${IProvider.DEVSAPP}`);
-    }
     const [name, version] = split(componentName, '@');
     return {
       provider,
@@ -140,8 +138,8 @@ class LoadApplication {
         artTemplate.defaults.imports[key] = filterHook[key];
       }
     }
-    const newData = artTemplate(filePath, data);
-    fs.writeFileSync(filePath, newData, 'utf-8');
+    const newData = getInputs(getYamlContent(filePath), data, artTemplate);
+    fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
     return newData;
   }
 
@@ -233,15 +231,23 @@ class LoadApplication {
     if (isEmpty(zipball_url)) {
       throw new Error('zipball_url is empty');
     }
-    await download(zipball_url, { dest: this.tempPath, logger, extract: true, strip: 1 });
+    await download(zipball_url, { dest: this.tempPath, logger, extract: true });
   }
   private async doZipballUrl() {
-    const response = await fetch(`${REGISTRY}/${this.provider}/${this.name}/releases/latest`);
+    const maps = {
+      [IProvider.PERSONAL]: `${REGISTRY}/${this.name}/releases/latest`,
+      [IProvider.DEVSAPP]: `${REGISTRY}/${this.provider}/${this.name}/releases/latest`,
+    };
+    const response = await fetch(maps[this.provider]);
     const data = await response.json();
     return get(data, 'Response.zipball_url');
   }
   private async doZipballUrlWithVersion() {
-    const response = await fetch(`${REGISTRY}/${this.provider}/${this.name}/releases`);
+    const maps = {
+      [IProvider.PERSONAL]: `${REGISTRY}/${this.name}/releases`,
+      [IProvider.DEVSAPP]: `${REGISTRY}/${this.provider}/${this.name}/releases`,
+    };
+    const response = await fetch(maps[this.provider]);
     const { Response } = await response.json();
     const obj = find(Response, (item: any) => item.tag_name === this.version);
     if (isEmpty(obj)) {
