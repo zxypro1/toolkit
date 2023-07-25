@@ -140,7 +140,7 @@ class LoadApplication {
     }
     const newData = getInputs(getYamlContent(filePath), data, artTemplate);
     fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
-    return newData;
+    return YAML.stringify(newData);
   }
 
   private async postInit() {
