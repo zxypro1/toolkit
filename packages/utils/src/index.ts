@@ -8,4 +8,4 @@ export { default as parseArgv } from './parse-argv';
 export { default as getYamlContent, getYamlPath, getAbsolutePath } from './get-yaml-content';
 export { default as fieldEncryption } from './field-encryption';
 export { default as isWindow } from './is-window';
-export * from './error/index';
+export { default as DevsError } from './devs-error';
