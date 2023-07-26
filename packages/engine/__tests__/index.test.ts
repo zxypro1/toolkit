@@ -283,7 +283,7 @@ test.only('plugin update inputs', async () => {
   expect(context.status).toBe('success');
 });
 
-test('utils_2.TipsError is not a constructor', async () => {
+test('utils_2.DevsError is not a constructor', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['error']

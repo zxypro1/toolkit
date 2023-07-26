@@ -2,7 +2,7 @@ import { IStep } from '@serverless-devs/parse-spec';
 import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import { AssertionError } from 'assert';
-import { TipsError } from '@serverless-devs/utils';
+import { DevsError } from '@serverless-devs/utils';
 export interface IEngineOptions {
   args?: string[]; //默认 process.argv.slice(2)
   template?: string;
@@ -72,4 +72,4 @@ export interface IContext {
   output: Record<string, any>; // 记录step的输出
 }
 
-export type IEngineError = Error | AssertionError | TipsError;
+export type IEngineError = Error | AssertionError | DevsError;
