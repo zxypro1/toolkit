@@ -189,6 +189,7 @@ class Engine {
         .start();
       stepService.send('INIT');
     });
+    this.glog.__clear();
     return res;
   }
   private getOutput() {
@@ -230,7 +231,7 @@ class Engine {
       traceId: get(process.env, 'serverless_devs_trace_id', randomId()),
       logDir: path.join(utils.getRootHome(), 'logs'),
       ...this.options.logConfig,
-      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : 'INFO'),
+      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),
     });
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
@@ -494,11 +495,10 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${
-          item.component
-        } has the ${command} command. Serverless Devs documents：${chalk.underline(
-          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-        )}`,
+        tips: `Please check the component ${item.component
+          } has the ${command} command. Serverless Devs documents：${chalk.underline(
+            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+          )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
       });
     }
