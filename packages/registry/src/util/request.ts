@@ -4,7 +4,6 @@ import http from 'http';
 import querystring from 'querystring';
 import { registry } from '@serverless-devs/utils';
 
-
 export const new_request_get = async (
   url: string,
   headers?: Record<string, string>,
@@ -124,4 +123,3 @@ export const request_put = async (url: string, filePath: string): Promise<any> =
     request.end();
   });
 };
-

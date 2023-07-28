@@ -6,7 +6,6 @@ import { PUBLISH_URL } from '../request-url';
 import logger from '../util/logger';
 import path from 'path';
 
-
 interface IRequest {
   /**
    * 版本信息，如果指定了优先使用，如果不指定则优先使用publish参数中的version

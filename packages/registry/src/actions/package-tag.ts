@@ -26,4 +26,4 @@ export const packageDetail = async (name: string, versionId?: string) => {
   const { body, request_id } = await request.new_request_get(uri, headers);
   logger.debug(`Get registry ${name} detail responseId: ${request_id}`);
   return body;
-}
+};

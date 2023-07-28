@@ -28,7 +28,9 @@ export async function generateToken() {
 
   for (let i = 0; i < 100; i++) {
     await sleep(2000);
-    const result = await request.new_request_get(`${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`);
+    const result = await request.new_request_get(
+      `${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`,
+    );
     const { body, request_id } = result || ({} as any);
     logger.debug(`ResponseId: ${request_id}`);
     if (typeof body === 'string') {

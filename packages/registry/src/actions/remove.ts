@@ -1,6 +1,6 @@
-import { request } from "../util";
-import logger from "../util/logger";
-import { getPackageUrl } from "../request-url";
+import { request } from '../util';
+import logger from '../util/logger';
+import { getPackageUrl } from '../request-url';
 
 export default async (name: string, versionId: string) => {
   const uri = getPackageUrl(name, versionId);

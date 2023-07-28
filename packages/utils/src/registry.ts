@@ -17,7 +17,7 @@ class Registry {
   getPlatformPath = () => {
     const rootHome = getRootHome();
     fs.mkdirSync(rootHome, { recursive: true });
-  
+
     return path.join(rootHome, 'serverless-devs-platform-V3.dat');
   };
 
@@ -25,14 +25,14 @@ class Registry {
     if (process.env.serverless_devs_registry_token) {
       return process.env.serverless_devs_registry_token;
     }
-  
+
     const platformPath = this.getPlatformPath();
     if (!fs.existsSync(platformPath)) {
       throw new Error('Please perform serverless registry through [s cli registry login]');
     }
-  
+
     return fs.readFileSync(platformPath, 'utf-8');
-  }
+  };
 
   getSignHeaders = (): Record<string, string> => {
     const safety_code = this.getToken();
@@ -43,14 +43,14 @@ class Registry {
     const timestamp = `${parseInt(`${new Date().getTime() / 1000}`, 10)}`;
     const nonce = random({ length: 15 });
     const sign_code = sha256(safety_code, nonce, timestamp);
-  
+
     return {
       sign_code,
       nonce,
       timestamp,
       token,
     };
-  };  
+  };
 }
 
 export default new Registry();
