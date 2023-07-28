@@ -14,7 +14,7 @@ const sha256 = (safety_code: string, nonce: string, timestamp: string) => {
   const sha = crypto.createHash('sha256');
   sha.update(message);
   return sha.digest('hex');
-}
+};
 
 /**
  * 获取 yaml 的内容
@@ -42,7 +42,7 @@ export const getContentText = (fileUri: string): string | undefined => {
 
 /**
  * 获取 token
- * @returns 
+ * @returns
  */
 export const getToken = (): string => {
   if (process.env.serverless_devs_registry_token) {
@@ -91,29 +91,38 @@ export const getSignHeaders = (): Record<string, string> => {
     timestamp,
     token,
   };
-}
+};
 
-export const new_request_get = async (url: string, headers?: Record<string, string>): Promise<{ request_id: string; body: any }> => {
+export const new_request_get = async (
+  url: string,
+  headers?: Record<string, string>,
+): Promise<{ request_id: string; body: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
   return new Promise((resolve, reject) => {
     const res: any = [];
-    pkg.get(uri.href, {
-      headers,
-    }, (response) => {
-      response.on('data', (chunk: any) => {
-        res.push(chunk);
-      });
-      response.on('end', () => {
-        const r = JSON.parse(Buffer.concat(res).toString());
-        resolve(r);
-      });
-    });
+    pkg.get(
+      uri.href,
+      {
+        headers,
+      },
+      (response) => {
+        response.on('data', (chunk: any) => {
+          res.push(chunk);
+        });
+        response.on('end', () => {
+          const r = JSON.parse(Buffer.concat(res).toString());
+          resolve(r);
+        });
+      },
+    );
   });
 };
 
-
-export const new_request_post = async (url: string, body?: Record<string, any>): Promise<{ request_id: string; body: any }> => {
+export const new_request_post = async (
+  url: string,
+  body?: Record<string, any>,
+): Promise<{ request_id: string; body: any }> => {
   const headers = getSignHeaders();
 
   const uri = new URL(url);
@@ -142,13 +151,15 @@ export const new_request_post = async (url: string, body?: Record<string, any>):
     });
     if (body) {
       const contents = querystring.stringify(body);
-      request.write(contents)
+      request.write(contents);
     }
     request.end();
   });
 };
 
-export const new_request_remove = async (url: string): Promise<{ request_id: string; body: any }> => {
+export const new_request_remove = async (
+  url: string,
+): Promise<{ request_id: string; body: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
   const headers = getSignHeaders();
@@ -176,7 +187,7 @@ export const new_request_remove = async (url: string): Promise<{ request_id: str
     });
     request.end();
   });
-}
+};
 
 export const request_put = async (url: string, filePath: string): Promise<any> => {
   const uri = new URL(url);
