@@ -21,8 +21,7 @@ export default class Registry {
    * @param token 指定 token
    */
   async resetToken() {
-    const token = command.getToken();
-    await command.resetToken(token);
+    await command.resetToken();
   }
 
   /**
@@ -38,17 +37,15 @@ export default class Registry {
    * @param codeUri 组件地址，默认为 process.cwd()
    */
   async publish(codeUri?: string) {
-    const token = command.getToken();
-    await command.publish(token, codeUri || process.cwd());
+    await command.publish(codeUri || process.cwd());
   }
 
   /**
    * 获取登陆用户发布的组件
    * @returns
    */
-  async list() {
-    const token = command.getToken();
-    return await command.list(token);
+  async list(options?: command.IList) {
+    return await command.list(options);
   }
 
   /**
@@ -56,8 +53,11 @@ export default class Registry {
    * @param name 组件名称
    * @returns
    */
-  async detail(name: string) {
-    return await command.detail(name);
+  async detail(name: string, page?: string) {
+    if (!name) {
+      throw new Error(`${name} not specified in command`);
+    }
+    return await command.detail(name, page);
   }
 
   /**
@@ -65,21 +65,13 @@ export default class Registry {
    * @param name 组件名称
    * @returns
    */
-  async remove(packageName: string, type: string) {
-    if (!packageName || !packageName.includes('@')) {
+  async remove(name: string, versionId: string) {
+    if (!name || !versionId) {
       throw new Error(
-        'Component name and version is required.\nPlease add --name-version, like: --name-version thinphp@0.0.1',
-      );
-    }
-    if (!type || !['Component', 'Application', 'Plugin'].includes(type)) {
-      throw new Error(
-        'Component type and version is required.\nPlease add --name-version, like: --type Component',
+        'Component name and version is required. like: --name think --version-id 0.0.1',
       );
     }
 
-    const token = command.getToken();
-    const [name, version] = packageName.split('@');
-
-    await command.remove(token, name, type, version);
+    await command.remove(name, versionId);
   }
 }

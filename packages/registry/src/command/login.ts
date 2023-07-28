@@ -1,7 +1,7 @@
 import random from 'random-string';
 // @ts-ignore
 import opn from 'opn';
-import { writeFile, sleep, request_get, request_post } from '../utils';
+import { writeFile, sleep, new_request_get, new_request_post } from '../utils';
 import logger from '../logger';
 import { GITHUB_LOGIN_URL, REGISTRY_INFORMATION_GITHUB, RESET_URL } from './constants';
 
@@ -28,12 +28,15 @@ export async function generateToken() {
 
   for (let i = 0; i < 100; i++) {
     await sleep(2000);
-    const result = await request_get(`${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`);
-    const { ResponseId, Response } = result || ({} as any);
-    logger.debug(`ResponseId: ${ResponseId}`);
-    if (!Response.Error && Response?.safety_code) {
-      writeFile(Response.safety_code);
-      logger.log(`${Response.login} Welcome to Serverless Devs Registry.`);
+    const result = await new_request_get(`${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`);
+    const { body, request_id } = result || ({} as any);
+    logger.debug(`ResponseId: ${request_id}`);
+    if (typeof body === 'string') {
+      throw new Error(body);
+    }
+    if (body.safety_code) {
+      writeFile(body.safety_code);
+      logger.log(`Hi ${body.name}, Welcome to Serverless Devs Registry.`);
       return;
     }
   }
@@ -46,16 +49,16 @@ export async function generateToken() {
  * 刷新 token
  * @param token 旧的 token
  */
-export async function resetToken(token: string) {
+export async function resetToken() {
   try {
-    const { ResponseId, Response } = await request_post(RESET_URL, { safety_code: token });
-    logger.debug(`ResponseId: ${ResponseId}`);
+    const { body, request_id } = await new_request_post(RESET_URL);
+    logger.debug(`ResponseId: ${request_id}`);
 
-    if (Response.Error) {
-      throw new Error(`${Response.Error}: ${Response.Message}`);
+    if (typeof body === 'string') {
+      throw new Error(body);
     }
 
-    writeFile(Response.safety_code);
+    writeFile(body.safety_code);
   } catch (_ex) {
     throw new Error('Network exception. Please try again later');
   }

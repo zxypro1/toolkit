@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/registry",
-  "version": "0.0.2-beta.1",
+  "version": "0.0.2-beta.2",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   "dependencies": {
     "@serverless-devs/utils": "workspace:^",
     "@serverless-devs/zip": "workspace:^",
+    "md5": "^2.3.0",
     "opn": "^6.0.0",
     "random-string": "^0.2.0"
   },

@@ -6,7 +6,7 @@ process.env.serverless_devs_config_home = serverless_devs_config_home;
 
 import Registry from '../src';
 
-describe.skip('Publish', () => {
+describe('Publish', () => {
   beforeAll(() => {
     require('dotenv').config({
       path: path.join(__dirname, '.env'),
@@ -25,7 +25,7 @@ describe.skip('Publish', () => {
   });
 });
 
-describe('API', () => {
+describe.only('API', () => {
   beforeEach(() => {
     require('dotenv').config({
       path: path.join(__dirname, '.env'),
@@ -42,9 +42,18 @@ describe('API', () => {
     expect(Array.isArray(result)).toBeTruthy();
   });
 
-  test('detail', async () => {
+  test.only('detail', async () => {
     const registry = new Registry({});
     const result = await registry.detail('wss-test');
+    console.log('result: ', result);
     expect(Array.isArray(result)).toBeTruthy();
+  });
+
+  test('remove', async () => {
+    const registry = new Registry({});
+    const result = await registry.remove('wss-test', '0.0.1');
+    console.log('result: ', result);
+
+    console.log(await registry.detail('wss-test'));
   });
 });
