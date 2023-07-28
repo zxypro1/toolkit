@@ -1,9 +1,9 @@
 import random from 'random-string';
 // @ts-ignore
 import opn from 'opn';
-import { writeFile, sleep, new_request_get, new_request_post } from '../utils';
-import logger from '../logger';
-import { GITHUB_LOGIN_URL, REGISTRY_INFORMATION_GITHUB, RESET_URL } from './constants';
+import { writeFile, sleep, request } from '../util';
+import logger from '../util/logger';
+import { GITHUB_LOGIN_URL, REGISTRY_INFORMATION_GITHUB, RESET_URL } from '../request-url';
 
 /**
  * 请求接口登陆
@@ -28,7 +28,7 @@ export async function generateToken() {
 
   for (let i = 0; i < 100; i++) {
     await sleep(2000);
-    const result = await new_request_get(`${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`);
+    const result = await request.new_request_get(`${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`);
     const { body, request_id } = result || ({} as any);
     logger.debug(`ResponseId: ${request_id}`);
     if (typeof body === 'string') {
@@ -51,7 +51,7 @@ export async function generateToken() {
  */
 export async function resetToken() {
   try {
-    const { body, request_id } = await new_request_post(RESET_URL);
+    const { body, request_id } = await request.new_request_post(RESET_URL);
     logger.debug(`ResponseId: ${request_id}`);
 
     if (typeof body === 'string') {

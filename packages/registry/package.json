@@ -17,7 +17,6 @@
   "dependencies": {
     "@serverless-devs/utils": "workspace:^",
     "@serverless-devs/zip": "workspace:^",
-    "md5": "^2.3.0",
     "opn": "^6.0.0",
     "random-string": "^0.2.0"
   },

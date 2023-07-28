@@ -42,7 +42,7 @@ describe.only('API', () => {
     expect(Array.isArray(result)).toBeTruthy();
   });
 
-  test.only('detail', async () => {
+  test('detail', async () => {
     const registry = new Registry({});
     const result = await registry.detail('wss-test');
     console.log('result: ', result);
@@ -51,9 +51,18 @@ describe.only('API', () => {
 
   test('remove', async () => {
     const registry = new Registry({});
-    const result = await registry.remove('wss-test', '0.0.1');
-    console.log('result: ', result);
+    await registry.remove('wss-test', '0.0.5');
+  });
 
-    console.log(await registry.detail('wss-test'));
+  test.only('package detail', async () => {
+    const registry = new Registry({});
+    const result = await registry.packageDetail('wss-test', '0.0.6');
+    console.log('result detail: ', result);
+  });
+
+  test.only('package latest', async () => {
+    const registry = new Registry({});
+    const result = await registry.packageDetail('wss-test');
+    console.log('result latest: ', result);
   });
 });

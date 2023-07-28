@@ -1,5 +1,6 @@
-import Logger from './logger';
-import * as command from './command';
+import Logger from './util/logger';
+import * as actions from './actions';
+import { registry } from '@serverless-devs/utils';
 
 export default class Registry {
   logger: any;
@@ -13,7 +14,7 @@ export default class Registry {
    * @param token 指定 token
    */
   async login(token?: string): Promise<void> {
-    await command.login(token);
+    await actions.login(token);
   }
 
   /**
@@ -21,7 +22,7 @@ export default class Registry {
    * @param token 指定 token
    */
   async resetToken() {
-    await command.resetToken();
+    await actions.resetToken();
   }
 
   /**
@@ -29,7 +30,7 @@ export default class Registry {
    * @returns
    */
   getToken(): string {
-    return command.getToken();
+    return registry.getToken();
   }
 
   /**
@@ -37,15 +38,15 @@ export default class Registry {
    * @param codeUri 组件地址，默认为 process.cwd()
    */
   async publish(codeUri?: string) {
-    await command.publish(codeUri || process.cwd());
+    await actions.publish(codeUri || process.cwd());
   }
 
   /**
    * 获取登陆用户发布的组件
    * @returns
    */
-  async list(options?: command.IList) {
-    return await command.list(options);
+  async list(options?: actions.IList) {
+    return await actions.list(options);
   }
 
   /**
@@ -55,9 +56,16 @@ export default class Registry {
    */
   async detail(name: string, page?: string) {
     if (!name) {
-      throw new Error(`${name} not specified in command`);
+      throw new Error(`${name} not specified in actions`);
     }
-    return await command.detail(name, page);
+    return await actions.detail(name, page);
+  }
+
+  async packageDetail(name: string, versionId?: string) {
+    if (!name) {
+      throw new Error(`${name} not specified in actions`);
+    }
+    return await actions.packageDetail(name, versionId);
   }
 
   /**
@@ -72,6 +80,6 @@ export default class Registry {
       );
     }
 
-    await command.remove(name, versionId);
+    await actions.remove(name, versionId);
   }
 }

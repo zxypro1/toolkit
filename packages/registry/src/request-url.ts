@@ -11,12 +11,11 @@ export const RESET_URL = `${baseUrl}/user/token`;
 // *** 发布 *** //
 export const PUBLISH_URL = `${baseUrl}/packages/releases`;
 
-// *** 已发布列表 *** //
-export const CENTER_PUBLISH_URL = `${baseUrl}/packages/releases`;
-
 // *** 指定仓库详情 *** //
 export const getDetailUrl = (name: string) => `${baseUrl}/packages/${name}/release`;
 
-// *** 删除 url *** //
-export const getRemoveUrl = (name: string, versionId: string) =>
+// ** 获取最新版本的 ** //
+export const getDetailLatestUrl = (name: string) => `${baseUrl}/packages/${name}/release/latest`;
+
+export const getPackageUrl = (name: string, versionId: string) =>
   `${baseUrl}/packages/${name}/release/tags/${versionId}`;

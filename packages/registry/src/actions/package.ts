@@ -1,12 +1,13 @@
 import zip from '@serverless-devs/zip';
-import { getRootHome } from '@serverless-devs/utils';
+import { getRootHome, registry } from '@serverless-devs/utils';
 import fs from 'fs';
-import { getYamlContentText, getContentText, new_request_post, request_put } from '../utils';
-import { PUBLISH_URL } from './constants';
-import logger from '../logger';
+import { getYamlContentText, getContentText, request } from '../util';
+import { PUBLISH_URL } from '../request-url';
+import logger from '../util/logger';
 import path from 'path';
 
-export interface IRequest {
+
+interface IRequest {
   /**
    * 版本信息，如果指定了优先使用，如果不指定则优先使用publish参数中的version
    */
@@ -45,8 +46,8 @@ export interface IRequest {
   version_body_en?: string;
 }
 
-async function publish(codeUri: string): Promise<string> {
-  const publishYaml = getYamlContentText(path.join(codeUri, 'publish'));
+async function getUploadUrl(codeUri: string): Promise<string> {
+  const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
   const sEnYaml = getYamlContentText(path.join(codeUri, 'src', 's_en'));
@@ -55,7 +56,7 @@ async function publish(codeUri: string): Promise<string> {
   const readme = getContentText(path.join(codeUri, 'readme.md'));
   const readmeEn = getContentText(path.join(codeUri, 'readme_en.md'));
 
-  const requestBodyIRequest = {
+  const requestBodyIRequest: IRequest = {
     publish: publishYaml,
     publish_en: publishEnYaml,
     version_body: versionMd,
@@ -66,7 +67,7 @@ async function publish(codeUri: string): Promise<string> {
     readme,
   };
 
-  const { body, request_id } = await new_request_post(PUBLISH_URL, requestBodyIRequest);
+  const { body, request_id } = await request.new_request_post(PUBLISH_URL, requestBodyIRequest);
   logger.debug(`Publish responseId: ${request_id}`);
   if (typeof body === 'string') {
     throw new Error(body);
@@ -75,9 +76,43 @@ async function publish(codeUri: string): Promise<string> {
   return body.url;
 }
 
-export default async (codeUri: string) => {
+export interface IList {
+  category?: string;
+  tag?: string;
+  search?: string;
+  page?: string;
+}
+
+export const list = async (options?: IList) => {
+  const { category, tag, search, page } = options || {};
+  const headers = registry.getSignHeaders();
+  let uri = PUBLISH_URL;
+  if (category) {
+    uri += `?category=${category}`;
+  }
+  if (tag) {
+    uri += `&tag=${tag}`;
+  }
+  if (search) {
+    uri += `&search=${search}`;
+  }
+  if (page) {
+    uri += `&page=${page}`;
+  }
+
+  const { body, request_id } = await request.new_request_get(uri, headers);
+  logger.debug(`Get registry list responseId: ${request_id}`);
+
+  if (typeof body === 'string') {
+    throw new Error(body);
+  }
+
+  return body;
+};
+
+export const publish = async (codeUri: string) => {
   // 发布版本，获取上传文件地址
-  const uploadUrl = await publish(codeUri);
+  const uploadUrl = await getUploadUrl(codeUri);
   logger.debug(`Publish upload url: ${uploadUrl}`);
 
   // 压缩文件
@@ -90,7 +125,7 @@ export default async (codeUri: string) => {
   logger.debug(`Zip file outputFile: ${zipResult.outputFile}`);
 
   // 上传压缩文件
-  await request_put(uploadUrl, zipResult.outputFile);
+  await request.request_put(uploadUrl, zipResult.outputFile);
 
   // 删除压缩文件
   fs.unlinkSync(zipResult.outputFile);
