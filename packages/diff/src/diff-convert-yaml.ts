@@ -88,7 +88,9 @@ export default function (
 
   const deep = opts?.deep || 0;
   const len = opts?.len || 4;
-  const strings = objectToString(result, deep, len);
+  const strings = Array.isArray(result)
+    ? arrayToString(result, deep, len)
+    : objectToString(result, deep, len);
 
   return {
     diffResult,

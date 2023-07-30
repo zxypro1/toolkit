@@ -11,7 +11,7 @@ import {
 } from '@serverless-devs/parse-spec';
 import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
-import { TipsError } from '@serverless-devs/utils';
+import { DevsError } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import { command } from 'execa';
 import loadComponent from '@serverless-devs/load-component';
@@ -154,7 +154,7 @@ class Actions {
           command: this.record.command,
         });
         if (useAllowFailure) return;
-        throw new TipsError(error.message, {
+        throw new DevsError(error.message, {
           exitCode: EXIT_CODE.RUN,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
         });
@@ -166,7 +166,7 @@ class Actions {
       command: this.record.command,
     });
     if (useAllowFailure) return;
-    throw new TipsError(`The ${hook.path} directory does not exist.`, {
+    throw new DevsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
     });
@@ -183,7 +183,7 @@ class Actions {
         command: this.record.command,
       });
       if (useAllowFailure) return;
-      throw new TipsError(error.message, {
+      throw new DevsError(error.message, {
         exitCode: EXIT_CODE.PLUGIN,
         prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
       });
@@ -209,7 +209,7 @@ class Actions {
           command: this.record.command,
         });
         if (useAllowFailure) return;
-        throw new TipsError(error.message, {
+        throw new DevsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
         });
@@ -221,7 +221,7 @@ class Actions {
     });
     if (useAllowFailure) return;
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-    throw new TipsError(`The [${command}] command was not found.`, {
+    throw new DevsError(`The [${command}] command was not found.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
       tips: `Please check the component ${componentName} has the ${command} command. Serverless Devs documents：${chalk.underline(

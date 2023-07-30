@@ -3,9 +3,9 @@ interface IOptions {
   prefix?: string;
   tips?: string;
 }
-class TipsError extends Error {
-  readonly CODE = 'TIPS';
-  static readonly CODE = 'TIPS';
+class DevsError extends Error {
+  readonly CODE = 'DevsError';
+  static readonly CODE = 'DevsError';
   exitCode?: number;
   prefix?: string;
   tips?: string;
@@ -17,4 +17,4 @@ class TipsError extends Error {
   }
 }
 
-export default TipsError;
+export default DevsError;

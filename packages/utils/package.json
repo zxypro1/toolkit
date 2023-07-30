@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/utils",
-  "version": "0.0.8-beta.2",
+  "version": "0.0.8-beta.5",
   "description": "utils for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -19,12 +19,15 @@
     "js-yaml": "^4.1.0",
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.isempty": "^4.4.0",
-    "minimist": "^1.2.8"
+    "md5": "^2.3.0",
+    "minimist": "^1.2.8",
+    "random-string": "^0.2.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
     "@types/lodash.defaultsdeep": "^4.6.7",
     "@types/lodash.isempty": "^4.4.7",
-    "@types/minimist": "^1.2.2"
+    "@types/minimist": "^1.2.2",
+    "@types/random-string": "^0.0.28"
   }
 }

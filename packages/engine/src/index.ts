@@ -36,7 +36,7 @@ import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import * as utils from '@serverless-devs/utils';
-import { TipsError } from '@serverless-devs/utils';
+import { DevsError } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
 
@@ -111,7 +111,7 @@ class Engine {
       this.globalActionInstance.setValue('command', command);
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
-      this.context.error.push(error as TipsError);
+      this.context.error.push(error as DevsError);
       this.context.status = STEP_STATUS.FAILURE;
       await this.doCompleted();
       return this.context;
@@ -189,6 +189,7 @@ class Engine {
         .start();
       stepService.send('INIT');
     });
+    this.glog.__clear();
     return res;
   }
   private getOutput() {
@@ -230,7 +231,7 @@ class Engine {
       traceId: get(process.env, 'serverless_devs_trace_id', randomId()),
       logDir: path.join(utils.getRootHome(), 'logs'),
       ...this.options.logConfig,
-      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : 'INFO'),
+      level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),
     });
   }
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
@@ -288,7 +289,7 @@ class Engine {
         await this.globalActionInstance.start(IHookType.FAIL, this.context);
       } catch (error) {
         this.context.status = STEP_STATUS.FAILURE;
-        this.context.error.push(error as TipsError);
+        this.context.error.push(error as DevsError);
       }
     }
     if (this.context.status === STEP_STATUS.SUCCESS) {
@@ -296,14 +297,14 @@ class Engine {
         await this.globalActionInstance.start(IHookType.SUCCESS, this.context);
       } catch (error) {
         this.context.status = STEP_STATUS.FAILURE;
-        this.context.error.push(error as TipsError);
+        this.context.error.push(error as DevsError);
       }
     }
     try {
       await this.globalActionInstance.start(IHookType.COMPLETE, this.context);
     } catch (error) {
       this.context.status = STEP_STATUS.FAILURE;
-      this.context.error.push(error as TipsError);
+      this.context.error.push(error as DevsError);
     }
   }
   private async handleSrc(item: IStepOptions) {
@@ -480,7 +481,7 @@ class Engine {
           });
           if (useAllowFailure) return;
           const error = e as Error;
-          throw new TipsError(error.message, {
+          throw new DevsError(error.message, {
             exitCode: EXIT_CODE.COMPONENT,
             prefix: `[${item.projectName}] failed to [${command}]:`,
           });
@@ -492,7 +493,7 @@ class Engine {
       });
       if (useAllowFailure) return;
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
-      throw new TipsError(`The [${command}] command was not found.`, {
+      throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
         tips: `Please check the component ${
           item.component
@@ -514,7 +515,7 @@ class Engine {
         });
         if (useAllowFailure) return;
         const error = e as Error;
-        throw new TipsError(error.message, {
+        throw new DevsError(error.message, {
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `[${item.projectName}] failed to [${command}]:`,
         });
