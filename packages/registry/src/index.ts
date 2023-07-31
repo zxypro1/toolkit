@@ -56,14 +56,18 @@ export default class Registry {
    */
   async detail(name: string, page?: string) {
     if (!name) {
-      throw new Error('The information packageName for obtaining published components cannot be empty');
+      throw new Error(
+        'The information packageName for obtaining published components cannot be empty',
+      );
     }
     return await actions.detail(name, page);
   }
 
   async packageDetail(name: string, versionId?: string) {
     if (!name) {
-      throw new Error('The information packageName for obtaining published components cannot be empty');
+      throw new Error(
+        'The information packageName for obtaining published components cannot be empty',
+      );
     }
     return await actions.packageDetail(name, versionId);
   }
