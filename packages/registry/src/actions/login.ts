@@ -34,7 +34,10 @@ export async function generateToken() {
     const { body, request_id } = result || ({} as any);
     logger.debug(`ResponseId: ${request_id}`);
     if (typeof body === 'string') {
-      throw new Error(body);
+      if (!['获取登陆 Token 失败', 'Failed to obtain login token'].includes(body)) {
+        throw new Error(body);
+      }
+      logger.debug(`Response body: ${body}`);
     }
     if (body.safety_code) {
       writeFile(body.safety_code);

@@ -5,6 +5,7 @@ import { getYamlContentText, getContentText, request } from '../util';
 import { PUBLISH_URL } from '../request-url';
 import logger from '../util/logger';
 import path from 'path';
+import querystring from 'querystring';
 
 interface IRequest {
   /**
@@ -83,21 +84,9 @@ export interface IList {
 }
 
 export const list = async (options?: IList) => {
-  const { category, tag, search, page } = options || {};
   const headers = registry.getSignHeaders();
-  let uri = PUBLISH_URL;
-  if (category) {
-    uri += `?category=${category}`;
-  }
-  if (tag) {
-    uri += `&tag=${tag}`;
-  }
-  if (search) {
-    uri += `&search=${search}`;
-  }
-  if (page) {
-    uri += `&page=${page}`;
-  }
+  const qs = querystring.stringify((options || {}) as any);
+  const uri = `${PUBLISH_URL}?${qs}`;
 
   const { body, request_id } = await request.new_request_get(uri, headers);
   logger.debug(`Get registry list responseId: ${request_id}`);
