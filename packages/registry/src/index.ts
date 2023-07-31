@@ -5,7 +5,7 @@ import { registry } from '@serverless-devs/utils';
 export default class Registry {
   logger: any;
 
-  constructor({ logger = console }) {
+  constructor({ logger }: any = {}) {
     this.logger = Logger.set(logger);
   }
 
