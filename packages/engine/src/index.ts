@@ -21,7 +21,7 @@ import {
   IEngineError,
   STEP_STATUS,
 } from './types';
-import { getProcessTime, getCredential, stringify, randomId, getAllowFailure } from './utils';
+import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
 import ParseSpec, {
   getInputs,
   ISpec,
@@ -228,7 +228,7 @@ class Engine {
       throw new Error('customLogger must be instance of Logger');
     }
     return new Logger({
-      traceId: get(process.env, 'serverless_devs_trace_id', randomId()),
+      traceId: get(process.env, 'serverless_devs_trace_id', utils.format()),
       logDir: path.join(utils.getRootHome(), 'logs'),
       ...this.options.logConfig,
       level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),

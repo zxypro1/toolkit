@@ -10,3 +10,4 @@ export { default as fieldEncryption } from './field-encryption';
 export { default as isWindow } from './is-window';
 export { default as DevsError } from './devs-error';
 export { default as registry } from './registry';
+export { default as format } from './format';
