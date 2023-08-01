@@ -5,6 +5,7 @@ import { getYamlContentText, getContentText, request } from '../util';
 import { PUBLISH_URL } from '../request-url';
 import logger from '../util/logger';
 import path from 'path';
+import yaml from 'js-yaml';
 import querystring from 'querystring';
 
 interface IRequest {
@@ -46,8 +47,25 @@ interface IRequest {
   version_body_en?: string;
 }
 
+function checkEdition(str: string) {
+  if (!str) {
+    throw new Error('Need to publish YAML content');
+  }
+  const { Edition } = yaml.load(str) as Record<string, any>
+  if (Edition !== '3.0.0') {
+    let message: string;
+    if (!Edition || Edition === '2.0.0') {
+      message = `Edition must be 2.0.0 version, please use 's cli registry publish'`
+    } else {
+      message = 'Edition must be 3.0.0 version.'
+    }
+    throw new Error(message);
+  }
+}
+
 async function getUploadUrl(codeUri: string): Promise<string> {
   const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
+  checkEdition(publishYaml);
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
   const sEnYaml = getYamlContentText(path.join(codeUri, 'src', 's_en'));

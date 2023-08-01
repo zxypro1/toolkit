@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/registry",
-  "version": "0.0.2-beta.3",
+  "version": "0.0.2-beta.4",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "access": "public"
   },
   "dependencies": {
+    "js-yaml": "^4.1.0",
     "@serverless-devs/utils": "workspace:^",
     "@serverless-devs/zip": "workspace:^",
     "opn": "^6.0.0",

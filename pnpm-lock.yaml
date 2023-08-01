@@ -91,8 +91,6 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
 
-  packages/demo: {}
-
   packages/diff:
     dependencies:
       chalk:
@@ -269,6 +267,15 @@ importers:
         specifier: ^0.0.30
         version: 0.0.30
 
+  packages/orm:
+    dependencies:
+      lowdb:
+        specifier: ^6.0.1
+        version: 6.0.1
+      readline:
+        specifier: ^1.3.0
+        version: 1.3.0
+
   packages/parse-spec:
     dependencies:
       '@serverless-cd/debug':
@@ -321,6 +328,9 @@ importers:
       '@serverless-devs/zip':
         specifier: workspace:^
         version: link:../zip
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
       opn:
         specifier: ^6.0.0
         version: 6.0.0
@@ -3096,6 +3106,13 @@ packages:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
 
+  /lowdb@6.0.1:
+    resolution: {integrity: sha512-1ktuKYLlQzAWwl4/PQkIr8JzNXgcTM6rAhpXaQ6BR+VwI98Q8ZwMFhBOn9u0ldcW3K/WWzhYpS3xyGTshgVGzA==}
+    engines: {node: '>=16'}
+    dependencies:
+      steno: 3.0.0
+    dev: false
+
   /lower-case@1.1.4:
     resolution: {integrity: sha512-2Fgx1Ycm599x+WGpIYwJOvsjmXFzTSc34IwDWALRA/8AopUKAVPwfJ+h5+f85BCp0PWmmJcWzEpxOpoXycMpdA==}
     dev: false
@@ -3728,6 +3745,11 @@ packages:
     dependencies:
       escape-string-regexp: 2.0.0
     dev: true
+
+  /steno@3.0.0:
+    resolution: {integrity: sha512-uZtn7Ht9yXLiYgOsmo8btj4+f7VxyYheMt8g6F1ANjyqByQXEE2Gygjgenp3otHH1TlHsS4JAaRGv5wJ1wvMNw==}
+    engines: {node: '>=14.16'}
+    dev: false
 
   /string-argv@0.3.2:
     resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
