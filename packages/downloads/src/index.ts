@@ -54,12 +54,13 @@ class Download {
     await fs.unlink(filePath);
   }
   private async doDownload(url: string): Promise<string> {
+    const { headers } = this.options;
     const dest = this.options.dest as string;
     const filename = this.options.filename as string;
     const uri = new URL(url);
     const pkg = url.toLowerCase().startsWith('https:') ? https : http;
     return new Promise((resolve, reject) => {
-      pkg.get(uri.href).on('response', (response: IncomingMessage) => {
+      pkg.get(uri.href, { headers }).on('response', (response: IncomingMessage) => {
         fs.ensureDirSync(dest);
         const filePath = path.join(dest, filename);
         if (response.statusCode === 200) {

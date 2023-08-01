@@ -1,17 +1,19 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { get, includes, find, split, filter, set, isEmpty } from 'lodash';
+import { get, includes, find, split, filter, isEmpty } from 'lodash';
 import axios from 'axios';
-import { getRootHome } from '@serverless-devs/utils';
-
+import { getRootHome, registry } from '@serverless-devs/utils';
+import { BASE_URL } from '../constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
+const getUrlWithLatest = (name: string) => `${BASE_URL}/packages/${name}/release/latest`;
+const getUrlWithVersion = (name: string, versionId: string) => `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
 
 export function readJsonFile(filePath: string) {
   if (fs.existsSync(filePath)) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) {}
+    } catch (error) { }
   }
 }
 
@@ -54,13 +56,10 @@ export const buildComponentInstance = async (componentPath: string, params?: any
 };
 
 export function getProvider(name: string) {
-  const [provider, component] = includes(name, '/') ? split(name, '/') : [null, name];
-  const [componentName, componentVersion] = split(component, '@');
+  const [componentName, componentVersion] = split(name, '@');
   const { core_load_serverless_devs_component } = process.env;
   if (core_load_serverless_devs_component) {
-    const componentList = filter(split(core_load_serverless_devs_component, ';'), (v) =>
-      includes(v, '@'),
-    );
+    const componentList = filter(split(core_load_serverless_devs_component, ';'), (v) =>includes(v, '@'));
     const componentNames = [];
     const obj: any = {};
     for (const item of componentList) {
@@ -68,53 +67,36 @@ export function getProvider(name: string) {
       componentNames.push(n);
       obj[n] = v;
     }
-    const key = provider ? `${provider}/${componentName}` : componentName;
+    const key = componentName;
     if (find(componentNames, (v) => v === key)) {
-      return [provider, componentName, obj[key]];
+      return [componentName, obj[key]];
     }
   }
-  return [provider, componentName, componentVersion];
+  return [componentName, componentVersion];
 }
 
 export const getZipballUrl = async (
-  provider: string,
   componentName: string,
-  componentVersion: string,
+  componentVersion?: string,
 ) => {
-  const base = provider
-    ? `http://registry.devsapp.cn/simple/${provider}/${componentName}/releases`
-    : `http://registry.devsapp.cn/simple/${componentName}/releases`;
-  const url = componentVersion ? base : `${base}/latest`;
+  const url = componentVersion ? getUrlWithVersion(componentName, componentVersion) : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
-  const response = await axios.get(url);
-  const data = get(response, 'data.Response');
-  let zipball_url = get(data, 'zipball_url');
-  if (componentVersion) {
-    const obj = find(data, (v) => v.tag_name === componentVersion);
-    zipball_url = get(obj, 'zipball_url');
-  }
+  const res = await axios.get(url, { headers: registry.getSignHeaders()});
+  debug(`res: ${JSON.stringify(res.data)}`);
+  const zipball_url = get(res, 'data.body.zipball_url');
   if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);
   return zipball_url;
 };
 
 export const getComponentCachePath = (
-  provider: string,
   componentName: string,
-  componentVersion: string,
+  componentVersion?: string,
 ) => {
-  if (provider) {
-    return path.join(
-      getRootHome(),
-      'components',
-      'devsapp.cn',
-      provider,
-      componentVersion ? `${componentName}@${componentVersion}` : componentName,
-    );
-  }
   return path.join(
     getRootHome(),
     'components',
     'devsapp.cn',
+    'v3',
     componentVersion ? `${componentName}@${componentVersion}` : componentName,
   );
 };

@@ -54,8 +54,8 @@ function checkEdition(str: string) {
   const { Edition } = yaml.load(str) as Record<string, any>;
   if (Edition !== '3.0.0') {
     let message: string;
-    if (!Edition || Edition === '2.0.0') {
-      message = `Edition must be 2.0.0 version, please use 's cli registry publish'`;
+    if (!Edition || Edition === '2.0.0' || Edition === '1.0.0') {
+      message = `Edition be 2.0.0 / 1.0.0 version, please use 's cli registry publish'`;
     } else {
       message = 'Edition must be 3.0.0 version.';
     }

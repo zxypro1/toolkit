@@ -23,4 +23,8 @@ export interface IOptions extends DecompressOptions {
    * @default demo.zip
    */
   filename?: string;
+  /**
+   * HTTP headers
+   */
+  headers?: Record<string, string>;
 }
