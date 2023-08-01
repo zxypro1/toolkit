@@ -51,13 +51,13 @@ function checkEdition(str: string) {
   if (!str) {
     throw new Error('Need to publish YAML content');
   }
-  const { Edition } = yaml.load(str) as Record<string, any>
+  const { Edition } = yaml.load(str) as Record<string, any>;
   if (Edition !== '3.0.0') {
     let message: string;
     if (!Edition || Edition === '2.0.0') {
-      message = `Edition must be 2.0.0 version, please use 's cli registry publish'`
+      message = `Edition must be 2.0.0 version, please use 's cli registry publish'`;
     } else {
-      message = 'Edition must be 3.0.0 version.'
+      message = 'Edition must be 3.0.0 version.';
     }
     throw new Error(message);
   }
