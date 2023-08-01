@@ -6,14 +6,15 @@ import { getRootHome, registry } from '@serverless-devs/utils';
 import { BASE_URL } from '../constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 const getUrlWithLatest = (name: string) => `${BASE_URL}/packages/${name}/release/latest`;
-const getUrlWithVersion = (name: string, versionId: string) => `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
+const getUrlWithVersion = (name: string, versionId: string) =>
+  `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
 
 export function readJsonFile(filePath: string) {
   if (fs.existsSync(filePath)) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) { }
+    } catch (error) {}
   }
 }
 
@@ -59,7 +60,9 @@ export function getProvider(name: string) {
   const [componentName, componentVersion] = split(name, '@');
   const { core_load_serverless_devs_component } = process.env;
   if (core_load_serverless_devs_component) {
-    const componentList = filter(split(core_load_serverless_devs_component, ';'), (v) =>includes(v, '@'));
+    const componentList = filter(split(core_load_serverless_devs_component, ';'), (v) =>
+      includes(v, '@'),
+    );
     const componentNames = [];
     const obj: any = {};
     for (const item of componentList) {
@@ -75,23 +78,19 @@ export function getProvider(name: string) {
   return [componentName, componentVersion];
 }
 
-export const getZipballUrl = async (
-  componentName: string,
-  componentVersion?: string,
-) => {
-  const url = componentVersion ? getUrlWithVersion(componentName, componentVersion) : getUrlWithLatest(componentName);
+export const getZipballUrl = async (componentName: string, componentVersion?: string) => {
+  const url = componentVersion
+    ? getUrlWithVersion(componentName, componentVersion)
+    : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
-  const res = await axios.get(url, { headers: registry.getSignHeaders()});
+  const res = await axios.get(url, { headers: registry.getSignHeaders() });
   debug(`res: ${JSON.stringify(res.data)}`);
   const zipball_url = get(res, 'data.body.zipball_url');
   if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);
   return zipball_url;
 };
 
-export const getComponentCachePath = (
-  componentName: string,
-  componentVersion?: string,
-) => {
+export const getComponentCachePath = (componentName: string, componentVersion?: string) => {
   return path.join(
     getRootHome(),
     'components',

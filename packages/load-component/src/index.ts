@@ -13,7 +13,7 @@ import { BASE_URL, PROVIDER } from './constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 
 class Componet {
-  constructor(private name: string, private params: Record<string, any> = {}) { }
+  constructor(private name: string, private params: Record<string, any> = {}) {}
   async run() {
     if (!this.name) return;
     // 本地路径
@@ -30,7 +30,7 @@ class Componet {
     const componentCachePath = getComponentCachePath(componentName, componentVersion);
     debug(`componentCachePath: ${componentCachePath}`);
     const lockPath = getLockFile(componentCachePath);
-    if (fs.existsSync(lockPath)){
+    if (fs.existsSync(lockPath)) {
       return await buildComponentInstance(componentCachePath, this.params);
     }
     const zipballUrl = await getZipballUrl(componentName, componentVersion);
