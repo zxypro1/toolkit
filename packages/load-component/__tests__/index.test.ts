@@ -3,6 +3,7 @@ import loadComponent from '../src';
 import path from 'path';
 import fs from 'fs-extra';
 import { getComponentCachePath } from '../src/utils';
+import { AssertionError } from 'assert';
 const env = process.env;
 
 beforeEach(() => {
@@ -49,6 +50,18 @@ test('core_load_serverless_devs_component=devsapp/fc@dev', async () => {
   // expect(get(instance, '__path')).toBe(componentPath);
 });
 
+test.only('shl/test', async () => {
+  const name = 'shl/test';
+  expect.assertions(1);
+  try {
+    const instance = await loadComponent(name);
+    console.log(instance);
+  } catch (e) {
+    const error = e as AssertionError;
+    console.log(error.message);
+    expect(error.message).toBe(`The component name ${name} cannot contain /`);
+  }
+});
 
 test('wss-test', async () => {
   const name = 'wss-test';
@@ -77,7 +90,7 @@ test('v3test dev.0.1', async () => {
   expect(get(instance, '__path')).toBe(getComponentCachePath('v3test', 'dev.0.1'));
 });
 
-test.only('v3test beta.0.1#1', async () => {
+test('v3test beta.0.1#1', async () => {
   const name = 'v3test@beta.0.1#1';
   const instance = await loadComponent(name);
   expect(get(instance, '__path')).toBe(getComponentCachePath('v3test', 'beta.0.1#1'));

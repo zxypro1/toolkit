@@ -4,6 +4,7 @@ import { get, includes, find, split, filter, isEmpty } from 'lodash';
 import axios from 'axios';
 import { getRootHome, registry } from '@serverless-devs/utils';
 import { BASE_URL } from '../constant';
+import assert from 'assert';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 const getUrlWithLatest = (name: string) => `${BASE_URL}/packages/${name}/release/latest`;
 const getUrlWithVersion = (name: string, versionId: string) =>
@@ -57,6 +58,7 @@ export const buildComponentInstance = async (componentPath: string, params?: any
 };
 
 export function getProvider(name: string) {
+  assert(!includes(name, '/'), `The component name ${name} cannot contain /`);
   const [componentName, componentVersion] = split(name, '@');
   const { core_load_serverless_devs_component } = process.env;
   if (core_load_serverless_devs_component) {

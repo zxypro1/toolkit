@@ -25,7 +25,7 @@ class Componet {
   }
   // devs源
   async getDevComponent() {
-    const [componentName, componentVersion] = getProvider(replace(this.name, PROVIDER, ''));
+    const [componentName, componentVersion] = getProvider(this.name);
     debug(`componentName: ${componentName}, componentVersion: ${componentVersion}`);
     const componentCachePath = getComponentCachePath(componentName, componentVersion);
     debug(`componentCachePath: ${componentCachePath}`);
