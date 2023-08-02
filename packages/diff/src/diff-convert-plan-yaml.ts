@@ -1,5 +1,5 @@
 import { diff } from 'just-diff';
-import { get, isEmpty, set, isPlainObject, cloneDeep, find } from 'lodash';
+import { get, isEmpty, isPlainObject, cloneDeep, dropRight, isEqual, each, last } from 'lodash';
 import { red, yellow, green, bold } from 'chalk';
 import { IOpts } from './types';
 
@@ -38,7 +38,6 @@ class Diff {
     const strings = Array.isArray(result)
       ? this.arrayToString('', result, deep, len)
       : this.objectToString('', result, deep, len);
-
     return {
       diffResult,
       show: strings.join('\n'),
@@ -52,14 +51,10 @@ class Diff {
     for (const [key, value] of Object.entries(obj)) {
       const k = preKey ? `${preKey}.${key}` : key;
 
-      const change = find(this.diffResult, item => item.pathString === k);
+      const change = this.getChange(k);
       if (change) {
         const { pathString, op } = change;
-        if (op === 'add') {
-          const setValue = toString(value);
-          const message = green(`${space}${bold('+')} ${key}: ${setValue}`);
-          strings.push(message);
-        } else if (op === 'remove') {
+        if (op === 'remove') {
           const setValue = toString(value);
           const message = red(`${space}${bold('-')} ${key}: ${setValue}`);
           strings.push(message);
@@ -84,6 +79,15 @@ class Diff {
       }
     }
 
+    const add = this.getAdd(preKey);
+    for (const addItem of add) {
+      const { pathString, path: p } = addItem;
+      const value = get(this.newObject, pathString);
+      const setValue = toString(value);
+      const message = green(`${space}${bold('+')} ${last(p)}: ${setValue}`);
+      strings.push(message);
+    }
+
     return strings;
   }
 
@@ -94,17 +98,12 @@ class Diff {
 
     for (let index = 0; index < arrayLength; index++) {
       const value = array[index];
-
       const k = preKey ? `${preKey}.${index}`: String(index);
 
-      const change = find(this.diffResult, item => item.pathString === k);
+      const change = this.getChange(k);
       if (change) {
         const { pathString, op } = change;
-        if (op === 'add') {
-          const setValue = toString(value);
-          const message = green(`${space}${bold('+')} - ${setValue}`);
-          strings.push(message);
-        } else if (op === 'remove') {
+        if (op === 'remove') {
           const setValue = toString(value);
           const message = red(`${space}${bold('-')} - ${setValue}`);
           strings.push(message);
@@ -129,7 +128,50 @@ class Diff {
       }
     }
 
+    const add = this.getAdd(preKey);
+    for (const addItem of add) {
+      const value = get(this.newObject, addItem.pathString);
+      const setValue = toString(value);
+      const nextSpaces = new Array((deep + 1) * len).join(' ');
+      const message = green(`${nextSpaces}${bold('+')} - ${setValue}`);
+      strings.push(`${space}-\n${message}`);
+    }
+
     return strings;
+  }
+
+  private getChange(key: string) {
+    if (isEmpty(this.diffResult)) {
+      return;
+    }
+    const diffLength = this.diffResult.length;
+
+    for (let index = 0; index < diffLength; index++) {
+      const item = this.diffResult[index];
+      if (item.pathString === key) {
+        this.diffResult.splice(index, 1);
+        return item;
+      }
+    }
+  }
+
+  private getAdd(preKey: string) {
+    const addResult = [];
+    const unsetIndex = [];
+
+    const diffLength = this.diffResult.length;
+    for (let index = 0; index < diffLength; index++) {
+      const item = this.diffResult[index];
+      const p = dropRight(item.path).join('.');
+      if (isEqual(p, preKey)) {
+        unsetIndex.push(index);
+        addResult.push(item);
+      }
+    }
+
+    each(unsetIndex, index => this.diffResult.splice(index, 1))
+
+    return addResult;
   }
 }
 
