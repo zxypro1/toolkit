@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/downloads",
-  "version": "0.0.2-beta.3",
+  "version": "0.0.2-beta.4",
   "description": "download for serverless-devs",
   "main": "lib/index.js",
   "scripts": {

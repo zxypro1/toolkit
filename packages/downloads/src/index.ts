@@ -27,7 +27,7 @@ class Download {
   async run() {
     const { logger } = this.options;
     const uri = new URL(this.url);
-    const write = logger.write || logger.log;
+    const write = logger.write ? (...args: any) => logger.write.apply(logger, args) : logger.log;
     write(`Downloading[${chalk.green(decodeURIComponent(uri.pathname))}]...`);
     try {
       const filePath = await this.doDownload(this.url);
