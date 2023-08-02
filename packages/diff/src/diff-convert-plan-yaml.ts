@@ -27,7 +27,7 @@ class Diff {
       };
     }
 
-    this.diffResult = cloneDeep(diffResult).map(item => ({
+    this.diffResult = cloneDeep(diffResult).map((item) => ({
       ...item,
       pathString: item.path.join('.'),
     }));
@@ -42,9 +42,9 @@ class Diff {
       diffResult,
       show: strings.join('\n'),
     };
-  }
+  };
 
-  private objectToString = (preKey: string, obj: any, deep: number, len: number): string[] =>  {
+  private objectToString = (preKey: string, obj: any, deep: number, len: number): string[] => {
     const strings: string[] = [];
     const space = new Array(deep * len).join(' ');
 
@@ -89,7 +89,7 @@ class Diff {
     }
 
     return strings;
-  }
+  };
 
   private arrayToString = (preKey: string, array: any[], deep: number, len: number): string[] => {
     const strings: string[] = [];
@@ -98,7 +98,7 @@ class Diff {
 
     for (let index = 0; index < arrayLength; index++) {
       const value = array[index];
-      const k = preKey ? `${preKey}.${index}`: String(index);
+      const k = preKey ? `${preKey}.${index}` : String(index);
 
       const change = this.getChange(k);
       if (change) {
@@ -133,12 +133,12 @@ class Diff {
       const value = get(this.newObject, addItem.pathString);
       const setValue = toString(value);
       const nextSpaces = new Array((deep + 1) * len).join(' ');
-      const message = green(`${nextSpaces}${bold('+')} - ${setValue}`);
+      const message = green(`${nextSpaces}${bold('+')} ${setValue}`);
       strings.push(`${space}-\n${message}`);
     }
 
     return strings;
-  }
+  };
 
   private getChange(key: string) {
     if (isEmpty(this.diffResult)) {
@@ -169,7 +169,7 @@ class Diff {
       }
     }
 
-    each(unsetIndex, index => this.diffResult.splice(index, 1))
+    each(unsetIndex, (index) => this.diffResult.splice(index, 1));
 
     return addResult;
   }
