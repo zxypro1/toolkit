@@ -1,4 +1,4 @@
-const baseUrl = 'http://api.devsapp.cn/v3';
+const baseUrl = 'https://api.devsapp.cn/v3';
 // *** 登陆 *** //
 // 登陆
 export const REGISTRY_INFORMATION_GITHUB = `${baseUrl}/user/check`;
