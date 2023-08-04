@@ -12,19 +12,19 @@
   "author": "xsahxl",
   "license": "MIT",
   "dependencies": {
+    "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/art-template": "^4.13.2",
     "@serverless-devs/downloads": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
     "art-template": "^4.13.2",
+    "axios": "^1.4.0",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21",
-    "node-fetch": "2.x",
     "yaml": "^2.3.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
-    "@types/lodash": "^4.14.191",
-    "@types/node-fetch": "2.x"
+    "@types/lodash": "^4.14.191"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
