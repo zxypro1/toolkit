@@ -5,7 +5,6 @@ import { IOptions } from './types';
 import { includes } from 'lodash';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
-
 export default async (template: string, options?: IOptions) => {
   assert(template, 'template is required');
   try {
@@ -18,7 +17,7 @@ export default async (template: string, options?: IOptions) => {
       throw error;
     }
     debug('try to load v3');
-    const res =  await new V3(template, options).run();
+    const res = await new V3(template, options).run();
     debug('load v3 success');
     return res;
   }

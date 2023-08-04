@@ -12,8 +12,6 @@ import assert from 'assert';
 import YAML from 'yaml';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
-
-
 class LoadApplication {
   /**
    * 组件名称
@@ -197,12 +195,12 @@ class LoadApplication {
 
   private async doLoad() {
     const { logger } = this.options;
-    const zipball_url = await this.getZipballUrl()
+    const zipball_url = await this.getZipballUrl();
     await download(zipball_url, {
       dest: this.tempPath,
       logger,
       extract: true,
-      headers: registry.getSignHeaders()
+      headers: registry.getSignHeaders(),
     });
   }
   private getZipballUrl = async () => {

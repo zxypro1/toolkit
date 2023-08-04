@@ -1,13 +1,14 @@
 {
   "name": "@serverless-devs/load-component",
-  "version": "0.0.2-beta.5",
+  "version": "0.0.2-beta.6",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
     "watch": "tsc -w",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "beta": "pnpm publish --tag beta --no-git-checks"
   },
   "author": "xsahxl",
   "license": "MIT",

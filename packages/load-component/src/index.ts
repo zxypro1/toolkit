@@ -20,6 +20,7 @@ class Componet {
     if (fs.existsSync(this.name)) {
       return await buildComponentInstance(this.name, this.params);
     }
+    return await this.getDevComponent();
     const isDev = getGlobalConfig('registry') === BASE_URL;
     return isDev ? await this.getDevComponent() : await this.getOtherComponent();
   }

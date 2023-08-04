@@ -7,7 +7,7 @@ export { default as getInputs } from './get-inputs';
 export const tryfun = async (fn: Function, ...args: any[]) => {
   try {
     return await fn(...args);
-  } catch (ex) { }
+  } catch (ex) {}
 };
 
 export const getYamlPath = (filePath: string, filename: string) => {

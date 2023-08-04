@@ -13,9 +13,6 @@ import YAML from 'yaml';
 import assert from 'assert';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
-
-
-
 class LoadApplication {
   private provider: `${IProvider}`;
   /**
@@ -58,7 +55,10 @@ class LoadApplication {
     const useProvider = includes(this.template, '/');
     if (useProvider) {
       const [provider, componentName] = split(this.template, '/');
-      assert(provider === IProvider.DEVSAPP, `The provider ${provider} is invalid, only support devsapp`)
+      assert(
+        provider === IProvider.DEVSAPP,
+        `The provider ${provider} is invalid, only support devsapp`,
+      );
       return {
         provider,
         componentName,
@@ -232,7 +232,7 @@ class LoadApplication {
     if (isEmpty(zipball_url)) {
       throw new Error('zipball_url is empty');
     }
-    await download(zipball_url, { 
+    await download(zipball_url, {
       dest: this.tempPath,
       logger,
       extract: true,
@@ -244,8 +244,8 @@ class LoadApplication {
       [IProvider.PERSONAL]: `${REGISTRY.V2}/${this.name}/releases/latest`,
       [IProvider.DEVSAPP]: `${REGISTRY.V2}/${this.provider}/${this.name}/releases/latest`,
     };
-    console.log(this.provider)
-    const url = maps[this.provider]
+    console.log(this.provider);
+    const url = maps[this.provider];
     debug(`url: ${url}`);
     const res = await axios.get(url);
     debug(`res: ${JSON.stringify(res.data)}`);
@@ -258,7 +258,7 @@ class LoadApplication {
       [IProvider.PERSONAL]: `${REGISTRY.V2}/${this.name}/releases`,
       [IProvider.DEVSAPP]: `${REGISTRY.V2}/${this.provider}/${this.name}/releases`,
     };
-    const url = maps[this.provider]
+    const url = maps[this.provider];
     debug(`url: ${url}`);
     const res = await axios.get(url);
     debug(`res: ${JSON.stringify(res.data)}`);
