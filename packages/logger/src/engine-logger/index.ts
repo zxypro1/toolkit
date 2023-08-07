@@ -52,14 +52,14 @@ export default class EngineLogger extends Logger {
   append(message: string, level: LoggerLevel = 'NONE') {
     // 将行尾符修改为 ''
     this.setEol('');
-    super.write(message);
+    this.write(message);
     // 修改为初始实例时的行尾
     this.setEol(this.eol);
   }
 
   output(content: Record<string, any>, indent?: number, options?: RendererOptions) {
     const message = prettyjson.render(content, options || { keysColor: 'bold' }, indent);
-    super.write(transport.transportSecrets(message));
+    this.write(message);
   }
   // TODO: 仅提示但不报错
   tips(message: string, tips?: string) {
@@ -67,8 +67,13 @@ export default class EngineLogger extends Logger {
     if (tips) {
       msg += `\n${chalk.gray(tips)}\n`;
     }
-    super.write(msg);
+    this.write(msg);
   }
+
+  write(msg: string) {
+    super.write(transport.transportSecrets(msg));
+  }
+
   private setEol(eol: string = os.EOL) {
     const c = this.get('console') as object;
     const f = this.get('file');
