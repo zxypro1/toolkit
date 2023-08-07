@@ -1,7 +1,8 @@
 import path from 'path';
 import fs from 'fs-extra';
 import download from '@serverless-devs/downloads';
-import artTemplate from '@serverless-devs/art-template';
+import _artTemplate from 'art-template';
+import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
 import {
   isEmpty,
@@ -72,6 +73,7 @@ class LoadApplication {
     this.name = name;
     this.version = version;
     this.options.projectName = this.options.projectName || name;
+    this.options.reserveComments = this.options.reserveComments || true;
     this.filePath = path.join(this.options.dest, this.options.projectName);
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
@@ -104,7 +106,7 @@ class LoadApplication {
     /**
      * 6. 解析 s.yaml里的 name 字段
      */
-    this.parseAppName(templateData);
+    this.parseAppName(templateData as string);
     /**
      * 7. 最后的动作, 比如：删除临时文件夹
      */
@@ -128,7 +130,7 @@ class LoadApplication {
 
   private async final() {
     // 如果有密码类型的参数，就写入.env文件
-    if (this.secretList.length > 0) {
+    if (!isEmpty(this.secretList)) {
       const dotEnvPath = path.join(this.filePath, '.env');
       fs.ensureFileSync(dotEnvPath);
       const str = map(this.secretList, (o) => `\n${o}=${this.publishData[o]}`).join('');
@@ -139,6 +141,7 @@ class LoadApplication {
   }
 
   private parseAppName(data: string) {
+    if (isEmpty(this.spath)) return;
     const { appName } = this.options;
     if (isEmpty(appName)) return;
     const newData = parse({ appName }, data);
@@ -146,10 +149,12 @@ class LoadApplication {
   }
 
   private async parseTemplateYaml(postData: Record<string, any>) {
+    if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
     return this.doArtTemplate(this.spath, this.publishData);
   }
   private doArtTemplate(filePath: string, data: Record<string, any>) {
+    const artTemplate = this.options.reserveComments ? _artTemplate : _devsArtTemplate;
     artTemplate.defaults.extname = path.extname(filePath);
     set(artTemplate.defaults, 'escape', false);
     const filterFilePath = path.join(this.tempPath, 'hook', 'filter.js');
@@ -158,6 +163,11 @@ class LoadApplication {
       for (const key in filterHook) {
         artTemplate.defaults.imports[key] = filterHook[key];
       }
+    }
+    if (this.options.reserveComments) {
+      const newData = artTemplate(this.spath, data);
+      fs.writeFileSync(filePath, newData, 'utf-8');
+      return newData;
     }
     const newData = getInputs(getYamlContent(filePath), data, artTemplate);
     fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
@@ -194,14 +204,10 @@ class LoadApplication {
    */
   private async parsePublishYaml() {
     const publishPath = path.join(this.tempPath, 'publish.yaml');
-    if (!fs.existsSync(publishPath)) {
-      throw new Error('publish.yaml is not found');
-    }
+    if (!fs.existsSync(publishPath)) return;
     fs.moveSync(path.join(this.tempPath, 'src'), this.filePath, { overwrite: true });
     const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
-    if (isEmpty(spath)) {
-      throw new Error('s.yaml/s.yml is not found');
-    }
+    if (isEmpty(spath)) return;
     this.spath = spath as string;
     const { parameters = {} } = this.options;
     // 如果有parameters参数，或者是 CI/CD 环境，就不需要提示用户输入参数了
@@ -380,7 +386,8 @@ class LoadApplication {
 
   private async doLoad() {
     const { logger } = this.options;
-    const zipball_url = await this.getZipballUrl();
+    const zipball_url = this.options.uri || (await this.getZipballUrl());
+    debug(`zipball_url: ${zipball_url}`);
     await download(zipball_url, {
       dest: this.tempPath,
       logger,

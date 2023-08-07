@@ -7,23 +7,14 @@ import chalk from 'chalk';
 import path from 'path';
 import { IOptions } from './types';
 import { DEFAULT_FILENAME } from './constants';
+import assert from 'assert';
 
 class Download {
   constructor(private url: string, private options: IOptions = {}) {
     this.options.dest = this.options.dest || process.cwd();
     this.options.logger = this.options.logger || console;
     this.options.filename = this.options.filename || DEFAULT_FILENAME;
-    this.validate();
   }
-  private validate() {
-    if (!this.url) {
-      throw new Error('url is required');
-    }
-    if (!this.url.toLowerCase().startsWith('http')) {
-      throw new Error('url must be http or https');
-    }
-  }
-
   async run() {
     const { logger } = this.options;
     const uri = new URL(this.url);
@@ -36,6 +27,17 @@ class Download {
     } catch (error) {
       write(`Download ${this.options.filename} failed`);
     }
+  }
+  async uri() {
+    // local zip file
+    if (this.url.endsWith('.zip')) {
+      return await this.doDecompress(this.url);
+    }
+    // local directory
+    if (this.url === this.options.dest) {
+      return this.url;
+    }
+    fs.moveSync(this.url, this.options.dest as string, { overwrite: true });
   }
   private async doDecompress(filePath: string) {
     const { dest } = this.options;
@@ -94,7 +96,12 @@ class Download {
   }
 }
 
-export default async (url: string, options?: IOptions) => {
+export default async (url: string, options: IOptions = {}) => {
+  assert(url, 'url is required');
   const download = new Download(url, options);
+  if (fs.existsSync(url)) {
+    return await download.uri();
+  }
+  assert(url.startsWith('http'), 'url must be http or https');
   return await download.run();
 };
