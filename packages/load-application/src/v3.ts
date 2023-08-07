@@ -2,14 +2,18 @@ import path from 'path';
 import fs from 'fs-extra';
 import download from '@serverless-devs/downloads';
 import artTemplate from '@serverless-devs/art-template';
-import { getYamlContent, registry } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set } from 'lodash';
+import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
+import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import { getYamlPath, getInputs, getUrlWithLatest, getUrlWithVersion } from './utils';
+import { getInputs, getUrlWithLatest, getUrlWithVersion, randomId, getAllCredential } from './utils';
 import assert from 'assert';
 import YAML from 'yaml';
+import inquirer from 'inquirer';
+import chalk from 'chalk';
+import Credential from '@serverless-devs/credential';
+import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, gray, RANDOM_PATTERN } from './constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
 class LoadApplication {
@@ -37,11 +41,14 @@ class LoadApplication {
    * s.yaml 的路径
    */
   private spath!: string;
+  /**
+   * 密码类型的参数
+   */
+  private secretList: string[] = [];
   constructor(private template: string, private options: IOptions = {}) {
     assert(!includes(this.template, '/'), `The component name ${this.template} cannot contain /`);
     this.options.dest = this.options.dest || process.cwd();
     this.options.logger = this.options.logger || console;
-    this.options.access = this.options.access || 'default';
     const [name, version] = split(this.template, '@');
     this.name = name;
     this.version = version;
@@ -50,6 +57,8 @@ class LoadApplication {
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
   async run(): Promise<string> {
+    // TODO: v2已经做过判断，后续v2删除后，这里需要做判断
+    // if (!await this.check()) return this.filePath;
     /**
      * 1. 下载模板
      */
@@ -66,10 +75,13 @@ class LoadApplication {
      * 4. 执行 postInit 钩子
      */
     const postData = await this.postInit();
+
+    const { _custom_secret_list, ...restPostData } = postData || {};
+    this.secretList = concat(this.secretList, keys(_custom_secret_list));
     /**
      * 5. 解析 s.yaml
      */
-    const templateData = await this.parseTemplateYaml(postData);
+    const templateData = await this.parseTemplateYaml(restPostData);
     /**
      * 6. 解析 s.yaml里的 name 字段
      */
@@ -81,7 +93,29 @@ class LoadApplication {
     return this.filePath;
   }
 
+  private async check() {
+    if (isCiCdEnvironment()) return true;
+    if (!fs.existsSync(this.filePath)) return true;
+    const res = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: `File ${this.options.projectName} already exists, override this file ?`,
+        default: true,
+      },
+    ]);
+    return res.confirm;
+  }
+
   private async final() {
+    // 如果有密码类型的参数，就写入.env文件
+    if (this.secretList.length > 0) {
+      const dotEnvPath = path.join(this.filePath, '.env');
+      fs.ensureFileSync(dotEnvPath);
+      const str = map(this.secretList, (o) => `\n${o}=${this.publishData[o]}`).join('');
+      fs.appendFileSync(dotEnvPath, str, 'utf-8');
+    }
+    // 删除临时文件夹
     fs.removeSync(this.tempPath);
   }
 
@@ -92,13 +126,9 @@ class LoadApplication {
     fs.writeFileSync(this.spath, newData, 'utf-8');
   }
 
-  private async parseTemplateYaml(data: Record<string, any>) {
-    const newData = {
-      ...this.publishData,
-      ...data,
-      access: this.options.access,
-    };
-    return this.doArtTemplate(this.spath, newData);
+  private async parseTemplateYaml(postData: Record<string, any>) {
+    this.publishData = { ...this.publishData, ...postData };
+    return this.doArtTemplate(this.spath, this.publishData);
   }
   private doArtTemplate(filePath: string, data: Record<string, any>) {
     artTemplate.defaults.extname = path.extname(filePath);
@@ -149,11 +179,145 @@ class LoadApplication {
       throw new Error('publish.yaml is not found');
     }
     fs.moveSync(path.join(this.tempPath, 'src'), this.filePath, { overwrite: true });
-    const spath = getYamlPath(this.filePath, 's');
+    const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
     if (isEmpty(spath)) {
       throw new Error('s.yaml/s.yml is not found');
     }
     this.spath = spath as string;
+    const { parameters = {} } = this.options;
+    // 如果有parameters参数，或者是 CI/CD 环境，就不需要提示用户输入参数了
+    if (!isEmpty(parameters) || isCiCdEnvironment()) {
+      this.publishData = this.parsePublishWithParameters(publishPath);
+      return;
+    };
+    this.publishData = await this.parsePublishWithInquire(publishPath);
+  }
+  private async parsePublishWithInquire(publishPath: string) {
+    const publishData = getYamlContent(publishPath);
+    const properties = get(publishData, 'Parameters.properties');
+    const requiredList = get(publishData, 'Parameters.required');
+    const promptList = [];
+    if (properties) {
+      let rangeList = [];
+      for (const key in properties) {
+        const ele = properties[key];
+        ele['__key'] = key;
+        rangeList.push(ele);
+      }
+      rangeList = sortBy(rangeList, (o) => o['x-range']);
+      for (const item of rangeList) {
+        const name = item.__key;
+        const prefix = item.description
+          ? `${gray(item.description)}\n${chalk.green('?')}`
+          : undefined;
+        const validate = (input: string) => {
+          if (isEmpty(input)) {
+            return includes(requiredList, name) ? 'value cannot be empty.' : true;
+          }
+          if (item.pattern) {
+            return new RegExp(item.pattern).test(input) ? true : item.description;
+          }
+          return true;
+        };
+        // 布尔类型
+        if (item.type === 'boolean') {
+          promptList.push({
+            type: 'confirm',
+            name,
+            prefix,
+            message: item.title,
+            default: item.default,
+          });
+        } else if (item.type === 'secret') {
+          // 记录密码类型的参数写入.env文件
+          this.secretList.push(name);
+          // 密码类型
+          promptList.push({
+            type: 'password',
+            name,
+            prefix,
+            message: item.title,
+            default: item.default,
+            validate,
+          });
+        } else if (item.enum) {
+          // 枚举类型
+          promptList.push({
+            type: 'list',
+            name,
+            prefix,
+            message: item.title,
+            choices: item.enum,
+            default: item.default,
+          });
+        } else if (item.type === 'string') {
+          // 字符串类型
+          promptList.push({
+            type: 'input',
+            message: item.title,
+            name,
+            prefix,
+            default: endsWith(item.default, RANDOM_PATTERN)
+              ? replace(item.default, RANDOM_PATTERN, randomId())
+              : item.default,
+            validate,
+          });
+        }
+      }
+    }
+    const credentialAliasList = map(await getAllCredential({ logger: this.options.logger }), (o) => ({
+      name: o,
+      value: o,
+    }));
+    let result: any = {};
+    if (this.options.access) {
+      result = await inquirer.prompt(promptList);
+      result.access = await this.getCredentialDirectly();
+    } else if (isEmpty(credentialAliasList)) {
+      promptList.push({
+        type: 'confirm',
+        name: '__access',
+        message: 'create credential?',
+        default: true,
+      });
+      result = await inquirer.prompt(promptList);
+      if (get(result, '__access')) {
+        const data = await new Credential({ logger: this.options.logger }).set();
+        result.access = data?.access;
+      } else {
+        result.access = DEFAULT_MAGIC_ACCESS;
+      }
+    } else {
+      promptList.push({
+        type: 'list',
+        name: 'access',
+        message: 'please select credential alias',
+        choices: concat(credentialAliasList, {
+          name: 'configure later.',
+          value: CONFIGURE_LATER,
+        }),
+      });
+      result = await inquirer.prompt(promptList);
+      if (result.alias === CONFIGURE_LATER) {
+        result.access = DEFAULT_MAGIC_ACCESS;
+      }
+    }
+    return result;
+  }
+  private async getCredentialDirectly() {
+    const { logger } = this.options;
+    const c = new Credential({ logger: this.options.logger })
+    try {
+      const data = await c.get(this.options.access);
+      return data?.access;
+    } catch (e) {
+      const error = e as Error;
+      logger.tips(error.message);
+      const data = await c.set();
+      return data?.access;
+    }
+  }
+  private parsePublishWithParameters(publishPath: string) {
     const publishData = getYamlContent(publishPath);
     const properties = get(publishData, 'Parameters.properties', {});
     const requiredList = get(publishData, 'Parameters.required', []);
@@ -169,9 +333,8 @@ class LoadApplication {
         throw new Error(`parameter ${key} is required`);
       }
     }
-    this.publishData = data;
+    return data;
   }
-
   private async preInit() {
     const hookPath = path.join(this.tempPath, 'hook');
     if (!fs.existsSync(hookPath)) return;
