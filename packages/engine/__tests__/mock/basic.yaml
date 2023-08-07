@@ -40,7 +40,7 @@ resources:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
-          AccountID: ${config('AccountID')}
-          name: ${this.name}
-          access: ${this.access}
-          codeUri: ${this.props.function.codeUri}
+          # AccountID: ${config('AccountID')}
+          # name: ${this.name}
+          # access: ${this.access}
+          # codeUri: ${this.props.function.codeUri}

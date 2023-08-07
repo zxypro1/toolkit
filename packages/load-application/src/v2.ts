@@ -4,7 +4,21 @@ import axios from 'axios';
 import download from '@serverless-devs/downloads';
 import artTemplate from '@serverless-devs/art-template';
 import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys, find } from 'lodash';
+import {
+  isEmpty,
+  includes,
+  split,
+  get,
+  has,
+  set,
+  sortBy,
+  endsWith,
+  replace,
+  map,
+  concat,
+  keys,
+  find,
+} from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, REGISTRY } from './constant';
@@ -44,8 +58,8 @@ class LoadApplication {
    */
   private spath!: string;
   /**
-  * 密码类型的参数
-  */
+   * 密码类型的参数
+   */
   private secretList: string[] = [];
   constructor(private template: string, private options: IOptions = {}) {
     this.options.dest = this.options.dest || process.cwd();
@@ -86,7 +100,7 @@ class LoadApplication {
     };
   }
   async run(): Promise<string> {
-    if (!await this.check()) return this.filePath;
+    if (!(await this.check())) return this.filePath;
     /**
      * 1. 下载模板
      */
@@ -295,10 +309,13 @@ class LoadApplication {
         }
       }
     }
-    const credentialAliasList = map(await getAllCredential({ logger: this.options.logger }), (o) => ({
-      name: o,
-      value: o,
-    }));
+    const credentialAliasList = map(
+      await getAllCredential({ logger: this.options.logger }),
+      (o) => ({
+        name: o,
+        value: o,
+      }),
+    );
     let result: any = {};
     if (this.options.access) {
       result = await inquirer.prompt(promptList);
@@ -336,7 +353,7 @@ class LoadApplication {
   }
   private async getCredentialDirectly() {
     const { logger } = this.options;
-    const c = new Credential({ logger: this.options.logger })
+    const c = new Credential({ logger: this.options.logger });
     try {
       const data = await c.get(this.options.access);
       return data?.access;

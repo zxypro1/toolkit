@@ -3,11 +3,30 @@ import fs from 'fs-extra';
 import download from '@serverless-devs/downloads';
 import artTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys } from 'lodash';
+import {
+  isEmpty,
+  includes,
+  split,
+  get,
+  has,
+  set,
+  sortBy,
+  endsWith,
+  replace,
+  map,
+  concat,
+  keys,
+} from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import { getInputs, getUrlWithLatest, getUrlWithVersion, randomId, getAllCredential } from './utils';
+import {
+  getInputs,
+  getUrlWithLatest,
+  getUrlWithVersion,
+  randomId,
+  getAllCredential,
+} from './utils';
 import assert from 'assert';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
@@ -189,7 +208,7 @@ class LoadApplication {
     if (!isEmpty(parameters) || isCiCdEnvironment()) {
       this.publishData = this.parsePublishWithParameters(publishPath);
       return;
-    };
+    }
     this.publishData = await this.parsePublishWithInquire(publishPath);
   }
   private async parsePublishWithInquire(publishPath: string) {
@@ -265,10 +284,13 @@ class LoadApplication {
         }
       }
     }
-    const credentialAliasList = map(await getAllCredential({ logger: this.options.logger }), (o) => ({
-      name: o,
-      value: o,
-    }));
+    const credentialAliasList = map(
+      await getAllCredential({ logger: this.options.logger }),
+      (o) => ({
+        name: o,
+        value: o,
+      }),
+    );
     let result: any = {};
     if (this.options.access) {
       result = await inquirer.prompt(promptList);
@@ -306,7 +328,7 @@ class LoadApplication {
   }
   private async getCredentialDirectly() {
     const { logger } = this.options;
-    const c = new Credential({ logger: this.options.logger })
+    const c = new Credential({ logger: this.options.logger });
     try {
       const data = await c.get(this.options.access);
       return data?.access;
