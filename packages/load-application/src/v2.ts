@@ -425,6 +425,7 @@ class LoadApplication {
       logger,
       extract: true,
       strip: 1,
+      filename: this.options.projectName,
     });
   }
   private async doZipballUrl() {

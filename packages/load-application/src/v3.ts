@@ -393,6 +393,7 @@ class LoadApplication {
       logger,
       extract: true,
       headers: registry.getSignHeaders(),
+      filename: this.options.projectName,
     });
   }
   private getZipballUrl = async () => {
