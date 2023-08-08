@@ -26,6 +26,7 @@ class Download {
       write(`Download ${this.options.filename} successfully`);
     } catch (error) {
       write(`Download ${this.options.filename} failed`);
+      throw error;
     }
   }
   async uri() {
