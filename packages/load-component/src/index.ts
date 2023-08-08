@@ -39,7 +39,7 @@ class Componet {
     await download(zipballUrl, {
       logger: get(this.params, 'engineLogger', get(this.params, 'logger')),
       dest: componentCachePath,
-      filename: `${componentName}${componentVersion ? `@${componentVersion}` : ''}.zip`,
+      filename: `${componentName}${componentVersion ? `@${componentVersion}` : ''}`,
       extract: true,
       headers: registry.getSignHeaders({ ignoreError: true }),
     });

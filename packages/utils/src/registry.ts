@@ -56,7 +56,6 @@ class Registry {
       timestamp,
       token,
     };
-
   };
 }
 

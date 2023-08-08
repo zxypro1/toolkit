@@ -1,1 +1,1 @@
-export const DEFAULT_FILENAME = 'demo.zip';
+export const DEFAULT_FILENAME = 'demo';
