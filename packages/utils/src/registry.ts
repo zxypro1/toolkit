@@ -28,7 +28,7 @@ class Registry {
 
     const platformPath = this.getPlatformPath();
     if (!fs.existsSync(platformPath)) {
-      throw new Error('Please perform serverless registry through [s cli registry login]');
+      throw new Error('Please perform serverless registry through [s registry login]');
     }
 
     return fs.readFileSync(platformPath, 'utf-8');
