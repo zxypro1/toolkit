@@ -89,7 +89,7 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
   debug(`res: ${JSON.stringify(res.data)}`);
   const zipball_url = get(res, 'data.body.zipball_url');
   if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);
-  return zipball_url;
+  return { zipballUrl: zipball_url, version: get(res, 'data.body.tag_name') };
 };
 
 export const getComponentCachePath = (componentName: string, componentVersion?: string) => {

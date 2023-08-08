@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-component",
-  "version": "0.0.2-beta.6",
+  "version": "0.0.2-beta.10",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -17,15 +17,17 @@
     "access": "public"
   },
   "dependencies": {
+    "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/downloads": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
-    "@serverless-cd/debug": "^4.3.4",
     "axios": "^1.4.0",
     "fs-extra": "^11.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "semver": "^7.5.4"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
-    "@types/lodash": "^4.14.195"
+    "@types/lodash": "^4.14.195",
+    "@types/semver": "^7.5.0"
   }
 }
