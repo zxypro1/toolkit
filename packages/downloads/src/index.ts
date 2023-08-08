@@ -55,7 +55,9 @@ class Download {
         }
       }
     }
-    await fs.unlink(filePath);
+    if (fs.existsSync(filePath)) {
+      await fs.unlink(filePath);
+    }
   }
   private async doDownload(url: string): Promise<string> {
     const { headers } = this.options;
@@ -66,7 +68,7 @@ class Download {
     return new Promise((resolve, reject) => {
       pkg.get(uri.href, { headers }).on('response', (response: IncomingMessage) => {
         fs.ensureDirSync(dest);
-        const filePath = path.join(dest, filename);
+        const filePath = path.join(dest, `${filename}.zip`);
         if (response.statusCode === 200) {
           const file = fs.createWriteStream(filePath);
           file.on('open', () => {
