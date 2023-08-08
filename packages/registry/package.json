@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/registry",
-  "version": "0.0.2-beta.5",
+  "version": "0.0.2-beta.6",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {

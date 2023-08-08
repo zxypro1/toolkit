@@ -392,7 +392,7 @@ class LoadApplication {
       dest: this.tempPath,
       logger,
       extract: true,
-      headers: registry.getSignHeaders(),
+      headers: registry.getSignHeaders({ ignoreError: true }),
       filename: this.options.projectName,
     });
   }
@@ -401,7 +401,7 @@ class LoadApplication {
       ? getUrlWithVersion(this.name, this.version)
       : getUrlWithLatest(this.name);
     debug(`url: ${url}`);
-    const res = await axios.get(url, { headers: registry.getSignHeaders() });
+    const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
     debug(`res: ${JSON.stringify(res.data)}`);
     const zipball_url = get(res, 'data.body.zipball_url');
     if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);

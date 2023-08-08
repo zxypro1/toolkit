@@ -85,7 +85,7 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
     ? getUrlWithVersion(componentName, componentVersion)
     : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
-  const res = await axios.get(url, { headers: registry.getSignHeaders() });
+  const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
   debug(`res: ${JSON.stringify(res.data)}`);
   const zipball_url = get(res, 'data.body.zipball_url');
   if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);

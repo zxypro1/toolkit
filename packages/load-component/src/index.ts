@@ -41,7 +41,7 @@ class Componet {
       dest: componentCachePath,
       filename: `${componentName}${componentVersion ? `@${componentVersion}` : ''}.zip`,
       extract: true,
-      headers: registry.getSignHeaders(),
+      headers: registry.getSignHeaders({ ignoreError: true }),
     });
     fs.writeFileSync(lockPath, JSON.stringify({ version: componentVersion }, null, 2));
     return await buildComponentInstance(componentCachePath, this.params);
