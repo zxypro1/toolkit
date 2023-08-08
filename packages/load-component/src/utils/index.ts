@@ -101,5 +101,3 @@ export const getComponentCachePath = (componentName: string, componentVersion?: 
     componentVersion ? `${componentName}@${componentVersion}` : componentName,
   );
 };
-
-export const getLockFile = (basePath: string) => path.join(basePath, '.s.lock');

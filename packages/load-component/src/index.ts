@@ -1,14 +1,8 @@
 import fs from 'fs-extra';
-import {
-  buildComponentInstance,
-  getProvider,
-  getZipballUrl,
-  getComponentCachePath,
-  getLockFile,
-} from './utils';
+import { buildComponentInstance, getProvider, getZipballUrl, getComponentCachePath } from './utils';
 import download from '@serverless-devs/downloads';
 import { get } from 'lodash';
-import { readJson, registry } from '@serverless-devs/utils';
+import { readJson, registry, getLockFile } from '@serverless-devs/utils';
 import assert from 'assert';
 import semver from 'semver';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
@@ -16,7 +10,7 @@ const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 export class Component {
   constructor(private name: string, private params: Record<string, any> = {}) {
     assert(name, 'component name is required');
-   }
+  }
   async run() {
     // 本地路径
     if (fs.existsSync(this.name)) {
@@ -33,7 +27,10 @@ export class Component {
     const lockInfo = readJson(lockPath);
     const { zipballUrl, version } = await getZipballUrl(componentName, componentVersion);
     if (semver.lte(version, lockInfo.version)) {
-      return fs.writeFileSync(lockPath, JSON.stringify({ version: lockInfo.version, lastUpdateCheck: Date.now() }));
+      return fs.writeFileSync(
+        lockPath,
+        JSON.stringify({ version: lockInfo.version, lastUpdateCheck: Date.now() }),
+      );
     }
     await download(zipballUrl, {
       dest: componentCachePath,
