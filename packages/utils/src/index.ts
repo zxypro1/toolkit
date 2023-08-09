@@ -1,3 +1,5 @@
+import path from 'path';
+
 export { default as getCurrentEnvironment } from './get-current-environment';
 export { default as isCiCdEnvironment } from './is-cicd-environment';
 export { default as isChinaUser } from './is-china-user';
@@ -11,3 +13,5 @@ export { default as isWindow } from './is-window';
 export { default as DevsError } from './devs-error';
 export { default as registry } from './registry';
 export { default as format } from './format';
+export { default as readJson } from './read-json';
+export const getLockFile = (basePath: string) => path.join(basePath, '.s.lock');

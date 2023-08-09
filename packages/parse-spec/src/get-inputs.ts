@@ -9,7 +9,7 @@ export const getInputs = (inputs: Record<string, any> = {}, context: Record<stri
   debug(`get inputs ignore: ${JSON.stringify(ignore)}`);
   const $ignore = map(ignore, (item) => '${' + item);
   function deepCopy(obj: any) {
-    let result: any = obj.constructor === Array ? [] : {};
+    let result: any = obj?.constructor === Array ? [] : {};
     if (typeof obj === 'object') {
       for (var i in obj) {
         let val = obj[i];

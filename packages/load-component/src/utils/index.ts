@@ -85,11 +85,11 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
     ? getUrlWithVersion(componentName, componentVersion)
     : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
-  const res = await axios.get(url, { headers: registry.getSignHeaders() });
+  const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
   debug(`res: ${JSON.stringify(res.data)}`);
   const zipball_url = get(res, 'data.body.zipball_url');
   if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);
-  return zipball_url;
+  return { zipballUrl: zipball_url, version: get(res, 'data.body.tag_name') };
 };
 
 export const getComponentCachePath = (componentName: string, componentVersion?: string) => {
@@ -101,5 +101,3 @@ export const getComponentCachePath = (componentName: string, componentVersion?: 
     componentVersion ? `${componentName}@${componentVersion}` : componentName,
   );
 };
-
-export const getLockFile = (basePath: string) => path.join(basePath, '.s.lock');

@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
 import { REGX } from './contants';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, isNil } from 'lodash';
 
 artTemplate.defaults.escape = false;
 artTemplate.defaults.rules.push({
@@ -21,9 +21,12 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   const env = { ...process.env, ...context.env };
   const cwd = context.cwd || process.cwd();
 
-  artTemplate.defaults.imports.env = (value: string) => {
+  artTemplate.defaults.imports.env = (value: string, defaultValue?: any) => {
     const res = env[value];
     if (res) return res;
+    if (!isNil(defaultValue)) {
+      return defaultValue;
+    }
     throw new Error(`env('${value}') not found`);
   };
   artTemplate.defaults.imports.config = (value: string) => {

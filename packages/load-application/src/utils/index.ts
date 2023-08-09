@@ -1,5 +1,6 @@
-import path from 'path';
-import fs from 'fs-extra';
+import { keys } from 'lodash';
+import { REGISTRY } from '../constant';
+import Credential from '@serverless-devs/credential';
 
 export { default as getInputs } from './get-inputs';
 
@@ -9,9 +10,13 @@ export const tryfun = async (fn: Function, ...args: any[]) => {
   } catch (ex) {}
 };
 
-export const getYamlPath = (filePath: string, filename: string) => {
-  const yamlPath = path.join(filePath, `${filename}.yaml`);
-  if (fs.existsSync(yamlPath)) return yamlPath;
-  const ymlPath = path.join(filePath, `${filename}.yml`);
-  if (fs.existsSync(ymlPath)) return ymlPath;
+export const getUrlWithLatest = (name: string) => `${REGISTRY.V3}/packages/${name}/release/latest`;
+export const getUrlWithVersion = (name: string, versionId: string) =>
+  `${REGISTRY.V3}/packages/${name}/release/tags/${versionId}`;
+
+export const randomId = () => Math.random().toString(36).substring(2, 6);
+
+export const getAllCredential = async ({ logger }: any) => {
+  const c = new Credential({ logger });
+  return keys(c.getAll());
 };

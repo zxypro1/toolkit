@@ -42,11 +42,35 @@ test('download strip', async () => {
   ).resolves.toBeUndefined();
 });
 
-test('download filename', async () => {
+test.only('download filename', async () => {
   await expect(
     download(url, {
       dest: path.join(__dirname, '_temp', 'core'),
       filename: 'core.zip',
     }),
   ).resolves.toBeUndefined();
+});
+
+
+test('uri local zip', async () => {
+  await expect(
+    download(path.join(__dirname, 'mock', 'core.zip'), {
+      dest: path.join(__dirname, '_temp'),
+      filename: 'core.zip',
+      extract: true,
+      strip: 1,
+    }),
+  ).resolves.toBeUndefined();
+});
+
+
+test('uri local dir', async () => {
+  await expect(
+    download(path.join(__dirname, '_temp'), {
+      dest: path.join(__dirname, '_temp1'),
+      filename: 'core.zip',
+      extract: true,
+      strip: 1,
+    }),
+  ).resolves.not.toThrowError();
 });

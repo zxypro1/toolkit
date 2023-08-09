@@ -1,13 +1,14 @@
 {
   "name": "@serverless-devs/downloads",
-  "version": "0.0.2-beta.4",
+  "version": "0.0.2-beta.8",
   "description": "download for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
     "watch": "tsc -w",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "beta": "pnpm publish --tag beta --no-git-checks"
   },
   "author": "xsahxl",
   "license": "MIT",

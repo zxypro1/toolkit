@@ -1,13 +1,14 @@
 {
   "name": "@serverless-devs/logger",
-  "version": "0.0.2-beta.6",
+  "version": "0.0.2-beta.7",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "start": "tsc -w",
     "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "beta": "pnpm publish --tag beta --no-git-checks"
   },
   "keywords": [],
   "author": "",

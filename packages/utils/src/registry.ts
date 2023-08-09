@@ -28,14 +28,20 @@ class Registry {
 
     const platformPath = this.getPlatformPath();
     if (!fs.existsSync(platformPath)) {
-      throw new Error('Please perform serverless registry through [s cli registry login]');
+      throw new Error('Please perform serverless registry through [s registry login]');
     }
 
     return fs.readFileSync(platformPath, 'utf-8');
   };
 
-  getSignHeaders = (): Record<string, string> => {
-    const safety_code = this.getToken();
+  getSignHeaders = ({ ignoreError }: { ignoreError?: boolean } = {}): Record<string, string> => {
+    let safety_code: string;
+    try {
+      safety_code = this.getToken();
+    } catch (error) {
+      if (ignoreError) return {};
+      throw error;
+    }
     if (!safety_code) {
       return {};
     }

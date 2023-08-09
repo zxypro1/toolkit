@@ -31,6 +31,11 @@ export interface IOptions {
    * @default default
    */
   access?: string;
+  /**
+   * Use specify uri, Eg: remote url, local dir, local zip file
+   */
+  uri?: string;
+  reserveComments?: boolean;
 }
 
 export enum IProvider {

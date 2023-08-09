@@ -1,13 +1,14 @@
 {
   "name": "@serverless-devs/engine",
-  "version": "0.0.1-beta.21",
+  "version": "0.0.1-beta.22",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "watch": "tsc -w",
     "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "beta": "pnpm publish --tag beta --no-git-checks"
   },
   "author": "xsahxl",
   "license": "MIT",

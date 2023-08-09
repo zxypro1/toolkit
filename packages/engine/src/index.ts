@@ -39,8 +39,7 @@ import * as utils from '@serverless-devs/utils';
 import { DevsError } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
-
-export { IEngineOptions, IContext, IEngineError } from './types';
+export * from './types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
