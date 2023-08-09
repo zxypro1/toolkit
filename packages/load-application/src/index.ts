@@ -10,13 +10,13 @@ export default async (template: string, options: IOptions = {}) => {
   if (options.uri) {
     return await v3(template, options);
   }
-  try {
+  if (includes(template, '/')) {
     return await v2(template, options);
-  } catch (error) {
-    if (includes(template, '/')) {
-      throw error;
-    }
+  }
+  try {
     return await v3(template, options);
+  } catch (error) {
+    return await v2(template, options);
   }
 };
 
