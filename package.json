@@ -24,6 +24,7 @@
     "test:engine": "jest --testTimeout 10000 packages/engine --watchAll",
     "test:utils": "jest --testTimeout 10000 packages/utils --watchAll",
     "test:diff": "jest --testTimeout 10000 packages/diff --watchAll",
+    "test:orm": "jest --testTimeout 10000 packages/orm --watchAll",
     "prepare": "husky install"
   },
   "author": "xsahxl",
