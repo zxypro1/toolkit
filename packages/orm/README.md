@@ -1,4 +1,4 @@
-# 压缩(@serverless-devs/orm)
+# ORM(@serverless-devs/orm)
 ### 依赖
 - [lowdb](https://github.com/typicode/lowdb)，本地JSON数据库，但是不支持`ESM`
 - [loopback-filters](https://github.com/strongloop/loopback-filters)，`ORM`过滤模块
@@ -12,16 +12,19 @@ $ npm install @serverless-devs/orm --save
 ## 使用方式
 
 ```ts
-import Logger from '@serverless-devs/orm';
+import ORM from '@serverless-devs/orm';
 
 ```
 ### create
 ```ts
 const tableName = 'posts';
-const orm = new Orm('./post.json');
+const orm = new Orm('./post.json', {
+  [tableName]: [],
+  users: []
+});
 const tableValue = 'dankun_1';
 
-await orm.init(tableName);
+await orm.init();
 await orm[tableName].create({
     data: {
         name: tableValue,
@@ -122,3 +125,5 @@ applyFilter(data, {
 })
 ```
 
+## 参考
+[prisma](https://www.prisma.io/docs/concepts/components/prisma-client/crud)

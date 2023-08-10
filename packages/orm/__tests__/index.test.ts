@@ -6,16 +6,25 @@ const tableName = 'posts';
 const curPath = path.resolve(__dirname, '_temp');
 
 test('create and find', async () => {
-  const orm = new Orm(path.join(curPath, 'create_db.json'));
+  const orm = new Orm(path.join(curPath, 'create_db.json'), {
+    posts: [],
+    users: []
+  });
   const tableValue = 'dankun_1';
 
-  await orm.init(tableName);
-  await orm[tableName].create({
-    data: {
-      name: tableValue,
-    },
+  await orm.init();
+  await orm['posts'].create({
+    data: [
+      { name: tableValue }
+    ],
   });
-  const data = await orm[tableName].findUnique({
+  await orm['users'].create({
+    data: [
+      { age: 18 }
+    ],
+  });
+
+  const data = await orm['posts'].findUnique({
     where: {
       name: tableValue,
     },
@@ -24,14 +33,16 @@ test('create and find', async () => {
 });
 
 test('findUnique', async () => {
-  const orm = new Orm(path.join(curPath, 'find_db.json'));
-  await orm.init(tableName, [
-    { name: 'case_1' },
-    { name: 'case_1' },
-    { name: 'case_2' },
-    { name: 'case_3' },
-    { name: 'case_4' },
-  ]);
+  const orm = new Orm(path.join(curPath, 'find_db.json'), {
+    [tableName]: [
+      { name: 'case_1' },
+      { name: 'case_1' },
+      { name: 'case_2' },
+      { name: 'case_3' },
+      { name: 'case_4' },
+    ],
+  });
+  await orm.init();
 
   const data = await orm[tableName].findUnique({
     where: {
@@ -42,31 +53,34 @@ test('findUnique', async () => {
 });
 
 test('findMany', async () => {
-  const orm = new Orm(path.join(curPath, 'find_db.json'));
-  await orm.init(tableName, [
-    { name: 'case_1' },
-    { name: 'case_1' },
-    { name: 'case_3' },
-    { name: 'case_4' },
-  ]);
+  const orm = new Orm(path.join(curPath, 'find_db.json'), {
+    [tableName]: [
+      { name: 'case_1' },
+      { name: 'case_1' },
+      { name: 'case_3' },
+      { name: 'case_4' },
+    ]
+  });
+  await orm.init();
 
   const data = await orm[tableName].findMany({
     where: {
       name: 'case_1',
     },
   });
-  console.log(data);
   expect(data.length).toBeLessThanOrEqual(2);
 });
 
 test('update', async () => {
-   const orm = new Orm(path.join(curPath, 'update_db.json'));
-   await orm.init(tableName, [
-    { name: 'case_1' },
-    { name: 'case_2' },
-    { name: 'case_3' },
-    { name: 'case_4' },
-  ]);
+  const orm = new Orm(path.join(curPath, 'update_db.json'), {
+    [tableName]: [
+      { name: 'case_1' },
+      { name: 'case_2' },
+      { name: 'case_3' },
+      { name: 'case_4' },
+    ]
+  });
+  await orm.init();
 
   const data = await orm[tableName].update({
     where: {
@@ -83,19 +97,26 @@ test('update', async () => {
 });
 
 test('delete', async () => {
-  const orm = new Orm(path.join(curPath, 'delete_db.json'));
-  await orm.init(tableName, [
-    { name: 'case_1' },
-    { name: 'case_2' },
-    { name: 'case_3' },
-    { name: 'case_4' },
-  ]);
+  const orm = new Orm(path.join(curPath, 'delete_db.json'), {
+    [tableName]: [
+      { name: 'case_1' },
+      { name: 'case_2' },
+      { name: 'case_3' },
+      { name: 'case_4' },
+    ],
+    users: []
+  });
+  await orm.init();
+  await orm['users'].create({
+    data: [
+      { age: 2 }
+    ],
+  });
 
   const data = await orm[tableName].delete({
     where: {
       name: 'case_1',
     },
   });
-  console.log(data);
   expect(data.length).toBe(3);
 });
