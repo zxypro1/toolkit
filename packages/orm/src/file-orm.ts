@@ -1,10 +1,8 @@
 import { Low } from './lowdb/core/Low';
 import { JSONFile } from './lowdb/node';
-import lodash, { forEach } from 'lodash';
+import lodash from 'lodash';
 
 const applyFilter = require('loopback-filters');
-
-// refer: https://www.prisma.io/docs/concepts/components/prisma-client/crud
 interface IFileOption {
   url: string;
   model: string;
@@ -135,7 +133,7 @@ export default class FileOrm {
     const updateData = lodash.get(filter, 'data', {});
 
     if (!lodash.isEmpty(filtered)) {
-      forEach(filtered, (filterItem) => {
+      lodash.forEach(filtered, (filterItem) => {
         for (const key in filterItem) {
           // @ts-ignore
           filterItem[key] = updateData[key];
