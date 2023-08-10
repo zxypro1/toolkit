@@ -110,7 +110,7 @@ export default class FileOrm {
       this.client.data[model] = [];
     }
     if (data) {
-      const modelData = Array.isArray(data)? data : [data];
+      const modelData = Array.isArray(data) ? data : [data];
       this.client.data[model] = lodash.concat(this.client.data[model], modelData);
       await this.client.write();
       return data;
