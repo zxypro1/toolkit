@@ -387,6 +387,7 @@ class Engine {
       this.actionInstance.setValue('step', item);
       this.actionInstance.setValue('command', command);
       const newInputs = await this.getProps(item);
+      this.actionInstance.setValue('componentProps', newInputs);
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
       // 记录全局的执行状态
