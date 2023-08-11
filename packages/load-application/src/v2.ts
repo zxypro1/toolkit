@@ -102,7 +102,6 @@ class LoadApplication {
     };
   }
   async run(): Promise<string> {
-    if (!(await this.check())) return this.filePath;
     /**
      * 1. 下载模板
      */
@@ -135,20 +134,6 @@ class LoadApplication {
      */
     await this.final();
     return this.filePath;
-  }
-
-  private async check() {
-    if (isCiCdEnvironment()) return true;
-    if (!fs.existsSync(this.filePath)) return true;
-    const res = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirm',
-        message: `File ${this.options.projectName} already exists, override this file ?`,
-        default: true,
-      },
-    ]);
-    return res.confirm;
   }
 
   private async final() {
@@ -425,7 +410,7 @@ class LoadApplication {
       logger,
       extract: true,
       strip: 1,
-      filename: this.options.projectName,
+      filename: this.name,
     });
   }
   private async doZipballUrl() {

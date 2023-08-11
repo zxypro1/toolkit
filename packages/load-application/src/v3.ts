@@ -78,8 +78,7 @@ class LoadApplication {
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
   async run(): Promise<string> {
-    // TODO: v2已经做过判断，后续v2删除后，这里需要做判断
-    // if (!await this.check()) return this.filePath;
+    if (!(await this.check())) return this.filePath;
     /**
      * 1. 下载模板
      */
@@ -393,7 +392,7 @@ class LoadApplication {
       logger,
       extract: true,
       headers: registry.getSignHeaders({ ignoreError: true }),
-      filename: this.options.projectName,
+      filename: this.name,
     });
   }
   private getZipballUrl = async () => {

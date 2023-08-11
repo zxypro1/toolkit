@@ -6,10 +6,10 @@ import { includes } from 'lodash';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
 export default async (template: string, options: IOptions = {}) => {
-  assert(template, 'template is required');
   if (options.uri) {
     return await v3(template, options);
   }
+  assert(template, 'template is required');
   if (includes(template, '/')) {
     return await v2(template, options);
   }
