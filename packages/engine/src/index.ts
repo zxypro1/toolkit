@@ -65,9 +65,15 @@ class Engine {
     debug(`engine options: ${stringify(options)}`);
   }
   private async beforeStart() {
+    // 初始化 logger
+    this.glog = this.getLogger() as Logger;
+    this.logger = this.glog.__generate('engine');
     // 初始化 spec
-    this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), this.options.args);
-    this.spec = this.parseSpecInstance.start();
+    this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), {
+      argv: this.options.args,
+      logger: this.logger,
+    });
+    this.spec = await this.parseSpecInstance.start();
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
@@ -75,9 +81,6 @@ class Engine {
     const { steps: _steps } = this.spec;
     // 参数校验
     this.validate();
-    // 初始化 logger
-    this.glog = this.getLogger() as Logger;
-    this.logger = this.glog.__generate('engine');
     this.context.steps = await this.download(_steps);
   }
   // engine应收敛所有的异常，不应该抛出异常
@@ -265,9 +268,10 @@ class Engine {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
+      resources: {},
     } as Record<string, any>;
     for (const obj of this.context.steps) {
-      data[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
+      data.resources[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
     }
     if (item) {
       data.credential = item.credential;
@@ -275,8 +279,8 @@ class Engine {
         name: item.projectName,
         access: item.access,
         component: item.component,
-        props: data[item.projectName].props,
-        output: data[item.projectName].output,
+        props: data.resources[item.projectName].props,
+        output: data.resources[item.projectName].output,
       };
     }
     return data;

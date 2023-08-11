@@ -5,23 +5,30 @@ export * from './types';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
-import { getDefaultYamlPath, isExtendMode } from './utils';
+import { getDefaultYamlPath, isExtendMode, getCredential } from './utils';
 import compile from './compile';
 import order from './order';
 import getInputs from './get-inputs';
-import { concat, each, find, get, includes, isEmpty, keys, map, omit, split } from 'lodash';
+import { each, filter, find, get, includes, isEmpty, keys, map, omit, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
-import { IGNORE, REGX } from './contants';
+import { REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
+
+interface IOptions {
+  argv?: string[];
+  logger?: any;
+}
 
 class ParseSpec {
   private yaml = {} as IYaml;
   private record = {} as IRecord;
-  constructor(filePath: string = '', private argv: string[] = process.argv.slice(2)) {
+  constructor(filePath: string = '', private options: IOptions = {}) {
+    this.options.argv = this.options.argv || process.argv.slice(2);
+    this.options.logger = this.options.logger || console;
     this.init(filePath);
     debug(`yaml path: ${this.yaml.path}`);
-    debug(`argv: ${JSON.stringify(argv)}`);
+    debug(`argv: ${JSON.stringify(this.options.argv)}`);
   }
   private init(filePath: string) {
     if (isEmpty(filePath)) {
@@ -51,16 +58,17 @@ class ParseSpec {
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
     this.yaml.template = get(this.yaml.content, 'template', {});
-    this.yaml.projects = get(this.yaml.content, projectKey, {});
     this.yaml.appName = get(this.yaml.content, 'name');
     require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
   }
-  start(): ISpec {
+  async start(): Promise<ISpec> {
     debug('parse start');
     this.doYamlinit();
     this.parseArgv();
-    // projectName 存在，说明指定了项目
-    const steps = this.record.projectName ? this.getOneStep() : this.getSteps();
+    if (!this.yaml.use3x) {
+      return this.v1()
+    }
+    const steps =  await this.getSteps();
     // 获取到真实值后，重新赋值
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
@@ -74,8 +82,25 @@ class ParseSpec {
     debug('parse end');
     return result;
   }
+  // 简单兼容v1版本，不需要做魔法变量解析
+  private v1(): ISpec {
+    const steps = [];
+    const services = get(this.yaml.content, 'services', {});
+    for (const project in services) {
+      const element = services[project];
+      steps.push({
+        ...element,
+        projectName: project,
+      });
+    }
+    return {
+      steps: this.record.projectName ? filter(steps, item => item.projectName === this.record.projectName) : steps,
+      yaml: this.yaml,
+      ...this.record,
+    };
+  }
   private parseArgv() {
-    const argv = utils.parseArgv(this.argv);
+    const argv = utils.parseArgv(this.options.argv as string[]);
     debug(`parse argv: ${JSON.stringify(argv)}`);
     const { _ } = argv;
     this.record.access = get(argv, 'access');
@@ -200,47 +225,68 @@ class ParseSpec {
       type,
     };
   }
-  private getOneStep() {
-    const projectName = this.record.projectName as string;
-    const project = get(this.yaml.projects, projectName, {});
-    const component = compile(get(project, 'component'), { cwd: path.dirname(this.yaml.path) });
-    return [
-      {
-        ...project,
-        projectName,
-        component,
-        access: this.getAccess(project),
-      },
-    ];
-  }
-  private getSteps() {
-    this.yaml.content = getInputs(this.yaml.content, {
+  private getCommonMagic() {
+    return {
       cwd: path.dirname(this.yaml.path),
       vars: this.yaml.vars,
-      ignore: concat(IGNORE, this.yaml.projectNames),
-      use3x: this.yaml.use3x,
-    });
-
+    }
+  }
+  private getMagicProps(item: Partial<IStep>) {
+    const resources = get(this.yaml.content, 'resources', {});
+    const temp = {};
+    each(resources, (item, key) => {
+      set(temp, `${key}.props`, item.props);
+      set(temp, `${key}.output`, {});
+    })
+    const name = item.projectName as string;
+    const res = {
+      ...this.getCommonMagic(),
+      resources: temp,
+      credential: item.credential,
+      that: {
+        name,
+        access: item.access,
+        component: item.component,
+        props: resources[name].props,
+        output: resources[name].output,
+      },
+    }
+    debug(`getMagicProps: ${JSON.stringify(res)}`);
+    return res;
+  }
+  private async getSteps() {
+    // resources字段， 其它字段
+    const { resources, ...rest } = this.yaml.content;
+    this.yaml.content = {
+      ...this.yaml.content,
+      ...getInputs(rest, this.getCommonMagic()),
+    };
     const steps = [];
-    for (const project in this.yaml.projects) {
-      const element = this.yaml.projects[project];
+     // projectName 存在，说明指定了项目
+    const temp = this.record.projectName ? { [this.record.projectName]: resources[this.record.projectName] } : resources;
+    for (const project in temp) {
+      const element = resources[project];
       const component = compile(get(element, 'component'), { cwd: path.dirname(this.yaml.path) });
-      const name = get(this.yaml.template, get(element, 'extend.name'), {});
-      const template = getInputs(omit(name, get(element, 'extend.ignore', [])), {
-        vars: this.yaml.vars,
-      });
-      const props = getInputs(get(element, 'props', {}), {
-        cwd: path.dirname(this.yaml.path),
-        vars: this.yaml.vars,
-        ignore: concat(IGNORE, this.yaml.projectNames),
-        use3x: this.yaml.use3x,
-      });
+      let template = get(this.yaml.template, get(element, 'extend.template'), {});
+      template = getInputs(template, this.getCommonMagic());
+      const access = this.getAccess(element);
+      const credential = await getCredential(access, this.options.logger);
+      
+      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
+      this.yaml.content = {
+        ...this.yaml.content,
+        resources: {
+          ...this.yaml.content.resources,
+          [project]: real,
+        }
+      }
       steps.push({
-        ...element,
-        props: extend2(true, {}, template, props),
+        ...real,
+        props: extend2(true, {}, template, real.props),
         projectName: project,
         component,
-        access: this.getAccess(element),
+        access,
+        credential,
       });
     }
     return steps;

@@ -7,6 +7,7 @@ export interface IStep {
   access: string | undefined;
   flowId?: number;
   allow_failure?: boolean | IAllowFailure;
+  credential: Record<string, any>;
 }
 
 export enum IHookType {

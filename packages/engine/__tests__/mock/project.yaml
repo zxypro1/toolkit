@@ -20,7 +20,7 @@ name: framework #  项目名称
 access: default
 
 vars: # 全局变量
-  region: cn-hangzhou
+  region: ${env('region')}
   service:
     name: website-wof2
     description: Serverless Devs Website Service
@@ -39,9 +39,6 @@ resources:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
-          region: ${next_function.props.region}
-          functionName: ${next_function.props.function.name}
-          hello: ${next_function.output.hello}
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}
@@ -64,3 +61,9 @@ resources:
         timeout: 30
         memorySize: 1024
         runtime: nodejs12
+        environmentVariables:
+          test: test-${env('desc')}-${resources.framework.props.function.name}-${resources.framework.output.hello}
+          AccountID: ${config('AccountID')}
+          name: ${this.name}
+          access: ${this.access}
+          codeUri: ${this.props.function.codeUri}
