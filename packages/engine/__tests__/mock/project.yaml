@@ -26,23 +26,6 @@ vars: # 全局变量
     description: Serverless Devs Website Service
     internetAccess: true
 resources:
-  framework: # 业务名称/模块名称
-    component: v3test # 组件名称
-    props: # 组件的属性值
-      region: ${vars.region}
-      service: ${vars.service}
-      function:
-        name: vuepress
-        description: Serverless Devs Website vuepress Function
-        codeUri: ./code/docs/.vuepress/dist
-        timeout: 30
-        memorySize: 512
-        runtime: nodejs12
-        environmentVariables:
-          AccountID: ${config('AccountID')}
-          name: ${this.name}
-          access: ${this.access}
-          codeUri: ${this.props.function.codeUri}
   next_function: # 第二个函数的案例，仅供参考
     # 如果在当前项目下执行 s deploy，会同时部署模块：
     #   helloworld：服务hello-world-service，函数cpp-event-function
@@ -63,6 +46,23 @@ resources:
         runtime: nodejs12
         environmentVariables:
           test: test-${env('desc')}-${resources.framework.props.function.name}-${resources.framework.output.hello}
+          AccountID: ${config('AccountID')}
+          name: ${this.name}
+          access: ${this.access}
+          codeUri: ${this.props.function.codeUri}
+  framework: # 业务名称/模块名称
+    component: v3test # 组件名称
+    props: # 组件的属性值
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: vuepress
+        description: Serverless Devs Website vuepress Function
+        codeUri: ./code/docs/.vuepress/dist
+        timeout: 30
+        memorySize: 512
+        runtime: nodejs12
+        environmentVariables:
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}

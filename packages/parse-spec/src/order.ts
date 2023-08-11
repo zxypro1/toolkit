@@ -50,7 +50,7 @@ class Order {
             if (matchResult) {
               for (const item of matchResult) {
                 const newItem = item.replace(REGXG, '$1');
-                const projectName = split(newItem, '.')[0];
+                const projectName = split(newItem, '.')[1];
                 if (includes(projectNameList, projectName)) {
                   set(dependencies, topKey, { ...dependencies[topKey], [projectName]: 1 });
                 }
