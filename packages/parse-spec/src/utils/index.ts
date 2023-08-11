@@ -21,7 +21,6 @@ export const isExtendMode = (extend: string | undefined, basePath: string) => {
   return true;
 };
 
-
 export async function getCredential(access: string | undefined, logger: any) {
   try {
     const instance = new Credential({ logger });

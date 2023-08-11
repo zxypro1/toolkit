@@ -6,7 +6,7 @@ import { get, isEmpty, isNil } from 'lodash';
 
 artTemplate.defaults.imports.$escape = (value: any, fallback: string) => {
   return value || fallback;
-}
+};
 artTemplate.defaults.rules.push({
   test: REGX,
   use: function (match: any, code: any) {
@@ -68,10 +68,9 @@ const compile = (value: string, context: Record<string, any> = {}) => {
   const res = artTemplate.compile(thatVal)(context);
   // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
   if (typeof res === 'string' && REGX.test(res)) {
-   return artTemplate.compile(res)(context);
+    return artTemplate.compile(res)(context);
   }
   return res;
 };
 
 export default compile;
-

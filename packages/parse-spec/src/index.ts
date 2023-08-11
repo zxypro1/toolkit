@@ -66,9 +66,9 @@ class ParseSpec {
     this.doYamlinit();
     this.parseArgv();
     if (!this.yaml.use3x) {
-      return this.v1()
+      return this.v1();
     }
-    const steps =  await this.getSteps();
+    const steps = await this.getSteps();
     // 获取到真实值后，重新赋值
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
@@ -94,7 +94,9 @@ class ParseSpec {
       });
     }
     return {
-      steps: this.record.projectName ? filter(steps, item => item.projectName === this.record.projectName) : steps,
+      steps: this.record.projectName
+        ? filter(steps, (item) => item.projectName === this.record.projectName)
+        : steps,
       yaml: this.yaml,
       ...this.record,
     };
@@ -229,7 +231,7 @@ class ParseSpec {
     return {
       cwd: path.dirname(this.yaml.path),
       vars: this.yaml.vars,
-    }
+    };
   }
   private getMagicProps(item: Partial<IStep>) {
     const resources = get(this.yaml.content, 'resources', {});
@@ -237,7 +239,7 @@ class ParseSpec {
     each(resources, (item, key) => {
       set(temp, `${key}.props`, item.props);
       set(temp, `${key}.output`, {});
-    })
+    });
     const name = item.projectName as string;
     const res = {
       ...this.getCommonMagic(),
@@ -250,7 +252,7 @@ class ParseSpec {
         props: resources[name].props,
         output: resources[name].output,
       },
-    }
+    };
     debug(`getMagicProps: ${JSON.stringify(res)}`);
     return res;
   }
@@ -262,8 +264,10 @@ class ParseSpec {
       ...getInputs(rest, this.getCommonMagic()),
     };
     const steps = [];
-     // projectName 存在，说明指定了项目
-    const temp = this.record.projectName ? { [this.record.projectName]: resources[this.record.projectName] } : resources;
+    // projectName 存在，说明指定了项目
+    const temp = this.record.projectName
+      ? { [this.record.projectName]: resources[this.record.projectName] }
+      : resources;
     for (const project in temp) {
       const element = resources[project];
       const component = compile(get(element, 'component'), { cwd: path.dirname(this.yaml.path) });
@@ -271,15 +275,18 @@ class ParseSpec {
       template = getInputs(template, this.getCommonMagic());
       const access = this.getAccess(element);
       const credential = await getCredential(access, this.options.logger);
-      
-      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
+
+      const real = getInputs(
+        element,
+        this.getMagicProps({ projectName: project, access, component, credential }),
+      );
       this.yaml.content = {
         ...this.yaml.content,
         resources: {
           ...this.yaml.content.resources,
           [project]: real,
-        }
-      }
+        },
+      };
       steps.push({
         ...real,
         props: extend2(true, {}, template, real.props),
