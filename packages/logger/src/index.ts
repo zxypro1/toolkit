@@ -57,7 +57,7 @@ export default class Logger extends Map<string, ILoggerInstance> {
 
   __generate = (instanceKey: string) => {
     if (super.has(instanceKey)) {
-      return super.get(instanceKey);
+      return super.get(instanceKey) as ILoggerInstance;
     }
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 

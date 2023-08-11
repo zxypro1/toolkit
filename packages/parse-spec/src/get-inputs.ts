@@ -4,7 +4,7 @@ import { REGXG } from './contants';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 export const getInputs = (inputs: Record<string, any> = {}, context: Record<string, any> = {}) => {
-  if (isEmpty(inputs)) return;
+  if (isEmpty(inputs)) return inputs;
   const { ignore } = context;
   debug(`get inputs ignore: ${JSON.stringify(ignore)}`);
   const $ignore = map(ignore, (item) => '${' + item);
