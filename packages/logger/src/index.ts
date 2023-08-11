@@ -1,4 +1,4 @@
-import { set, each, unset } from 'lodash';
+import { each, unset } from 'lodash';
 import path from 'path';
 import { IOptions } from './type';
 import EngineLogger from './engine-logger';
@@ -37,13 +37,14 @@ export interface ILoggerInstance extends EngineLogger {
  * 文档书写
  * 测试书写
  */
-export default class Logger {
+export default class Logger extends Map<string, ILoggerInstance> {
   readonly CODE = 'DevsLogger';
   static readonly CODE = 'DevsLogger';
   private __options: IOptions;
   __progressFooter: ProgressFooter;
 
   constructor(options: IOptions) {
+    super();
     this.__options = options;
     this.__progressFooter = new ProgressFooter();
 
@@ -55,6 +56,9 @@ export default class Logger {
   }
 
   __generate = (instanceKey: string) => {
+    if (super.has(instanceKey)) {
+      return super.get(instanceKey);
+    }
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 
     logger.progress = (message: string) => {
@@ -73,7 +77,7 @@ export default class Logger {
       this.__progressFooter.upsert(instanceKey, message);
     };
 
-    set(this, instanceKey, logger);
+    super.set(instanceKey, logger);
     return logger;
   };
 
