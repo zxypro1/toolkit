@@ -1,69 +1,66 @@
-import fs from 'node:fs'
-import * as fsPromises from 'node:fs/promises'
-import path from 'node:path'
+import fs from 'node:fs';
+import * as fsPromises from 'node:fs/promises';
+import path from 'node:path';
 
-import { Writer } from './steno'
+import { Writer } from './steno';
 
-import { Adapter, SyncAdapter } from '../../core/Low'
+import { Adapter, SyncAdapter } from '../../core/Low';
 
 export class TextFile implements Adapter<string> {
-  #filename: string
-  #writer: Writer
+  #filename: string;
+  #writer: Writer;
 
   constructor(filename: string) {
-    this.#filename = filename
-    this.#writer = new Writer(filename)
+    this.#filename = filename;
+    this.#writer = new Writer(filename);
   }
 
   async read(): Promise<string | null> {
-    let data
+    let data;
 
     try {
-      data = await fsPromises.readFile(this.#filename, 'utf-8')
+      data = await fsPromises.readFile(this.#filename, 'utf-8');
     } catch (e) {
       if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
-        return null
+        return null;
       }
-      throw e
+      throw e;
     }
 
-    return data
+    return data;
   }
 
   write(str: string): Promise<void> {
-    return this.#writer.write(str)
+    return this.#writer.write(str);
   }
 }
 
 export class TextFileSync implements SyncAdapter<string> {
-  #tempFilename: string
-  #filename: string
+  #tempFilename: string;
+  #filename: string;
 
   constructor(filename: string) {
-    this.#filename = filename
-    this.#tempFilename = path.join(
-      path.dirname(filename),
-      `.${path.basename(filename)}.tmp`,
-    )
+    this.#filename = filename;
+    this.#tempFilename = path.join(path.dirname(filename), `.${path.basename(filename)}.tmp`);
   }
 
   read(): string | null {
-    let data
+    let data;
 
     try {
-      data = fs.readFileSync(this.#filename, 'utf-8')
+      data = fs.readFileSync(this.#filename, 'utf-8');
     } catch (e) {
       if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
-        return null
+        return null;
       }
-      throw e
+      throw e;
     }
 
-    return data
+    return data;
   }
 
   write(str: string): void {
-    fs.writeFileSync(this.#tempFilename, str)
-    fs.renameSync(this.#tempFilename, this.#filename)
+    fs.writeFileSync(this.#tempFilename, str);
+    fs.renameSync(this.#tempFilename, this.#filename);
   }
 }

@@ -1,2 +1,2 @@
-export * from './adapters/node/JSONFile'
-export * from './adapters/node/TextFile'
+export * from './adapters/node/JSONFile';
+export * from './adapters/node/TextFile';

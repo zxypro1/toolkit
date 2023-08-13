@@ -37,7 +37,7 @@ export default class FileOrm {
     this.url = url;
   }
 
-  async init(model: string, initialModel ?: object[]) {
+  async init(model: string, initialModel?: object[]) {
     const adapter = new JSONFile(this.url);
     this.client = new Low(adapter, { [model]: initialModel || [] });
 
