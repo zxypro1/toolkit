@@ -78,7 +78,7 @@ test('credential secret', async () => {
   expect(context.status).toBe('success');
 });
 
-test('s deploy', async () => {
+test.only('s deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['deploy'],

@@ -231,6 +231,7 @@ class ParseSpec {
     return {
       cwd: path.dirname(this.yaml.path),
       vars: this.yaml.vars,
+      __runtime: 'parse'
     };
   }
   private getMagicProps(item: Partial<IStep>) {
