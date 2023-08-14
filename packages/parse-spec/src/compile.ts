@@ -8,7 +8,7 @@ artTemplate.defaults.imports.$escape = (value: any, magic: string, ignoreError: 
   if (value) return value;
   if (ignoreError) return magic;
   throw new Error(`${magic} not found`);
-}
+};
 artTemplate.defaults.rules.push({
   test: REGX,
   use: function (match: any, code: any) {
@@ -68,12 +68,19 @@ const compile = (value: string, _context: Record<string, any> = {}) => {
   };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');
-  const res = artTemplate.compile(thatVal, { runtime: __runtime })(context);
-  // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
-  if (typeof res === 'string' && REGX.test(res)) {
-    return artTemplate.compile(res, { runtime: __runtime })(context);
+  try {
+    const res = artTemplate.compile(thatVal, { runtime: __runtime })(context);
+    // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
+    if (typeof res === 'string' && REGX.test(res)) {
+      return artTemplate.compile(res, { runtime: __runtime })(context);
+    }
+    return res;
+  } catch (e) {
+    const error = e as Error;
+  // fix: that. => this.
+    const msg = error.message.replace(/\$\{that\./g, '${this.');
+    throw new Error(msg);
   }
-  return res;
 };
 
 export default compile;
