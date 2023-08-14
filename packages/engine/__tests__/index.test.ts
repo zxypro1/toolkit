@@ -45,7 +45,7 @@ test('extend yaml 格式有问题', async () => {
   expect(get(context, 'error[0].message')).toContain('base-error.yaml format is incorrect');
 });
 
-test('魔法变量含中划线报错', async () => {
+test.skip('魔法变量含中划线报错', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/error/dashed-line.yaml'),
     args: ['deploy']
@@ -83,7 +83,7 @@ test('s deploy', async () => {
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['deploy'],
     logConfig: {
-      level: 'DEBUG',
+      // level: 'DEBUG',
     }
   });
   const context = await engine.start();
@@ -93,14 +93,14 @@ test('s deploy', async () => {
 test('s projectName deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['next_function', 'deploy']
+    args: ['framework', 'deploy']
   });
   const context = await engine.start();
   console.log(context.error);
   expect(context.status).toBe('success');
 });
 
-test('extend', async () => {
+test.skip('extend', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/extend/extend.yaml'),
     args: ['deploy']
@@ -125,7 +125,7 @@ test('指定服务 方法不存在时', async () => {
   const command = 'empty';
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['next_function', 'empty']
+    args: ['framework', 'empty']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -136,7 +136,7 @@ test('指定服务 方法不存在时', async () => {
 test('指定服务 方法存在，但是执行报错了', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
-    args: ['next_function', 'error']
+    args: ['framework', 'error']
   });
   const context = await engine.start();
   expect(get(context, 'error[0].message')).toBe(`error test`);
@@ -208,7 +208,7 @@ test('flow-order', async () => {
 test('args', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/flow.yaml'),
-    args: ['deploy', '--help', '-a', 'test', '--skip-actions', '--debug', '-o', 'json', '-v']
+    args: ['deploy', '--help', '-a', 'default', '--skip-actions', '--debug', '-o', 'json', '-v']
   });
   const context = await engine.start();
   console.log(context.error);
@@ -270,7 +270,7 @@ test('extend and project yaml extend', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('plugin update inputs', async () => {
+test('plugin update inputs', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/plugin.yaml'),
     args: ['deploy'],

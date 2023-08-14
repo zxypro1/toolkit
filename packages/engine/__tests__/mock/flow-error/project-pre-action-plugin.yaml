@@ -104,7 +104,7 @@ resources:
     actions:
       pre-${regx('.')}:
         # - run: npm run error
-        - run: echo next-helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}-${helloworld.output.hello}
+        - run: echo next-helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}-${resources.helloworld.output.hello}
         - plugin: ${path('../plugin/a.js')}
           args:
             testKey: testValue
@@ -112,7 +112,7 @@ resources:
           args:
             testKey: testValue
       success-deploy:
-        - run: echo success-deploy--${this.props.service.name}-${this.props.function.name}-${this.output.hello}-${helloworld.output.hello}
+        - run: echo success-deploy--${this.props.service.name}-${this.props.function.name}-${this.output.hello}-${resources.helloworld.output.hello}
       complete-${regx('deploy')}:
         - run: echo complete-deploy
         - plugin: ${path('../plugin/a.js')}

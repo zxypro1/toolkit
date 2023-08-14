@@ -286,7 +286,7 @@ test('global-complete-action-run', async () => {
 
 });
 
-test.only('global-complete-action-plugin', async () => {
+test('global-complete-action-plugin', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/allow-failure/global-complete-action-plugin.yaml'),
     args: ['deploy'],

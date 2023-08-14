@@ -249,8 +249,8 @@ class ParseSpec {
         name,
         access: item.access,
         component: item.component,
-        props: resources[name].props,
-        output: resources[name].output,
+        props: resources[name].props || {},
+        output: resources[name].output || {},
       },
     };
     debug(`getMagicProps: ${JSON.stringify(res)}`);
@@ -275,7 +275,7 @@ class ParseSpec {
       template = getInputs(template, this.getCommonMagic());
       const access = this.getAccess(element);
       const credential = await getCredential(access, this.options.logger);
-
+      
       const real = getInputs(
         element,
         this.getMagicProps({ projectName: project, access, component, credential }),

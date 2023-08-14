@@ -74,7 +74,7 @@ resources:
       service: ${vars.service} # 应用整体的服务配置
       function:
         name: next-function-example
-        description: Serverless Devs Website vuepress Function-${website.output.hello}-${framework.output.hello}
+        description: Serverless Devs Website vuepress Function-${resources.website.output.hello}-${resources.framework.output.hello}
         codeUri: ./next-code
         timeout: 30
         memorySize: 1024
