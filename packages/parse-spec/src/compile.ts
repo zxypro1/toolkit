@@ -4,9 +4,11 @@ import artTemplate from '@serverless-devs/art-template';
 import { REGX } from './contants';
 import { get, isEmpty, isNil } from 'lodash';
 
-artTemplate.defaults.imports.$escape = (value: any, fallback: string) => {
-  return value || fallback;
-};
+artTemplate.defaults.imports.$escape = (value: any, magic: string, ignoreError: boolean) => {
+  if (value) return value;
+  if (ignoreError) return magic;
+  throw new Error(`${magic} not found`);
+}
 artTemplate.defaults.rules.push({
   test: REGX,
   use: function (match: any, code: any) {

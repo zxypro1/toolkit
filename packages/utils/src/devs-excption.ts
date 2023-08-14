@@ -4,7 +4,6 @@ interface IOptions {
   tips?: string;
 }
 
-
 class BaseException extends Error {
   exitCode?: number;
   title?: string;
@@ -18,8 +17,8 @@ class BaseException extends Error {
 }
 
 class DevsException extends BaseException {
-    readonly CODE = 'DevsError';
-    static readonly CODE = 'DevsError';
+  readonly CODE = 'DevsError';
+  static readonly CODE = 'DevsError';
 }
 
 // TODO：暂时先注释
