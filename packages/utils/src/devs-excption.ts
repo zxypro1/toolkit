@@ -22,15 +22,16 @@ class DevsException extends BaseException {
     static readonly CODE = 'DevsError';
 }
 
-class ApiException extends BaseException {
-    readonly CODE = 'ApiException';
-    static readonly CODE = 'ApiException';
-    constructor(message: string, options: {
-        code: string,
-        requestId?: string,
-    }) {
-        super(message);
-        this.title = options.title;
-        this.tips = options.tips;
-    }
-}
+// TODO：暂时先注释
+// class ApiException extends BaseException {
+//     readonly CODE = 'ApiException';
+//     static readonly CODE = 'ApiException';
+//     constructor(message: string, options: {
+//         code: string,
+//         requestId?: string,
+//     }) {
+//         super(message);
+//         this.title = options.title;
+//         this.tips = options.tips;
+//     }
+// }

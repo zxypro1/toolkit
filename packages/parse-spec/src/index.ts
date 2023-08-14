@@ -231,7 +231,7 @@ class ParseSpec {
     return {
       cwd: path.dirname(this.yaml.path),
       vars: this.yaml.vars,
-      __runtime: 'parse'
+      __runtime: 'parse',
     };
   }
   private getMagicProps(item: Partial<IStep>) {
@@ -276,7 +276,7 @@ class ParseSpec {
       template = getInputs(template, this.getCommonMagic());
       const access = this.getAccess(element);
       const credential = await getCredential(access, this.options.logger);
-      
+
       const real = getInputs(
         element,
         this.getMagicProps({ projectName: project, access, component, credential }),
