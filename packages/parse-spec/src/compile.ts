@@ -77,7 +77,7 @@ const compile = (value: string, _context: Record<string, any> = {}) => {
     return res;
   } catch (e) {
     const error = e as Error;
-  // fix: that. => this.
+    // fix: that. => this.
     const msg = error.message.replace(/\$\{that\./g, '${this.');
     throw new Error(msg);
   }
