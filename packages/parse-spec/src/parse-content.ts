@@ -68,7 +68,7 @@ class ParseContent {
     for (const project in temp) {
       const element = resources[project];
       const component = compile(get(element, 'component'), this.getCommonMagic());
-      let template = get(this.content.template, get(element, 'extend.template'), {});
+      let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(
         omit(template, get(element, 'extend.ignore', [])),
         this.getCommonMagic(),
