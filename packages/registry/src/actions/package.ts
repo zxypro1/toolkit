@@ -34,6 +34,10 @@ interface IRequest {
    */
   syaml?: string;
   /**
+   * s.yaml
+   */
+  flowyaml?: string;
+  /**
    * 英文版 s.yaml
    */
   syaml_en?: string;
@@ -68,6 +72,7 @@ async function getUploadUrl(codeUri: string): Promise<string> {
   checkEdition(publishYaml);
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
+  const flowYaml = getYamlContentText(path.join(codeUri, 'src', 'flow'));
   const sEnYaml = getYamlContentText(path.join(codeUri, 'src', 's_en'));
   const versionMd = getContentText(path.join(codeUri, 'version.md'));
   const versionEnMd = getContentText(path.join(codeUri, 'version_body_en.md'));
@@ -79,6 +84,7 @@ async function getUploadUrl(codeUri: string): Promise<string> {
     publish_en: publishEnYaml,
     version_body: versionMd,
     version_body_en: versionEnMd,
+    flowyaml: flowYaml,
     syaml: sYaml,
     syaml_en: sEnYaml,
     readme_en: readmeEn,
