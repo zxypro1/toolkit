@@ -66,7 +66,8 @@ class ParseContent {
       ? { [this.options.projectName]: resources[this.options.projectName] }
       : resources;
     for (const project in temp) {
-      const element = resources[project];
+      const _element = resources[project];
+      const element = typeof _element === 'string' ? compile(_element, this.getCommonMagic()) : _element;
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(
