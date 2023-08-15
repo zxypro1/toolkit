@@ -39,9 +39,9 @@ resources:
         memorySize: 512
         runtime: nodejs12
         environmentVariables:
-          region: ${next_function.props.region}
-          functionName: ${next_function.props.function.name}
-          hello: ${next_function.output.hello}
+          region: ${resources.next_function.props.region}
+          functionName: ${resources.next_function.props.function.name}
+          hello: ${resources.next_function.output.hello}
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}

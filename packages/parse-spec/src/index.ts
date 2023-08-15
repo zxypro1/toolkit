@@ -5,11 +5,11 @@ export * from './types';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
-import { getDefaultYamlPath, isExtendMode, getCredential } from './utils';
+import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import order from './order';
-import getInputs from './get-inputs';
-import { each, filter, find, get, includes, isEmpty, keys, map, omit, set, split } from 'lodash';
+import ParseContent from './parse-content';
+import { each, filter, find, get, includes, isEmpty, keys, map, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { REGX } from './contants';
 const extend2 = require('extend2');
@@ -39,37 +39,64 @@ class ParseSpec {
     }
     throw new Error(`The specified template file does not exist: ${filePath}`);
   }
-  private doYamlinit() {
+  private async doYamlinit() {
+    await this.doExtend();
+    this.yaml.access = get(this.yaml.content, 'access');
+    const projectKey = this.yaml.use3x ? 'resources' : 'services';
+    this.yaml.projectNames = keys(get(this.yaml.content, projectKey, {}));
+    this.yaml.vars = get(this.yaml.content, 'vars', {});
+    this.yaml.flow = get(this.yaml.content, 'flow', {});
+    this.yaml.useFlow = false;
+    this.yaml.appName = get(this.yaml.content, 'name');
+    require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
+  }
+  private async doExtend() {
     this.yaml.content = utils.getYamlContent(this.yaml.path);
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
     if (this.yaml.useExtend) {
       const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
       require('dotenv').config({ path: path.join(extendPath, '.env') });
-      const extendYaml = utils.getYamlContent(extendPath);
-      this.yaml.content = extend2(true, {}, extendYaml, this.yaml.content);
+      const extendContent = utils.getYamlContent(extendPath);
+      this.yaml.use3x =
+        String(get(this.yaml.content, 'edition', get(extendContent, 'edition'))) === '3.0.0';
+      // 1.x 不做extend动作
+      if (!this.yaml.use3x) return;
+      const { resources: extendResource, ...extendRest } = extendContent;
+      const { resources: currentResource, ...currentRest } = this.yaml.content;
+      const tempRest = extend2(true, {}, extendRest, currentRest);
+      const base = await new ParseContent(
+        { ...extendContent, ...tempRest },
+        this.getParsedContentOptions(extendPath),
+      ).start();
+      const current = await new ParseContent(
+        { ...this.yaml.content, ...tempRest },
+        this.getParsedContentOptions(this.yaml.path),
+      ).start();
+      this.yaml.content = extend2(true, {}, get(base, 'content'), get(current, 'content'));
+      return;
     }
-    this.yaml.access = get(this.yaml.content, 'access');
-    const use3x = String(get(this.yaml.content, 'edition')) === '3.0.0';
-    const projectKey = use3x ? 'resources' : 'services';
-    this.yaml.use3x = use3x;
-    this.yaml.projectNames = keys(get(this.yaml.content, projectKey, {}));
-    this.yaml.vars = get(this.yaml.content, 'vars', {});
-    this.yaml.flow = get(this.yaml.content, 'flow', {});
-    this.yaml.useFlow = false;
-    this.yaml.template = get(this.yaml.content, 'template', {});
-    this.yaml.appName = get(this.yaml.content, 'name');
-    require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
+    this.yaml.use3x = String(get(this.yaml.content, 'edition')) === '3.0.0';
+  }
+  private getParsedContentOptions(basePath: string) {
+    return {
+      logger: this.options.logger,
+      basePath,
+      projectName: this.record.projectName,
+      access: this.record.access,
+    };
   }
   async start(): Promise<ISpec> {
     debug('parse start');
-    this.doYamlinit();
     this.parseArgv();
-    if (!this.yaml.use3x) {
-      return this.v1();
-    }
-    const steps = await this.getSteps();
+    await this.doYamlinit();
+    if (!this.yaml.use3x) return this.v1();
+    const { steps, content } = await new ParseContent(
+      this.yaml.content,
+      this.getParsedContentOptions(this.yaml.path),
+    ).start();
     // 获取到真实值后，重新赋值
+    this.yaml.content = content;
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
     this.yaml.actions = this.parseActions(actions);
@@ -226,84 +253,6 @@ class ParseSpec {
       validate: command === this.record.command,
       type,
     };
-  }
-  private getCommonMagic() {
-    return {
-      cwd: path.dirname(this.yaml.path),
-      vars: this.yaml.vars,
-      __runtime: 'parse',
-    };
-  }
-  private getMagicProps(item: Partial<IStep>) {
-    const resources = get(this.yaml.content, 'resources', {});
-    const temp = {};
-    each(resources, (item, key) => {
-      set(temp, `${key}.props`, item.props);
-      set(temp, `${key}.output`, {});
-    });
-    const name = item.projectName as string;
-    const res = {
-      ...this.getCommonMagic(),
-      resources: temp,
-      credential: item.credential,
-      that: {
-        name,
-        access: item.access,
-        component: item.component,
-        props: resources[name].props || {},
-        output: resources[name].output || {},
-      },
-    };
-    debug(`getMagicProps: ${JSON.stringify(res)}`);
-    return res;
-  }
-  private async getSteps() {
-    // resources字段， 其它字段
-    const { resources, ...rest } = this.yaml.content;
-    this.yaml.content = {
-      ...this.yaml.content,
-      ...getInputs(rest, this.getCommonMagic()),
-    };
-    const steps = [];
-    // projectName 存在，说明指定了项目
-    const temp = this.record.projectName
-      ? { [this.record.projectName]: resources[this.record.projectName] }
-      : resources;
-    for (const project in temp) {
-      const element = resources[project];
-      const component = compile(get(element, 'component'), { cwd: path.dirname(this.yaml.path) });
-      let template = get(this.yaml.template, get(element, 'extend.template'), {});
-      template = getInputs(template, this.getCommonMagic());
-      const access = this.getAccess(element);
-      const credential = await getCredential(access, this.options.logger);
-
-      const real = getInputs(
-        element,
-        this.getMagicProps({ projectName: project, access, component, credential }),
-      );
-      this.yaml.content = {
-        ...this.yaml.content,
-        resources: {
-          ...this.yaml.content.resources,
-          [project]: real,
-        },
-      };
-      steps.push({
-        ...real,
-        props: extend2(true, {}, template, real.props),
-        projectName: project,
-        component,
-        access,
-        credential,
-      });
-    }
-    return steps;
-  }
-  private getAccess(data: Record<string, any>) {
-    // 全局的access > 项目的access > yaml的access
-    if (this.record.access) return this.record.access;
-    if (get(data, 'access')) return get(data, 'access');
-    if (this.yaml.access) return this.yaml.access;
   }
 }
 

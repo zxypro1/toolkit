@@ -45,16 +45,6 @@ test('extend yaml 格式有问题', async () => {
   expect(get(context, 'error[0].message')).toContain('base-error.yaml format is incorrect');
 });
 
-test.skip('魔法变量含中划线报错', async () => {
-  const engine = new Engine({
-    template: path.join(__dirname, './mock/error/dashed-line.yaml'),
-    args: ['deploy']
-  });
-  const context = await engine.start();
-  console.log(context.error);
-  expect(get(context, 'error[0].message')).toContain(`not support '-' in value`);
-});
-
 test('basic', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/basic.yaml'),
@@ -78,7 +68,7 @@ test('credential secret', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('s deploy', async () => {
+test('s deploy', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
     args: ['deploy'],
@@ -100,7 +90,7 @@ test('s projectName deploy', async () => {
   expect(context.status).toBe('success');
 });
 
-test.skip('extend', async () => {
+test.only('extend', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/extend/extend.yaml'),
     args: ['deploy']

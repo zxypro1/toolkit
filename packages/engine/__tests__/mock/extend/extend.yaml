@@ -18,5 +18,3 @@ resources:
     props: # 组件的属性值
       service:
         name: website-wof2-pre
-        description: Serverless Devs Website Service
-        internetAccess: true
