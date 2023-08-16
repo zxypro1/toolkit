@@ -58,7 +58,7 @@ export default class EngineLogger extends Logger {
   }
 
   output(content: Record<string, any>, indent?: number, options?: RendererOptions) {
-    const message = prettyjson.render(content, options || { keysColor: 'bold' }, indent);
+    const message = prettyjson.render(content, { keysColor: 'bold', emptyArrayMsg: '[]', ...options }, indent);
     this.write(message);
   }
   // TODO: 仅提示但不报错

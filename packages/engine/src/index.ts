@@ -11,6 +11,7 @@ import {
   omit,
   includes,
   set,
+  isNil,
 } from 'lodash';
 import {
   IStepOptions,
@@ -230,7 +231,7 @@ class Engine {
   private getOutput() {
     const output = {};
     each(this.context.steps, (item) => {
-      if (!isEmpty(item.output)) {
+      if (!isNil(item.output)) {
         set(output, item.projectName, item.output);
       }
     });
