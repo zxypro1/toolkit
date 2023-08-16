@@ -1,7 +1,8 @@
 import compile from './compile';
 import { isEmpty } from 'lodash';
 
-export const getInputs = (inputs: Record<string, any> = {}, context: Record<string, any> = {}) => {
+export const getInputs = (_inputs: Record<string, any> = {}, context: Record<string, any> = {}) => {
+  const inputs = typeof _inputs === 'string' ? compile(_inputs, context) : _inputs;
   if (isEmpty(inputs)) return inputs;
   function deepCopy(obj: any) {
     let result: any = obj?.constructor === Array ? [] : {};

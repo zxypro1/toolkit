@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "beta": "pnpm publish --tag beta --no-git-checks"
+    "pub": "pnpm publish --no-git-checks"
   },
   "author": "wss-git",
   "license": "MIT",

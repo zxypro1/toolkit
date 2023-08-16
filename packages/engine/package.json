@@ -8,7 +8,7 @@
     "watch": "tsc -w",
     "build": "tsc",
     "prepublishOnly": "npm run build",
-    "beta": "pnpm publish --tag beta --no-git-checks"
+    "pub": "pnpm publish --no-git-checks"
   },
   "author": "xsahxl",
   "license": "MIT",
