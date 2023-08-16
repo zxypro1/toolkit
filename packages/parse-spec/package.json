@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/parse-spec",
-  "version": "0.0.1-beta.23",
+  "version": "0.0.1-beta.24",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {

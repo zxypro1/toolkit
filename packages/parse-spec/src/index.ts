@@ -88,8 +88,11 @@ class ParseSpec {
   }
   async start(): Promise<ISpec> {
     debug('parse start');
+    // 第一次尝试解析参数，比如全局access给 extend 用
     this.parseArgv();
     await this.doYamlinit();
+    // 再次解析参数，比如projectNames
+    this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
     const { steps, content } = await new ParseContent(
       this.yaml.content,
