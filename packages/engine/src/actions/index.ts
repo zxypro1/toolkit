@@ -225,6 +225,8 @@ class Actions {
         });
         if (useAllowFailure) return;
         throw new DevsError(error.message, {
+          data: get(e, 'data'),
+          stack: error.stack,
           exitCode: EXIT_CODE.RUN,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
         });
@@ -271,6 +273,8 @@ class Actions {
       });
       if (useAllowFailure) return;
       throw new DevsError(error.message, {
+        data: get(e, 'data'),
+        stack: error.stack,
         exitCode: EXIT_CODE.PLUGIN,
         prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
       });
@@ -319,6 +323,8 @@ class Actions {
         });
         if (useAllowFailure) return;
         throw new DevsError(error.message, {
+          data: get(e, 'data'),
+          stack: error.stack,
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
         });

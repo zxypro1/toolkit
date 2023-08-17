@@ -1,6 +1,5 @@
 import minimist from 'minimist';
-import defaultsDeep from 'lodash.defaultsdeep';
-import isEmpty from 'lodash.isempty';
+import { defaultsDeep, isEmpty } from 'lodash';
 
 const DEFAULT_OPTS = {
   alias: {

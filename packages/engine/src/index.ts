@@ -617,6 +617,8 @@ class Engine {
           if (useAllowFailure) return;
           const error = e as Error;
           throw new DevsError(error.message, {
+            data: get(e, 'data'),
+            stack: error.stack,
             exitCode: EXIT_CODE.COMPONENT,
             prefix: `[${item.projectName}] failed to [${command}]:`,
           });
@@ -651,6 +653,8 @@ class Engine {
         if (useAllowFailure) return;
         const error = e as Error;
         throw new DevsError(error.message, {
+          data: get(e, 'data'),
+          stack: error.stack,
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `[${item.projectName}] failed to [${command}]:`,
         });

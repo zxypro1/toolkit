@@ -1,19 +1,25 @@
+import { set } from 'lodash';
 interface IOptions {
   exitCode?: number;
   prefix?: string;
   tips?: string;
+  data?: {
+    RequestID: string;
+    Code: string;
+    Message: string;
+    statusCode: number;
+  };
+  stack?: string;
 }
 class DevsError extends Error {
   readonly CODE = 'DevsError';
   static readonly CODE = 'DevsError';
-  exitCode?: number;
-  prefix?: string;
-  tips?: string;
   constructor(message: string, options: IOptions = {}) {
     super(message);
-    this.exitCode = options.exitCode;
-    this.prefix = options.prefix;
-    this.tips = options.tips;
+    for (const key in options) {
+      const k = key as keyof IOptions;
+      set(this, k, options[k]);
+    }
   }
 }
 
