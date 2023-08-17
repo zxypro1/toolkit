@@ -1,0 +1,70 @@
+version: v2
+type: flow
+steps:
+  - type: pass
+    name: init
+    outputMappings:
+      - source: $input.endpoint
+        target: endpoint
+      - source: $input.bucketName
+        target: bucketName
+      - source: $input.prefix
+        target: prefix
+      - source: $input.maxKeys
+        target: maxKeys
+      - source: $input.pollInterval
+        target: pollInterval
+      - source: $input.marker
+        target: marker
+      - source: $input.workers
+        target: workers
+      - source: $input.groupSize
+        target: groupSize
+
+  # List archive files from marker
+  - type: task
+    name: listArchiveFiles
+    resourceArn: acs:fc:::services/yyyy-OSSRestoreService-20549E51BFB3/functions/listArchiveFiles
+    outputMappings:
+      - source: $local.bucketName
+        target: bucketName
+      - source: $local.filesGroup
+        target: filesGroup
+      - source: $local.marker
+        target: marker
+      - source: $local.end
+        target: end
+      - source: $local.empty
+        target: empty
+      - source: $local.archiveFilesCount
+        target: archiveFilesCount
+
+  # Check whether file restore success, if not, retry check
+  - type: choice
+    name: checkEmpty
+    choices:
+      # If list archive files not empty
+      - condition: $.empty == "false"
+        steps:
+          # Invoke subflow restore to restore listed files
+          - type: task
+            name: invokeRestoreFlow
+            resourceArn: acs:fnf:::flow/yyyy-restoreFlow-69B95C75D71A
+            pattern: sync
+            serviceParams:
+              Input: $
+    default:
+      goto: checkEnd
+
+  # Check list files ended
+  - type: choice
+    name: checkEnd
+    choices:
+      - condition: $.end == "true"
+        goto: success
+    default:
+      goto: listArchiveFiles
+
+  # success
+  - type: pass
+    name: success

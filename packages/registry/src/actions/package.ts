@@ -7,6 +7,7 @@ import logger from '../util/logger';
 import path from 'path';
 import yaml from 'js-yaml';
 import querystring from 'querystring';
+import { forEach, get, isEmpty } from 'lodash';
 
 interface IRequest {
   /**
@@ -67,12 +68,33 @@ function checkEdition(str: string) {
   }
 }
 
+function getFlowsYaml(str: string | undefined, codeUri: string) {
+  if (!str) {
+    throw new Error('Need to s YAML content');
+  }
+  const { resources } = yaml.load(str) as Record<string, any>;
+  const definitionPaths: any = {}
+  forEach(resources, (value: any, key: string) => {
+    const component: string = get(value, 'component', '');
+    const definition: string = get(value, 'props.definition', '');
+    if ((component === 'devsapp/fnf' || component === 'fnf') && definition) {
+      definitionPaths[key] = definition
+    }
+  })
+  if (isEmpty(definitionPaths)) return []
+  const flowsYaml: any[] = []
+  forEach(definitionPaths, (value: string, key: string) => {
+    flowsYaml.push({ [key]: getYamlContentText(path.join(codeUri, 'src', value)) })
+  })
+  return flowsYaml
+}
+
 async function getUploadUrl(codeUri: string): Promise<string> {
   const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
   checkEdition(publishYaml);
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
-  const flowYaml = getYamlContentText(path.join(codeUri, 'src', 'flow'));
+  const flowYaml = getFlowsYaml(sYaml, codeUri)
   const sEnYaml = getYamlContentText(path.join(codeUri, 'src', 's_en'));
   const versionMd = getContentText(path.join(codeUri, 'version.md'));
   const versionEnMd = getContentText(path.join(codeUri, 'version_body_en.md'));
@@ -84,7 +106,7 @@ async function getUploadUrl(codeUri: string): Promise<string> {
     publish_en: publishEnYaml,
     version_body: versionMd,
     version_body_en: versionEnMd,
-    flowyaml: flowYaml,
+    flowyaml: JSON.stringify(flowYaml),
     syaml: sYaml,
     syaml_en: sEnYaml,
     readme_en: readmeEn,

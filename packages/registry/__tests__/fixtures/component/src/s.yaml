@@ -13,3 +13,20 @@ resources:
         runtime: nodejs14
         code: ./
         handler: event.handler
+  # fnf 服务配置
+  video-demo-flow:
+    component: devsapp/fnf
+    props:
+      name: ${vars.flowName}
+      region: ${vars.region}
+      description: FnF video processing demo flow
+      definition: code/flows/flow1.yml
+      roleArn: "{{ fnfRoleArn }}"
+  video-demo-flow2:
+    component: fnf
+    props:
+      name: ${vars.flowName}
+      region: ${vars.region}
+      description: FnF video processing demo flow
+      definition: code/flows/flow2.yml
+      roleArn: "{{ fnfRoleArn }}"

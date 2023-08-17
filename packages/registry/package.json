@@ -16,9 +16,10 @@
     "access": "public"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0",
     "@serverless-devs/utils": "workspace:^",
     "@serverless-devs/zip": "workspace:^",
+    "js-yaml": "^4.1.0",
+    "lodash": "^4.17.21",
     "opn": "^6.0.0",
     "random-string": "^0.2.0"
   },
