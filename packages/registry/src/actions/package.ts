@@ -73,20 +73,20 @@ function getFlowsYaml(str: string | undefined, codeUri: string) {
     throw new Error('Need to s YAML content');
   }
   const { resources } = yaml.load(str) as Record<string, any>;
-  const definitionPaths: any = {}
+  const definitionPaths: any = {};
   forEach(resources, (value: any, key: string) => {
     const component: string = get(value, 'component', '');
     const definition: string = get(value, 'props.definition', '');
     if ((component === 'devsapp/fnf' || component === 'fnf') && definition) {
-      definitionPaths[key] = definition
+      definitionPaths[key] = definition;
     }
-  })
-  if (isEmpty(definitionPaths)) return []
-  const flowsYaml: any[] = []
+  });
+  if (isEmpty(definitionPaths)) return [];
+  const flowsYaml: any[] = [];
   forEach(definitionPaths, (value: string, key: string) => {
-    flowsYaml.push({ [key]: getYamlContentText(path.join(codeUri, 'src', value)) })
-  })
-  return flowsYaml
+    flowsYaml.push({ [key]: getYamlContentText(path.join(codeUri, 'src', value)) });
+  });
+  return flowsYaml;
 }
 
 async function getUploadUrl(codeUri: string): Promise<string> {
@@ -94,7 +94,7 @@ async function getUploadUrl(codeUri: string): Promise<string> {
   checkEdition(publishYaml);
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
-  const flowYaml = getFlowsYaml(sYaml, codeUri)
+  const flowYaml = getFlowsYaml(sYaml, codeUri);
   const sEnYaml = getYamlContentText(path.join(codeUri, 'src', 's_en'));
   const versionMd = getContentText(path.join(codeUri, 'version.md'));
   const versionEnMd = getContentText(path.join(codeUri, 'version_body_en.md'));
