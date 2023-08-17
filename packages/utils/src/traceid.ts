@@ -1,4 +1,7 @@
-const format = (): string => {
+const traceid = (): string => {
+  if (process.env.serverless_devs_traceid) {
+    return process.env.serverless_devs_traceid;
+  }
   const date = new Date();
   const month = `0${date.getMonth() + 1}`.slice(-2);
   const day = `0${date.getDate()}`.slice(-2);
@@ -8,4 +11,4 @@ const format = (): string => {
   return `${month}${day}${hours}${minutes}${seconds}`;
 };
 
-export default format;
+export default traceid;
