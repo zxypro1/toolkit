@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/component-interface",
-  "version": "0.0.3-beta.1",
+  "version": "0.0.3-beta.2",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -11,6 +11,10 @@
   },
   "author": "wss-git",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"

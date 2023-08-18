@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-application",
-  "version": "0.0.3-beta.6",
+  "version": "0.0.3-beta.7",
   "description": "load application for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -12,6 +12,10 @@
   },
   "author": "xsahxl",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "dependencies": {
     "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/art-template": "^4.13.2",

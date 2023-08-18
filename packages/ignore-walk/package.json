@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/ignore-walk",
-  "version": "0.0.2-beta.2",
+  "version": "0.0.2-beta.3",
   "description": "ignore-walk for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -11,6 +11,10 @@
   },
   "author": "wss-git",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "dependencies": {
     "minimatch": "5.0.0"
   },

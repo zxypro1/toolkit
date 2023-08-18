@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/progress-bar",
-  "version": "0.0.2",
+  "version": "0.0.3-beta.1",
   "description": "progress-bar for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -11,6 +11,10 @@
   },
   "author": "wss-git",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "dependencies": {
     "progress": "^2.0.3",
     "chalk": "^4.1.0"

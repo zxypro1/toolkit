@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-component",
-  "version": "0.0.2-beta.13",
+  "version": "0.0.2-beta.14",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -12,6 +12,10 @@
   },
   "author": "xsahxl",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"

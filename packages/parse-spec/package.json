@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/parse-spec",
-  "version": "0.0.1-beta.24",
+  "version": "0.0.1-beta.25",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -12,6 +12,10 @@
   },
   "author": "xsahxl",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"

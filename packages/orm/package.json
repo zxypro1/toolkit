@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/orm",
-  "version": "0.0.2",
+  "version": "0.0.3-beta.1",
   "description": "orm for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -11,6 +11,10 @@
   },
   "author": "heimamba",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "dependencies": {
     "lodash": "^4.17.21",
     "loopback-filters": "^1.1.1",

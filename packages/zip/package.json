@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/zip",
-  "version": "0.0.3-beta.3",
+  "version": "0.0.3-beta.4",
   "description": "zip for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -11,6 +11,10 @@
   },
   "author": "wss-git",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Serverless-Devs/toolkit"
+  },
   "dependencies": {
     "@serverless-devs/ignore-walk": "^0.0.1",
     "@serverless-devs/progress-bar": "^0.0.1",
