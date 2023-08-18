@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/progress-bar",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "progress-bar for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
