@@ -15,7 +15,7 @@ export function readJsonFile(filePath: string) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) { }
+    } catch (error) {}
   }
 }
 
@@ -92,7 +92,7 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
     if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);
     return { zipballUrl: zipball_url, version: get(res, 'data.body.tag_name') };
   } catch (error) {
-    if(get(error, 'response.status') === 404) {
+    if (get(error, 'response.status') === 404) {
       const name = componentVersion ? `${componentName}@${componentVersion}` : componentName;
       throw new Error(`Component ${name} is not found`);
     }

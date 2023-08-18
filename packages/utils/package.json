@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/utils",
-  "version": "0.0.8-beta.14",
+  "version": "0.0.8-beta.15",
   "description": "utils for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
