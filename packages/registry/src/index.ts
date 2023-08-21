@@ -56,18 +56,14 @@ export default class Registry {
    */
   async detail(name: string, page?: string) {
     if (!name) {
-      throw new Error(
-        'The information packageName for obtaining published components cannot be empty',
-      );
+      throw new Error('The information packageName for obtaining published components cannot be empty');
     }
     return await actions.detail(name, page);
   }
 
   async packageDetail(name: string, versionId?: string) {
     if (!name) {
-      throw new Error(
-        'The information packageName for obtaining published components cannot be empty',
-      );
+      throw new Error('The information packageName for obtaining published components cannot be empty');
     }
     return await actions.packageDetail(name, versionId);
   }
@@ -79,9 +75,7 @@ export default class Registry {
    */
   async remove(name: string, versionId: string) {
     if (!name || !versionId) {
-      throw new Error(
-        'Component name and version is required. like: --name think --version-id 0.0.1',
-      );
+      throw new Error('Component name and version is required. like: --name think --version-id 0.0.1');
     }
 
     await actions.remove(name, versionId);

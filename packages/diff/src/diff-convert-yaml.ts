@@ -54,11 +54,7 @@ function objectToString(obj: any, deep: number, len: number): string[] {
   return strings;
 }
 
-export default function (
-  oldObject: Record<string, any>,
-  newObject: Record<string, any>,
-  opts?: IOpts,
-): { diffResult: any[]; show: string } {
+export default function (oldObject: Record<string, any>, newObject: Record<string, any>, opts?: IOpts): { diffResult: any[]; show: string } {
   const diffResult = diff(oldObject, newObject);
 
   if (isEmpty(diffResult) && !opts?.complete) {
@@ -88,9 +84,7 @@ export default function (
 
   const deep = opts?.deep || 0;
   const len = opts?.len || 4;
-  const strings = Array.isArray(result)
-    ? arrayToString(result, deep, len)
-    : objectToString(result, deep, len);
+  const strings = Array.isArray(result) ? arrayToString(result, deep, len) : objectToString(result, deep, len);
 
   return {
     diffResult,

@@ -43,7 +43,7 @@ class Zip {
     }
 
     if (!_.isEmpty(this.includes)) {
-      _.forIn(this.includes, (file) => {
+      _.forIn(this.includes, file => {
         if (!fs.pathExistsSync(file)) {
           throw new Error(`Include codeUri: ${file} is not exist`);
         }
@@ -62,8 +62,8 @@ class Zip {
     const zipArchiver = archiver('zip', {
       zlib: { level: this.level },
     })
-      .on('warning', (err) => this.logger.warn(err))
-      .on('error', (err) => {
+      .on('warning', err => this.logger.warn(err))
+      .on('error', err => {
         throw err;
       });
 
@@ -79,13 +79,9 @@ class Zip {
 
     return await new Promise((resolve, reject) => {
       let bar: ProgressService;
-      zipArchiver.on('progress', (processOptions) => {
+      zipArchiver.on('progress', processOptions => {
         if (!bar) {
-          bar = new ProgressService(
-            ProgressType.Bar,
-            { total: _.get(processOptions, 'fs.totalBytes') },
-            `Zipping ((:bar)) :current/:total(Bytes) :percent :etas`,
-          );
+          bar = new ProgressService(ProgressType.Bar, { total: _.get(processOptions, 'fs.totalBytes') }, `Zipping ((:bar)) :current/:total(Bytes) :percent :etas`);
         }
         bar.update(_.get(processOptions, 'fs.processedBytes'));
       });
@@ -130,11 +126,7 @@ class Zip {
       try {
         s = await fs.lstat(fPath);
       } catch (error) {
-        this.logger.warn(
-          `Before zip: could not found fPath ${fPath}, absolute fPath is ${path.resolve(
-            fPath,
-          )}, exception is ${error}, skipping`,
-        );
+        this.logger.warn(`Before zip: could not found fPath ${fPath}, absolute fPath is ${path.resolve(fPath)}, exception is ${error}, skipping`);
         return 0;
       }
 
@@ -178,7 +170,7 @@ class Zip {
 
       readline
         .createInterface({ input: fs.createReadStream(fileName) })
-        .on('line', (line) => lines.push(line))
+        .on('line', line => lines.push(line))
         .on('close', () => resolve(lines))
         .on('error', reject);
     });

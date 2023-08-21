@@ -11,21 +11,7 @@ export { default as ProgressFooter } from './progress-footer';
 
 export interface ILoggerInstance extends EngineLogger {
   spin: (
-    type:
-      | 'getting'
-      | 'setting'
-      | 'creating'
-      | 'updating'
-      | 'removing'
-      | 'checking'
-      | 'got'
-      | 'set'
-      | 'created'
-      | 'updated'
-      | 'removed'
-      | 'checked'
-      | 'using'
-      | 'retrying',
+    type: 'getting' | 'setting' | 'creating' | 'updating' | 'removing' | 'checking' | 'got' | 'set' | 'created' | 'updated' | 'removed' | 'checked' | 'using' | 'retrying',
     ...rest: any[]
   ) => void;
   progress: (message: string) => void;

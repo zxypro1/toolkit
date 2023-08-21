@@ -18,10 +18,7 @@ const DEFAULT_OPTS = {
  * @param opts
  * @returns
  */
-function parseArgv(
-  argv: string[] = process.argv.slice(2),
-  opts?: minimist.Opts,
-): Record<string, any> {
+function parseArgv(argv: string[] = process.argv.slice(2), opts?: minimist.Opts): Record<string, any> {
   // 需要考虑两个 case
   //   1. 包含空格: -e '{ "setCredential": "value" }'
   //   2. -la => l + a

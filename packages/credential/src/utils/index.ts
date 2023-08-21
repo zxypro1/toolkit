@@ -53,14 +53,14 @@ export async function getAliasDefault() {
     return DEFAULT_NAME;
   }
 
-  const keys = Object.keys(content).filter((item) => item.startsWith(DEFAULT_NAME));
+  const keys = Object.keys(content).filter(item => item.startsWith(DEFAULT_NAME));
   if (keys.length === 0) {
     return DEFAULT_NAME;
   }
 
   let max = 0;
 
-  keys.forEach((item) => {
+  keys.forEach(item => {
     const [, end] = item.split('-');
     const e = parseInt(end);
     if (!isNaN(e) && e > max) {

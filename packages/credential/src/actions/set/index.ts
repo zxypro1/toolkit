@@ -28,10 +28,7 @@ export default class SetCredential {
       if ((options as setType.IAlibaba).SecurityToken) {
         set(credInformation, 'SecurityToken', (options as setType.IAlibaba).SecurityToken);
       }
-      await this.setAccountId(
-        options as setType.IAlibaba,
-        credInformation as unknown as setType.IAlibaba,
-      );
+      await this.setAccountId(options as setType.IAlibaba, credInformation as unknown as setType.IAlibaba);
     }
 
     const content = await getYamlContent();
@@ -66,9 +63,7 @@ export default class SetCredential {
     try {
       const accountId = await Alibaba.getAccountId(credInformation as unknown as IAliCredential);
       if (uid && uid !== accountId) {
-        Logger.logger.warn(
-          'The inputted AccountID does not match the actual obtained value, using the actual value',
-        );
+        Logger.logger.warn('The inputted AccountID does not match the actual obtained value, using the actual value');
       }
       set(credInformation, 'AccountID', accountId);
     } catch (ex) {

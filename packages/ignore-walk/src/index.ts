@@ -81,7 +81,7 @@ class Walker extends EE {
       }
       this.emit('done', this.result);
     } else {
-      const hasIg = this.entries.some((e) => this.isIgnoreFile(e));
+      const hasIg = this.entries.some(e => this.isIgnoreFile(e));
 
       if (hasIg) {
         this.addIgnoreFiles();
@@ -92,23 +92,21 @@ class Walker extends EE {
   }
 
   addIgnoreFiles() {
-    const newIg = this.entries.filter((e) => this.isIgnoreFile(e));
+    const newIg = this.entries.filter(e => this.isIgnoreFile(e));
 
     let igCount = newIg.length;
-    const then = (_) => {
+    const then = _ => {
       if (--igCount === 0) {
         this.filterEntries();
       }
     };
 
-    newIg.forEach((e) => this.addIgnoreFile(e, then));
+    newIg.forEach(e => this.addIgnoreFile(e, then));
   }
 
   addIgnoreFile(file, then) {
     const ig = path.resolve(this.path, file);
-    fs.readFile(ig, 'utf8', (er, data) =>
-      er ? this.emit('error', er) : this.onReadIgnoreFile(file, data, then),
-    );
+    fs.readFile(ig, 'utf8', (er, data) => (er ? this.emit('error', er) : this.onReadIgnoreFile(file, data, then)));
   }
 
   onReadIgnoreFile(file, data, then) {
@@ -120,8 +118,8 @@ class Walker extends EE {
     };
     const rules = data
       .split(/\r?\n/)
-      .filter((line) => !/^#|^$/.test(line.trim()))
-      .map((r) => {
+      .filter(line => !/^#|^$/.test(line.trim()))
+      .map(r => {
         // support ./ && !./
         if (r) {
           if (r.startsWith('./')) {
@@ -149,14 +147,14 @@ class Walker extends EE {
     // at this point will be checked again later once we know
     // what it is.
     const filtered = this.entries
-      .map((entry) => {
+      .map(entry => {
         // at this point, we don't know if it's a dir or not.
         const passFile = this.filterEntry(entry, false);
         const passDir = this.filterEntry(entry, true);
 
         return passFile || passDir ? [entry, passFile, passDir] : false;
       })
-      .filter((e) => e);
+      .filter(e => e);
 
     // now we stat them all
     // if it's a dir, and passes as a dir, then recurse
@@ -165,13 +163,13 @@ class Walker extends EE {
     if (entryCount === 0) {
       this.emit('done', this.result);
     } else {
-      const then = (_) => {
+      const then = _ => {
         if (--entryCount === 0) {
           this.emit('done', this.result);
         }
       };
 
-      filtered.forEach((filt) => {
+      filtered.forEach(filt => {
         const entry = filt[0];
         const file = filt[1];
         const dir = filt[2];
@@ -246,9 +244,9 @@ class Walker extends EE {
       included = this.parent.filterEntry(pt, partial);
     }
 
-    this.ignoreFiles.forEach((f) => {
+    this.ignoreFiles.forEach(f => {
       if (this.ignoreRules[f]) {
-        this.ignoreRules[f].forEach((rule) => {
+        this.ignoreRules[f].forEach(rule => {
           // negation means inclusion
           // so if it's negated, and already included, no need to check
           // likewise if it's neither negated nor included
@@ -260,9 +258,7 @@ class Walker extends EE {
               rule.match('/' + entry) ||
               rule.match(entry) ||
               (!!partial && (rule.match('/' + entry + '/') || rule.match(entry + '/'))) ||
-              (!!partial &&
-                rule.negate &&
-                (rule.match('/' + entry, true) || rule.match(entry, true)));
+              (!!partial && rule.negate && (rule.match('/' + entry, true) || rule.match(entry, true)));
 
             if (match) {
               included = rule.negate;
@@ -308,7 +304,7 @@ const walk = (opts: IOptions, callback?) => {
   const p = new Promise((resolve, reject) => {
     new Walker(opts).on('done', resolve).on('error', reject).start();
   });
-  return callback ? p.then((res) => callback(null, res), callback) : p;
+  return callback ? p.then(res => callback(null, res), callback) : p;
 };
 
 const walkSync = (opts: IOptions) => new WalkerSync(opts).start().result;

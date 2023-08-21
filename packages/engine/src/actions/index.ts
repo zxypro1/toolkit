@@ -1,14 +1,4 @@
-import {
-  IAction,
-  IActionLevel,
-  IActionType,
-  IAllowFailure,
-  IComponentAction,
-  IHookType,
-  IPluginAction,
-  IRunAction,
-  getInputs,
-} from '@serverless-devs/parse-spec';
+import { IAction, IActionLevel, IActionType, IAllowFailure, IComponentAction, IHookType, IPluginAction, IRunAction, getInputs } from '@serverless-devs/parse-spec';
 import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import { DevsError } from '@serverless-devs/utils';
@@ -77,11 +67,7 @@ class Actions {
       let err = error as Error;
       if (this.option.hookLevel === IActionLevel.GLOBAL) {
         this.logger.write(
-          `${chalk.red('✖')} ${chalk.gray(
-            `${IActionLevel.GLOBAL} ${hookType}-action failed to [${
-              this.record.command
-            }] (${getProcessTime(this.record.startTime)}s)`,
-          )}`,
+          `${chalk.red('✖')} ${chalk.gray(`${IActionLevel.GLOBAL} ${hookType}-action failed to [${this.record.command}] (${getProcessTime(this.record.startTime)}s)`)}`,
         );
       }
       throw error;
@@ -111,13 +97,10 @@ class Actions {
   private async afterStart(hookType: `${IHookType}`, inputs: Record<string, any> = {}) {
     if (this.option.skipActions) return {};
     this.inputs = inputs;
-    const hooks = filter(this.actions, (item) => item.hookType === hookType);
+    const hooks = filter(this.actions, item => item.hookType === hookType);
     if (isEmpty(hooks)) return {};
     this.record.startTime = Date.now();
-    this.record.lable =
-      this.option.hookLevel === IActionLevel.PROJECT
-        ? `[${this.option.projectName}]`
-        : IActionLevel.GLOBAL;
+    this.record.lable = this.option.hookLevel === IActionLevel.PROJECT ? `[${this.option.projectName}]` : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
     const newHooks = getInputs(hooks, this.record.magic);
     // post-action应获取componentProps, 先清空pluginOutput
@@ -126,10 +109,7 @@ class Actions {
     }
     for (const hook of newHooks) {
       debug(`${hook.level} action item: ${stringify(hook)}`);
-      this.record.allowFailure =
-        this.record.step && 'allow_failure' in this.record.step
-          ? get(this.record, 'step.allow_failure')
-          : hook.allow_failure;
+      this.record.allowFailure = this.record.step && 'allow_failure' in this.record.step ? get(this.record, 'step.allow_failure') : hook.allow_failure;
       if (hook.actionType === IActionType.RUN) {
         await this.run(hook);
       }
@@ -144,13 +124,7 @@ class Actions {
     this.logger.debug(`The ${hookType}-action successfully to execute in ${this.record.lable}`);
 
     if (this.option.hookLevel === IActionLevel.GLOBAL) {
-      this.logger.write(
-        `${chalk.green('✔')} ${chalk.gray(
-          `${IActionLevel.GLOBAL} ${hookType}-action completed (${getProcessTime(
-            this.record.startTime,
-          )})`,
-        )}`,
-      );
+      this.logger.write(`${chalk.green('✔')} ${chalk.gray(`${IActionLevel.GLOBAL} ${hookType}-action completed (${getProcessTime(this.record.startTime)})`)}`);
     }
     return this.record;
   }
@@ -214,9 +188,7 @@ class Actions {
         // If the current environment is Windows, log additional debugging information.
         if (utils.isWindow()) {
           debug('Command run execution environment：CMD');
-          debug(
-            'Please check whether the actions section of yaml can be executed in the current environment.',
-          );
+          debug('Please check whether the actions section of yaml can be executed in the current environment.');
         }
         // Check if the error can be safely ignored.
         const useAllowFailure = getAllowFailure(this.record.allowFailure, {
@@ -309,7 +281,7 @@ class Actions {
       // 方法存在，执行报错，退出码101
       const newInputs = {
         ...this.record.componentProps,
-        argv: filter(argv.slice(2), (o) => !includes([componentName, command], o)),
+        argv: filter(argv.slice(2), o => !includes([componentName, command], o)),
       };
       try {
         // Execute the command for the component with the prepared inputs.

@@ -67,12 +67,9 @@ export async function inputCredentials(): Promise<Record<string, string>> {
       validate: validateInput,
     }));
     const result = await prompt(promptList);
-    const trimResult = transform(
-      result,
-      (result: Record<string, string>, value: string, key: string) => {
-        result[key] = trim(value);
-      },
-    );
+    const trimResult = transform(result, (result: Record<string, string>, value: string, key: string) => {
+      result[key] = trim(value);
+    });
     merge(credentials, trimResult);
   }
 
@@ -95,10 +92,7 @@ export async function inputAlias() {
  * 获取别名
  * @returns
  */
-export async function getAlias(options: {
-  access?: string;
-  force?: boolean;
-}): Promise<string | boolean> {
+export async function getAlias(options: { access?: string; force?: boolean }): Promise<string | boolean> {
   const { access, force } = options || {};
   let a = access;
 

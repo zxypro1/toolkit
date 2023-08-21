@@ -58,21 +58,14 @@ class ParseSpec {
       const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
       require('dotenv').config({ path: path.join(extendPath, '.env') });
       const extendContent = utils.getYamlContent(extendPath);
-      this.yaml.use3x =
-        String(get(this.yaml.content, 'edition', get(extendContent, 'edition'))) === '3.0.0';
+      this.yaml.use3x = String(get(this.yaml.content, 'edition', get(extendContent, 'edition'))) === '3.0.0';
       // 1.x 不做extend动作
       if (!this.yaml.use3x) return;
       const { resources: extendResource, ...extendRest } = extendContent;
       const { resources: currentResource, ...currentRest } = this.yaml.content;
       const tempRest = extend2(true, {}, extendRest, currentRest);
-      const base = await new ParseContent(
-        { ...extendContent, ...tempRest },
-        this.getParsedContentOptions(extendPath),
-      ).start();
-      const current = await new ParseContent(
-        { ...this.yaml.content, ...tempRest },
-        this.getParsedContentOptions(this.yaml.path),
-      ).start();
+      const base = await new ParseContent({ ...extendContent, ...tempRest }, this.getParsedContentOptions(extendPath)).start();
+      const current = await new ParseContent({ ...this.yaml.content, ...tempRest }, this.getParsedContentOptions(this.yaml.path)).start();
       this.yaml.content = extend2(true, {}, get(base, 'content'), get(current, 'content'));
       return;
     }
@@ -94,10 +87,7 @@ class ParseSpec {
     // 再次解析参数，比如projectNames
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
-    const { steps, content } = await new ParseContent(
-      this.yaml.content,
-      this.getParsedContentOptions(this.yaml.path),
-    ).start();
+    const { steps, content } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
     // 获取到真实值后，重新赋值
     this.yaml.content = content;
     this.yaml.vars = get(this.yaml.content, 'vars', {});
@@ -124,9 +114,7 @@ class ParseSpec {
       });
     }
     return {
-      steps: this.record.projectName
-        ? filter(steps, (item) => item.projectName === this.record.projectName)
-        : steps,
+      steps: this.record.projectName ? filter(steps, item => item.projectName === this.record.projectName) : steps,
       yaml: this.yaml,
       ...this.record,
     };
@@ -198,7 +186,7 @@ class ParseSpec {
       debug(`action: ${action}, useAction: ${JSON.stringify(actionInfo)}`);
       if (actionInfo.validate) {
         actionList.push(
-          ...map(element, (item) => {
+          ...map(element, item => {
             if (item[IActionType.RUN]) {
               const { run, ...rest } = item;
               return {

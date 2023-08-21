@@ -3,10 +3,7 @@ export interface ICommands {
 }
 
 type ICommanded = ICommands;
-export type IRunFunction = (
-  args: Record<string, number | boolean | string>,
-  props: Record<string, any>,
-) => boolean;
+export type IRunFunction = (args: Record<string, number | boolean | string>, props: Record<string, any>) => boolean;
 
 export interface ICommand {
   /**

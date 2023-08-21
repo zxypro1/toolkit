@@ -7,9 +7,7 @@ export enum ProgressType {
   Loading,
 }
 
-const DEFAULT_BAR_FORMAT = `Loading ${green(
-  ':loading',
-)} ((:bar)) :current/:total(Bytes) :percent :etas`;
+const DEFAULT_BAR_FORMAT = `Loading ${green(':loading')} ((:bar)) :current/:total(Bytes) :percent :etas`;
 const DEFAULT_LOADING_FORMAT = `Loading ${green(':loading')} ((:bar)) :etas`;
 
 export default class ProgressService {
@@ -21,11 +19,7 @@ export default class ProgressService {
    * @param format, format of progress bar
    * @param options, options of progress bar, with type Loading, just set {width:50, total:100}
    */
-  constructor(
-    protected readonly type: ProgressType,
-    protected readonly options?: ProgressBarOptions,
-    format?: string,
-  ) {
+  constructor(protected readonly type: ProgressType, protected readonly options?: ProgressBarOptions, format?: string) {
     if (type === ProgressType.Loading) {
       if (!options) {
         // @ts-ignore
@@ -70,10 +64,7 @@ export default class ProgressService {
     return format as string;
   }
 
-  private static initProgressBarOptions(
-    type: ProgressType,
-    options: ProgressBarOptions,
-  ): ProgressBarOptions {
+  private static initProgressBarOptions(type: ProgressType, options: ProgressBarOptions): ProgressBarOptions {
     if (!options.width) {
       options.width = 30;
     }

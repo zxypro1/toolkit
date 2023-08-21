@@ -4,30 +4,11 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import {
-  isEmpty,
-  includes,
-  split,
-  get,
-  has,
-  set,
-  sortBy,
-  endsWith,
-  replace,
-  map,
-  concat,
-  keys,
-} from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import {
-  getInputs,
-  getUrlWithLatest,
-  getUrlWithVersion,
-  randomId,
-  getAllCredential,
-} from './utils';
+import { getInputs, getUrlWithLatest, getUrlWithVersion, randomId, getAllCredential } from './utils';
 import assert from 'assert';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
@@ -132,7 +113,7 @@ class LoadApplication {
     if (!isEmpty(this.secretList)) {
       const dotEnvPath = path.join(this.filePath, '.env');
       fs.ensureFileSync(dotEnvPath);
-      const str = map(this.secretList, (o) => `\n${o}=${this.publishData[o]}`).join('');
+      const str = map(this.secretList, o => `\n${o}=${this.publishData[o]}`).join('');
       fs.appendFileSync(dotEnvPath, str, 'utf-8');
     }
     // 删除临时文件夹
@@ -228,12 +209,10 @@ class LoadApplication {
         ele['__key'] = key;
         rangeList.push(ele);
       }
-      rangeList = sortBy(rangeList, (o) => o['x-range']);
+      rangeList = sortBy(rangeList, o => o['x-range']);
       for (const item of rangeList) {
         const name = item.__key;
-        const prefix = item.description
-          ? `${gray(item.description)}\n${chalk.green('?')}`
-          : undefined;
+        const prefix = item.description ? `${gray(item.description)}\n${chalk.green('?')}` : undefined;
         const validate = (input: string) => {
           if (isEmpty(input)) {
             return includes(requiredList, name) ? 'value cannot be empty.' : true;
@@ -281,21 +260,16 @@ class LoadApplication {
             message: item.title,
             name,
             prefix,
-            default: endsWith(item.default, RANDOM_PATTERN)
-              ? replace(item.default, RANDOM_PATTERN, randomId())
-              : item.default,
+            default: endsWith(item.default, RANDOM_PATTERN) ? replace(item.default, RANDOM_PATTERN, randomId()) : item.default,
             validate,
           });
         }
       }
     }
-    const credentialAliasList = map(
-      await getAllCredential({ logger: this.options.logger }),
-      (o) => ({
-        name: o,
-        value: o,
-      }),
-    );
+    const credentialAliasList = map(await getAllCredential({ logger: this.options.logger }), o => ({
+      name: o,
+      value: o,
+    }));
     let result: any = {};
     if (this.options.access) {
       result = await inquirer.prompt(promptList);
@@ -396,9 +370,7 @@ class LoadApplication {
     });
   }
   private getZipballUrl = async () => {
-    const url = this.version
-      ? getUrlWithVersion(this.name, this.version)
-      : getUrlWithLatest(this.name);
+    const url = this.version ? getUrlWithVersion(this.name, this.version) : getUrlWithLatest(this.name);
     debug(`url: ${url}`);
     const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
     debug(`res: ${JSON.stringify(res.data)}`);

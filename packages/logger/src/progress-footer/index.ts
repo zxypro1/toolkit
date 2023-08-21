@@ -7,8 +7,7 @@ export default class ProgressFooter extends Map<string, IMateValue> {
   constructor(private options: IPropsOptions = {}) {
     super();
     this.progress = CliProgressFooter();
-    this.options.format =
-      typeof options.format === 'function' ? options.format : this.defaultFormat;
+    this.options.format = typeof options.format === 'function' ? options.format : this.defaultFormat;
   }
 
   /**

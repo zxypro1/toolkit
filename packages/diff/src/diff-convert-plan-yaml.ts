@@ -27,7 +27,7 @@ class Diff {
       };
     }
 
-    this.diffResult = cloneDeep(diffResult).map((item) => ({
+    this.diffResult = cloneDeep(diffResult).map(item => ({
       ...item,
       pathString: item.path.join('.'),
     }));
@@ -35,9 +35,7 @@ class Diff {
     const deep = opts?.deep || 0;
     const len = opts?.len || 4;
 
-    const strings = Array.isArray(result)
-      ? this.arrayToString('', result, deep, len)
-      : this.objectToString('', result, deep, len);
+    const strings = Array.isArray(result) ? this.arrayToString('', result, deep, len) : this.objectToString('', result, deep, len);
     return {
       diffResult,
       show: strings.join('\n'),
@@ -169,7 +167,7 @@ class Diff {
       }
     }
 
-    each(unsetIndex, (index) => this.diffResult.splice(index, 1));
+    each(unsetIndex, index => this.diffResult.splice(index, 1));
 
     return addResult;
   }

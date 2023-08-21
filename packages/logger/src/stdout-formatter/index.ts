@@ -180,13 +180,7 @@ export const using = (type: string, detail: string): string => {
  *  Retrying fc-function: create cn-hangzhou/my-test-service/function, retry 1 times
  *  Retrying fc-function: create cn-hangzhou/my-test-service/function, retry 1/3 times
  */
-export const retrying = (
-  type: string,
-  action: string,
-  detail: string,
-  time?: number,
-  times?: number,
-): string => {
+export const retrying = (type: string, action: string, detail: string, time?: number, times?: number): string => {
   const showLog = `${blue(`Retrying ${type}`)}: ${action} ${showDetail(detail)}`;
 
   if (isNil(time)) {

@@ -35,5 +35,4 @@ export function writeFile(token: string) {
   fs.closeSync(fd);
 }
 
-export const sleep = async (timer: number) =>
-  await new Promise((resolve) => setTimeout(resolve, timer));
+export const sleep = async (timer: number) => await new Promise(resolve => setTimeout(resolve, timer));

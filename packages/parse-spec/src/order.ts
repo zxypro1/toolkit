@@ -13,11 +13,11 @@ class Order {
     return { steps: this.sort(), dependencies };
   }
   sort() {
-    const newSteps = map(this.steps, (item) => ({
+    const newSteps = map(this.steps, item => ({
       ...item,
       order: this.orderMap[item.projectName],
     }));
-    const result = sortBy(newSteps, (item) => -item.order);
+    const result = sortBy(newSteps, item => -item.order);
     return result;
   }
   analysis(dependencies: Record<string, any>) {
@@ -32,7 +32,7 @@ class Order {
     debug(`order map: ${JSON.stringify(this.orderMap)}`);
   }
   getDependencies() {
-    const projectNameList = map(this.steps, (item) => {
+    const projectNameList = map(this.steps, item => {
       set(this.orderMap, item.projectName, 1);
       return item.projectName;
     });

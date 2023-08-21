@@ -1,35 +1,8 @@
 import { createMachine, interpret } from 'xstate';
-import {
-  isEmpty,
-  get,
-  each,
-  map,
-  isFunction,
-  has,
-  uniqueId,
-  filter,
-  omit,
-  includes,
-  set,
-  isNil,
-} from 'lodash';
-import {
-  IStepOptions,
-  IRecord,
-  IStatus,
-  IEngineOptions,
-  IContext,
-  IEngineError,
-  STEP_STATUS,
-} from './types';
+import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil } from 'lodash';
+import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
 import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
-import ParseSpec, {
-  getInputs,
-  ISpec,
-  IHookType,
-  IStep as IParseStep,
-  IActionLevel,
-} from '@serverless-devs/parse-spec';
+import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
 import Actions from './actions';
@@ -118,11 +91,7 @@ class Engine {
       return this.context;
     }
     const { steps: _steps, yaml, command, access = yaml.access } = this.spec;
-    this.logger.write(
-      `⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray(
-        '====================',
-      )}`,
-    );
+    this.logger.write(`⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`);
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -162,13 +131,10 @@ class Engine {
           invoke: {
             src: async () => {
               // 执行终态是 error-with-continue 的时候，改为 success
-              const status =
-                this.record.status === STEP_STATUS.ERROR_WITH_CONTINUE
-                  ? STEP_STATUS.SUCCESS
-                  : this.record.status;
+              const status = this.record.status === STEP_STATUS.ERROR_WITH_CONTINUE ? STEP_STATUS.SUCCESS : this.record.status;
               this.context.status = status;
               await this.doCompleted();
-              this.context.steps = map(this.context.steps, (item) => omit(item, ['instance']));
+              this.context.steps = map(this.context.steps, item => omit(item, ['instance']));
               this.context.output = this.getOutput();
               debug(`context: ${stringify(this.context)}`);
               debug('engine end');
@@ -180,12 +146,8 @@ class Engine {
 
       // Every states object has dynamic state, that based on the step.StepCount.
       each(this.context.steps, (item, index) => {
-        const target = this.context.steps[index + 1]
-          ? get(this.context.steps, `[${index + 1}].stepCount`)
-          : 'final';
-        const flowProject = yaml.useFlow
-          ? filter(this.context.steps, (o) => o.flowId === item.flowId)
-          : [item];
+        const target = this.context.steps[index + 1] ? get(this.context.steps, `[${index + 1}].stepCount`) : 'final';
+        const flowProject = yaml.useFlow ? filter(this.context.steps, o => o.flowId === item.flowId) : [item];
         states[item.stepCount as string] = {
           invoke: {
             id: item.stepCount,
@@ -197,9 +159,9 @@ class Engine {
               this.recordContext(item, { status: STEP_STATUS.RUNNING });
               // 检查全局的执行状态，如果是failure，则不执行该步骤, 并记录状态为 skipped
               if (this.record.status === STEP_STATUS.FAILURE) {
-                return await Promise.all(map(flowProject, (o) => this.doSkip(o)));
+                return await Promise.all(map(flowProject, o => this.doSkip(o)));
               }
-              return await Promise.all(map(flowProject, (o) => this.handleSrc(o)));
+              return await Promise.all(map(flowProject, o => this.handleSrc(o)));
             },
             onDone: {
               target,
@@ -217,7 +179,7 @@ class Engine {
       });
 
       const stepService = interpret(fetchMachine)
-        .onTransition((state) => state.value)
+        .onTransition(state => state.value)
         .start();
       stepService.send('INIT');
     });
@@ -231,7 +193,7 @@ class Engine {
    */
   private getOutput() {
     const output = {};
-    each(this.context.steps, (item) => {
+    each(this.context.steps, item => {
       if (!isNil(item.output)) {
         set(output, item.projectName, item.output);
       }
@@ -293,7 +255,7 @@ class Engine {
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
     const { status, error, output, process_time, props, done } = options;
     this.context.stepCount = item.stepCount as string;
-    this.context.steps = map(this.context.steps, (obj) => {
+    this.context.steps = map(this.context.steps, obj => {
       if (obj.stepCount === item.stepCount) {
         if (status) {
           obj.status = status;
@@ -437,16 +399,10 @@ class Engine {
 
     // Log output based on the record status.
     if (this.record.status === STEP_STATUS.SUCCESS) {
-      this.logger.write(
-        `${chalk.green('✔')} ${chalk.gray(`[${item.projectName}] completed (${process_time}s)`)}`,
-      );
+      this.logger.write(`${chalk.green('✔')} ${chalk.gray(`[${item.projectName}] completed (${process_time}s)`)}`);
     }
     if (this.record.status === STEP_STATUS.FAILURE) {
-      this.logger.write(
-        `${chalk.red('✖')} ${chalk.gray(
-          `[${item.projectName}] failed to [${command}] (${process_time}s)`,
-        )}`,
-      );
+      this.logger.write(`${chalk.red('✖')} ${chalk.gray(`[${item.projectName}] failed to [${command}] (${process_time}s)`)}`);
     }
 
     // step执行完成后，释放logger
@@ -564,7 +520,7 @@ class Engine {
       name: get(this.spec, 'yaml.appName'),
       props: newInputs,
       command,
-      args: filter(this.options.args, (o) => !includes([projectName, command], o)),
+      args: filter(this.options.args, o => !includes([projectName, command], o)),
       yaml: {
         path: get(this.spec, 'yaml.path'),
       },
@@ -633,9 +589,7 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${
-          item.component
-        } has the ${command} command. Serverless Devs documents：${chalk.underline(
+        tips: `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：${chalk.underline(
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,

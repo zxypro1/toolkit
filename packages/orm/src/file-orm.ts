@@ -133,7 +133,7 @@ export default class FileOrm {
     const updateData = lodash.get(filter, 'data', {});
 
     if (!lodash.isEmpty(filtered)) {
-      lodash.forEach(filtered, (filterItem) => {
+      lodash.forEach(filtered, filterItem => {
         for (const key in filterItem) {
           // @ts-ignore
           filterItem[key] = updateData[key];

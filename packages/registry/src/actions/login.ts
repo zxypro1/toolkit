@@ -13,13 +13,9 @@ export async function generateToken() {
   const loginUrl = `${GITHUB_LOGIN_URL}?token=${tempToken}`;
 
   // 输出提醒
-  logger.warn(
-    'Serverless registry no longer provides independent registration function, but will uniformly adopt GitHub authorized login scheme.',
-  );
+  logger.warn('Serverless registry no longer provides independent registration function, but will uniformly adopt GitHub authorized login scheme.');
   logger.info('The system will attempt to automatically open the browser for authorization......');
-  logger.info(
-    'If the browser is not opened automatically, please try to open the following URL manually for authorization.',
-  );
+  logger.info('If the browser is not opened automatically, please try to open the following URL manually for authorization.');
   logger.info(loginUrl);
 
   try {
@@ -28,9 +24,7 @@ export async function generateToken() {
 
   for (let i = 0; i < 100; i++) {
     await sleep(2000);
-    const result = await request.new_request_get(
-      `${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`,
-    );
+    const result = await request.new_request_get(`${REGISTRY_INFORMATION_GITHUB}?token=${tempToken}`);
     const { body, request_id } = result || ({} as any);
     logger.debug(`ResponseId: ${request_id}`);
     if (typeof body === 'string') {
@@ -45,9 +39,7 @@ export async function generateToken() {
       return;
     }
   }
-  logger.error(
-    'Login failed. Please log in to GitHub account on the pop-up page and authorize it, or try again later.',
-  );
+  logger.error('Login failed. Please log in to GitHub account on the pop-up page and authorize it, or try again later.');
 }
 
 /**

@@ -51,11 +51,7 @@ export async function handlerHelp(
   return { help, argsData: parsedArgs };
 }
 
-export async function handlerCommonFunction(
-  pendingParams: IRunFunction | unknown,
-  props: IOptions['props'],
-  argsData: Record<string, any>,
-): Promise<unknown> {
+export async function handlerCommonFunction(pendingParams: IRunFunction | unknown, props: IOptions['props'], argsData: Record<string, any>): Promise<unknown> {
   if (isFunction(pendingParams)) {
     return await pendingParams(argsData, props);
   }

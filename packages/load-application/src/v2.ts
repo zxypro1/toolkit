@@ -5,21 +5,7 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import {
-  isEmpty,
-  includes,
-  split,
-  get,
-  has,
-  set,
-  sortBy,
-  endsWith,
-  replace,
-  map,
-  concat,
-  keys,
-  find,
-} from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys, find } from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, REGISTRY } from './constant';
@@ -78,10 +64,7 @@ class LoadApplication {
     const useProvider = includes(this.template, '/');
     if (useProvider) {
       const [provider, componentName] = split(this.template, '/');
-      assert(
-        provider === IProvider.DEVSAPP,
-        `The provider ${provider} is invalid, only support devsapp`,
-      );
+      assert(provider === IProvider.DEVSAPP, `The provider ${provider} is invalid, only support devsapp`);
       return {
         provider,
         componentName,
@@ -141,7 +124,7 @@ class LoadApplication {
     if (this.secretList.length > 0) {
       const dotEnvPath = path.join(this.filePath, '.env');
       fs.ensureFileSync(dotEnvPath);
-      const str = map(this.secretList, (o) => `\n${o}=${this.publishData[o]}`).join('');
+      const str = map(this.secretList, o => `\n${o}=${this.publishData[o]}`).join('');
       fs.appendFileSync(dotEnvPath, str, 'utf-8');
     }
     // 删除临时文件夹
@@ -240,12 +223,10 @@ class LoadApplication {
         ele['__key'] = key;
         rangeList.push(ele);
       }
-      rangeList = sortBy(rangeList, (o) => o['x-range']);
+      rangeList = sortBy(rangeList, o => o['x-range']);
       for (const item of rangeList) {
         const name = item.__key;
-        const prefix = item.description
-          ? `${gray(item.description)}\n${chalk.green('?')}`
-          : undefined;
+        const prefix = item.description ? `${gray(item.description)}\n${chalk.green('?')}` : undefined;
         const validate = (input: string) => {
           if (isEmpty(input)) {
             return includes(requiredList, name) ? 'value cannot be empty.' : true;
@@ -293,21 +274,16 @@ class LoadApplication {
             message: item.title,
             name,
             prefix,
-            default: endsWith(item.default, RANDOM_PATTERN)
-              ? replace(item.default, RANDOM_PATTERN, randomId())
-              : item.default,
+            default: endsWith(item.default, RANDOM_PATTERN) ? replace(item.default, RANDOM_PATTERN, randomId()) : item.default,
             validate,
           });
         }
       }
     }
-    const credentialAliasList = map(
-      await getAllCredential({ logger: this.options.logger }),
-      (o) => ({
-        name: o,
-        value: o,
-      }),
-    );
+    const credentialAliasList = map(await getAllCredential({ logger: this.options.logger }), o => ({
+      name: o,
+      value: o,
+    }));
     let result: any = {};
     if (this.options.access) {
       result = await inquirer.prompt(promptList);
@@ -399,9 +375,7 @@ class LoadApplication {
 
   private async doLoad() {
     const { logger } = this.options;
-    const zipball_url = this.version
-      ? await this.doZipballUrlWithVersion()
-      : await this.doZipballUrl();
+    const zipball_url = this.version ? await this.doZipballUrlWithVersion() : await this.doZipballUrl();
     if (isEmpty(zipball_url)) {
       throw new Error('zipball_url is empty');
     }

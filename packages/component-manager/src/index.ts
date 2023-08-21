@@ -37,11 +37,7 @@ export default class ComponentManager {
     for (const needHandlerKey of ['parallel', 'hangRun', 'singleton']) {
       const needHandlerConfig = get(commandConfig, needHandlerKey);
       if (!isNil(needHandlerConfig)) {
-        const handlerResult = await handlerCommonFunction(
-          needHandlerConfig,
-          cloneDeep(props),
-          cloneDeep(argsData),
-        );
+        const handlerResult = await handlerCommonFunction(needHandlerConfig, cloneDeep(props), cloneDeep(argsData));
         set(result, needHandlerKey, handlerResult);
       }
     }

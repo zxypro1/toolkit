@@ -11,8 +11,7 @@ export const tryfun = async (fn: Function, ...args: any[]) => {
 };
 
 export const getUrlWithLatest = (name: string) => `${REGISTRY.V3}/packages/${name}/release/latest`;
-export const getUrlWithVersion = (name: string, versionId: string) =>
-  `${REGISTRY.V3}/packages/${name}/release/tags/${versionId}`;
+export const getUrlWithVersion = (name: string, versionId: string) => `${REGISTRY.V3}/packages/${name}/release/tags/${versionId}`;
 
 export const randomId = () => Math.random().toString(36).substring(2, 6);
 

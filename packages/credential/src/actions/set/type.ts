@@ -47,17 +47,7 @@ export interface ICustom extends IBaseOptions {
   infoList: string;
 }
 
-export type ISetOptions =
-  | IBaseOptions
-  | ICustom
-  | IAlibaba
-  | IAws
-  | IBaidu
-  | IHuawei
-  | IAzure
-  | IGoogle
-  | ITencent
-  | IGoogle;
+export type ISetOptions = IBaseOptions | ICustom | IAlibaba | IAws | IBaidu | IHuawei | IAzure | IGoogle | ITencent | IGoogle;
 
 export type IResult = {
   access: string;

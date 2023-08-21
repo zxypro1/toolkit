@@ -15,7 +15,7 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
   async start() {
     const { steps, content } = await this.getSteps();
     return {
@@ -62,24 +62,16 @@ class ParseContent {
     };
     const steps = [];
     // projectName 存在，说明指定了项目
-    const temp = this.options.projectName
-      ? { [this.options.projectName]: resources[this.options.projectName] }
-      : resources;
+    const temp = this.options.projectName ? { [this.options.projectName]: resources[this.options.projectName] } : resources;
     for (const project in temp) {
       const element = resources[project];
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
-      template = getInputs(
-        omit(template, get(element, 'extend.ignore', [])),
-        this.getCommonMagic(),
-      );
+      template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
       const access = this.getAccess(element);
       const credential = await getCredential(access, this.options.logger);
 
-      const real = getInputs(
-        element,
-        this.getMagicProps({ projectName: project, access, component, credential }),
-      );
+      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
       set(real, 'props', extend2(true, {}, template, real.props));
       this.content = {
         ...this.content,

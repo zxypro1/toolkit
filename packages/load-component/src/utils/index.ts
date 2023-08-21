@@ -7,8 +7,7 @@ import { BASE_URL } from '../constant';
 import assert from 'assert';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 const getUrlWithLatest = (name: string) => `${BASE_URL}/packages/${name}/release/latest`;
-const getUrlWithVersion = (name: string, versionId: string) =>
-  `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
+const getUrlWithVersion = (name: string, versionId: string) => `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
 
 export function readJsonFile(filePath: string) {
   if (fs.existsSync(filePath)) {
@@ -62,9 +61,7 @@ export function getProvider(name: string) {
   const [componentName, componentVersion] = split(name, '@');
   const { core_load_serverless_devs_component } = process.env;
   if (core_load_serverless_devs_component) {
-    const componentList = filter(split(core_load_serverless_devs_component, ';'), (v) =>
-      includes(v, '@'),
-    );
+    const componentList = filter(split(core_load_serverless_devs_component, ';'), v => includes(v, '@'));
     const componentNames = [];
     const obj: any = {};
     for (const item of componentList) {
@@ -73,7 +70,7 @@ export function getProvider(name: string) {
       obj[n] = v;
     }
     const key = componentName;
-    if (find(componentNames, (v) => v === key)) {
+    if (find(componentNames, v => v === key)) {
       return [componentName, obj[key]];
     }
   }
@@ -81,9 +78,7 @@ export function getProvider(name: string) {
 }
 
 export const getZipballUrl = async (componentName: string, componentVersion?: string) => {
-  const url = componentVersion
-    ? getUrlWithVersion(componentName, componentVersion)
-    : getUrlWithLatest(componentName);
+  const url = componentVersion ? getUrlWithVersion(componentName, componentVersion) : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
   try {
     const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
@@ -101,11 +96,5 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
 };
 
 export const getComponentCachePath = (componentName: string, componentVersion?: string) => {
-  return path.join(
-    getRootHome(),
-    'components',
-    'devsapp.cn',
-    'v3',
-    componentVersion ? `${componentName}@${componentVersion}` : componentName,
-  );
+  return path.join(getRootHome(), 'components', 'devsapp.cn', 'v3', componentVersion ? `${componentName}@${componentVersion}` : componentName);
 };

@@ -73,21 +73,21 @@ class Download {
           const file = fs.createWriteStream(filePath);
           file.on('open', () => {
             response
-              .on('data', (chunk) => {
+              .on('data', chunk => {
                 file.write(chunk);
               })
               .on('end', () => {
                 file.end();
                 resolve(filePath);
               })
-              .on('error', (err) => {
+              .on('error', err => {
                 file.destroy();
                 fs.unlink(dest, () => reject(err));
               });
           });
         } else if (response.statusCode === 302 || response.statusCode === 301) {
           // Recursively follow redirects, only a 200 will resolve.
-          this.doDownload(response.headers.location as string).then((val) => resolve(val));
+          this.doDownload(response.headers.location as string).then(val => resolve(val));
         } else {
           reject({
             code: response.statusCode,

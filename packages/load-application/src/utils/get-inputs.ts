@@ -1,10 +1,6 @@
 import { isEmpty } from 'lodash';
 
-export const getInputs = (
-  inputs: Record<string, any> = {},
-  context: Record<string, any> = {},
-  artTemplate: any,
-) => {
+export const getInputs = (inputs: Record<string, any> = {}, context: Record<string, any> = {}, artTemplate: any) => {
   if (isEmpty(inputs)) return;
   function deepCopy(obj: any) {
     let result: any = obj.constructor === Array ? [] : {};

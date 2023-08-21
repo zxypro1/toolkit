@@ -17,5 +17,4 @@ export const getDetailUrl = (name: string) => `${baseUrl}/packages/${name}/relea
 // ** 获取最新版本的 ** //
 export const getDetailLatestUrl = (name: string) => `${baseUrl}/packages/${name}/release/latest`;
 
-export const getPackageUrl = (name: string, versionId: string) =>
-  `${baseUrl}/packages/${name}/release/tags/${versionId}`;
+export const getPackageUrl = (name: string, versionId: string) => `${baseUrl}/packages/${name}/release/tags/${versionId}`;

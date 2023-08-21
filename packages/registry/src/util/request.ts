@@ -4,20 +4,17 @@ import http from 'http';
 import querystring from 'querystring';
 import { registry } from '@serverless-devs/utils';
 
-export const new_request_get = async (
-  url: string,
-  headers?: Record<string, string>,
-): Promise<{ request_id: string; body: any }> => {
+export const new_request_get = async (url: string, headers?: Record<string, string>): Promise<{ request_id: string; body: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const res: any = [];
     pkg.get(
       uri.href,
       {
         headers,
       },
-      (response) => {
+      response => {
         response.on('data', (chunk: any) => {
           res.push(chunk);
         });
@@ -30,10 +27,7 @@ export const new_request_get = async (
   });
 };
 
-export const new_request_post = async (
-  url: string,
-  body?: Record<string, any>,
-): Promise<{ request_id: string; body: any }> => {
+export const new_request_post = async (url: string, body?: Record<string, any>): Promise<{ request_id: string; body: any }> => {
   const headers = registry.getSignHeaders();
 
   const uri = new URL(url);
@@ -49,9 +43,9 @@ export const new_request_post = async (
     },
   };
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const res: any = [];
-    const request = pkg.request(options, (response) => {
+    const request = pkg.request(options, response => {
       response.on('data', (chunk: any) => {
         res.push(chunk);
       });
@@ -68,9 +62,7 @@ export const new_request_post = async (
   });
 };
 
-export const new_request_remove = async (
-  url: string,
-): Promise<{ request_id: string; body: any }> => {
+export const new_request_remove = async (url: string): Promise<{ request_id: string; body: any }> => {
   const uri = new URL(url);
   const pkg = url.toLowerCase().startsWith('https:') ? https : http;
   const headers = registry.getSignHeaders();
@@ -85,9 +77,9 @@ export const new_request_remove = async (
     },
   };
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const res: any = [];
-    const request = pkg.request(options, (response) => {
+    const request = pkg.request(options, response => {
       response.on('data', (chunk: any) => {
         res.push(chunk);
       });
@@ -109,9 +101,9 @@ export const request_put = async (url: string, filePath: string): Promise<any> =
   };
   const contents = fs.readFileSync(filePath);
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const res: any = [];
-    const request = pkg.request(uri, options, (response) => {
+    const request = pkg.request(uri, options, response => {
       response.on('data', (chunk: any) => {
         res.push(chunk);
       });

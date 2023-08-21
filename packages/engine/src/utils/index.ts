@@ -45,19 +45,13 @@ export const stringify = (value: any) => {
   }
 };
 
-export const getAllowFailure = (
-  allowFailure: boolean | IAllowFailure | undefined,
-  data: { exitCode?: number; command?: string },
-): boolean => {
+export const getAllowFailure = (allowFailure: boolean | IAllowFailure | undefined, data: { exitCode?: number; command?: string }): boolean => {
   if (typeof allowFailure === 'boolean') {
     return allowFailure;
   }
   if (typeof allowFailure !== 'object') return false;
   if ('exit_code' in allowFailure && 'command' in allowFailure) {
-    return (
-      includes(get(allowFailure, 'exit_code'), get(data, 'exitCode')) &&
-      includes(get(allowFailure, 'command'), get(data, 'command'))
-    );
+    return includes(get(allowFailure, 'exit_code'), get(data, 'exitCode')) && includes(get(allowFailure, 'command'), get(data, 'command'));
   }
   if ('exit_code' in allowFailure) {
     return includes(get(allowFailure, 'exit_code'), get(data, 'exitCode'));

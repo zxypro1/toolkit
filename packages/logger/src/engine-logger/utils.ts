@@ -35,11 +35,11 @@ class Transport {
   transportSecrets = (message: string) => {
     const secrets = this.secrets;
 
-    const newSecrets = filter(secrets, (secret) => !isEmpty(secret));
+    const newSecrets = filter(secrets, secret => !isEmpty(secret));
 
     let msg = message;
     if (!isEmpty(secrets)) {
-      each(newSecrets, (str) => {
+      each(newSecrets, str => {
         if (includes(msg, str)) {
           const re = new RegExp(str, 'g');
           msg = replace(msg, re, mark(str));

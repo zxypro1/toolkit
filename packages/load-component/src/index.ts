@@ -27,10 +27,7 @@ export class Component {
     const lockInfo = readJson(lockPath);
     const { zipballUrl, version } = await getZipballUrl(componentName, componentVersion);
     if (semver.lte(version, lockInfo.version)) {
-      return fs.writeFileSync(
-        lockPath,
-        JSON.stringify({ version: lockInfo.version, lastUpdateCheck: Date.now() }),
-      );
+      return fs.writeFileSync(lockPath, JSON.stringify({ version: lockInfo.version, lastUpdateCheck: Date.now() }));
     }
     await download(zipballUrl, {
       dest: componentCachePath,
