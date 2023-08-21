@@ -158,7 +158,7 @@ class ParseSpec {
     const fn = (projects: string[] = [], index: number) => {
       for (const project of projects) {
         for (const step of steps) {
-          if (includes(project, step.projectName)) {
+          if (project === step.projectName) {
             newSteps.push({ ...step, flowId: index });
             projectOrder[step.projectName] = index;
           }

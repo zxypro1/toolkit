@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/ignore-walk",
-  "version": "0.0.2-beta.3",
+  "version": "0.0.2-beta.4",
   "description": "ignore-walk for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
