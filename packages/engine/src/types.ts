@@ -70,6 +70,7 @@ export interface IContext {
   inputs: Record<string, any>; // 记录inputs的输入(魔法变量)
   error: IEngineError[]; // 记录step的错误信息
   output: Record<string, any>; // 记录step的输出
+  credential: Record<string, any>; // 尝试获取到的密钥信息
 }
 
 export type IEngineError = Error | AssertionError | DevsError;

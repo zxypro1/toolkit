@@ -130,6 +130,7 @@ class Engine {
       skipActions: this.spec.skipActions,
     });
     const credential = await getCredential(access, this.logger);
+    this.context.credential = credential;
     // 处理 global-pre
     try {
       this.globalActionInstance.setValue('magic', this.getFilterContext());

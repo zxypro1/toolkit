@@ -15,7 +15,7 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
   async start() {
     const { steps, content } = await this.getSteps();
     return {
@@ -98,6 +98,7 @@ class ParseContent {
     }
     return { steps, content: this.content };
   }
+  // TODO:后续可以删除 项目的access
   private getAccess(data: Record<string, any>) {
     // 全局的access > 项目的access > yaml的access
     if (this.options.access) return this.options.access;
