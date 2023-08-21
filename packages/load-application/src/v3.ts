@@ -77,8 +77,8 @@ class LoadApplication {
     this.filePath = path.join(this.options.dest, this.options.projectName);
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
-  async run(): Promise<string> {
-    if (!(await this.check())) return this.filePath;
+  async run(): Promise<string | undefined> {
+    if (!(await this.check())) return;
     /**
      * 1. 下载模板
      */
