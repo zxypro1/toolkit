@@ -318,6 +318,9 @@ importers:
       dotenv:
         specifier: ^16.2.0
         version: 16.2.0
+      dotenv-expand:
+        specifier: ^10.0.0
+        version: 10.0.0
       extend2:
         specifier: ^1.0.1
         version: 1.0.1
@@ -408,7 +411,7 @@ importers:
         version: 0.0.1
       '@serverless-devs/progress-bar':
         specifier: ^0.0.1
-        version: link:../progress-bar
+        version: 0.0.1
       archiver:
         specifier: ^5.3.1
         version: 5.3.1
@@ -1131,6 +1134,13 @@ packages:
     resolution: {integrity: sha512-Ma0h397U/JDt0YrDcIRkI5G9yDDng1E3RR5z4M5lORYEua4xR7LF1UoG8JvueeeEAhjy4gTbzf1u8uWLWiVmaQ==}
     dependencies:
       minimatch: 5.0.0
+    dev: false
+
+  /@serverless-devs/progress-bar@0.0.1:
+    resolution: {integrity: sha512-sgP/+7uwhTbqM907jEfE4VkijzVvqmRwXLabHRTAyQmUcJt+v+rBVqSefnJbxtCnJCmYnXPvkBuWMUbKLFua5Q==}
+    dependencies:
+      chalk: 4.1.2
+      progress: 2.0.3
     dev: false
 
   /@sinclair/typebox@0.25.24:
@@ -1964,6 +1974,11 @@ packages:
     resolution: {integrity: sha512-ofrBgwpPhCD85kMKtE9RYFFq6OC1A89oW2vvgWZNCwxrUpRUILopY7lsYyMDSjc8g6U6aiO0Qubg6r4Wgt5ZnA==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dev: true
+
+  /dotenv-expand@10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
+    engines: {node: '>=12'}
+    dev: false
 
   /dotenv@16.2.0:
     resolution: {integrity: sha512-jcq2vR1DY1+QA+vH58RIrWLDZOifTGmyQJWzP9arDUbgZcySdzuBb1WvhWZzZtiXgfm+GW2pjBqStqlfpzq7wQ==}

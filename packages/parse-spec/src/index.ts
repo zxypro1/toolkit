@@ -5,6 +5,8 @@ export * from './types';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
+import dotenv from 'dotenv';
+import { expand } from 'dotenv-expand';
 import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import order from './order';
@@ -48,7 +50,7 @@ class ParseSpec {
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
     this.yaml.appName = get(this.yaml.content, 'name');
-    require('dotenv').config({ path: path.join(path.dirname(this.yaml.path), '.env') });
+    expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env') }));
   }
   private async doExtend() {
     this.yaml.content = utils.getYamlContent(this.yaml.path);
@@ -56,7 +58,7 @@ class ParseSpec {
     this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
     if (this.yaml.useExtend) {
       const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
-      require('dotenv').config({ path: path.join(extendPath, '.env') });
+      expand(dotenv.config({ path: path.join(extendPath, '.env') }));
       const extendContent = utils.getYamlContent(extendPath);
       this.yaml.use3x = String(get(this.yaml.content, 'edition', get(extendContent, 'edition'))) === '3.0.0';
       // 1.x 不做extend动作

@@ -1,4 +1,4 @@
-import { each, endsWith, assign, set, intersection } from 'lodash';
+import { each, endsWith, assign, set, intersection, isNil } from 'lodash';
 import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from '../constant';
 import { getYamlContent } from '../utils';
 import decryptCredential from './decrypt';
@@ -43,7 +43,6 @@ export const getAccessFile = () => {
  */
 export const getEnvKeyPair = (): undefined | IResult => {
   const envKeys = Object.keys(process.env);
-
   if (intersection(envKeys, KEY_PAIR_IMPORTANT).length === KEY_PAIR_IMPORTANT.length) {
     const credential: Record<string, string> = {};
 
@@ -63,5 +62,10 @@ export default (): IAccessList => {
   const envResult = getEnvironment();
   const yamlResult = getAccessFile();
 
-  return assign(getEnvKeyPair(), yamlResult, envResult);
+  const data = getEnvKeyPair();
+  const first = {};
+  if (!isNil(data)) {
+    set(first, data.access, data.credential);
+  }
+  return assign(first, yamlResult, envResult);
 };

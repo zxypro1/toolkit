@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/parse-spec",
-  "version": "0.0.1-beta.26",
+  "version": "0.0.1-beta.27",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -27,6 +27,7 @@
     "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",
     "dotenv": "^16.2.0",
+    "dotenv-expand": "^10.0.0",
     "extend2": "^1.0.1",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21"
