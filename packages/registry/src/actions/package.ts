@@ -77,9 +77,9 @@ function getFlowsYaml(str: string | undefined, codeUri: string) {
   forEach(resources, (value: any, key: string) => {
     const component: string = get(value, 'component', '');
     const definition: string = get(value, 'props.definition', '');
-    const fnfComponents = ['devsapp/fnf', 'fnf', 'devsapp/fnf@dev', 'fnf@dev']
+    const fnfComponents = ['devsapp/fnf', 'fnf', 'devsapp/fnf@dev', 'fnf@dev'];
     if (includes(fnfComponents, component) && definition) {
-      definitionPaths[key] = definition
+      definitionPaths[key] = definition;
     }
   });
   if (isEmpty(definitionPaths)) return [];

@@ -375,7 +375,7 @@ class LoadApplication {
     const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
     debug(`res: ${JSON.stringify(res.data)}`);
     const zipball_url = get(res, 'data.body.zipball_url');
-    const template = this.version ? `${this.name}@${this.version}` : this.name
+    const template = this.version ? `${this.name}@${this.version}` : this.name;
     if (isEmpty(zipball_url)) throw new Error(`Application ${template} is not found`);
     return zipball_url;
   };
