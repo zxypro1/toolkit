@@ -7,7 +7,7 @@ import logger from '../util/logger';
 import path from 'path';
 import yaml from 'js-yaml';
 import querystring from 'querystring';
-import { forEach, get, isEmpty } from 'lodash';
+import { forEach, get, isEmpty, includes } from 'lodash';
 
 interface IRequest {
   /**
@@ -70,15 +70,16 @@ function checkEdition(str: string) {
 
 function getFlowsYaml(str: string | undefined, codeUri: string) {
   if (!str) {
-    throw new Error('Need to s YAML content');
+    return {};
   }
   const { resources } = yaml.load(str) as Record<string, any>;
   const definitionPaths: any = {};
   forEach(resources, (value: any, key: string) => {
     const component: string = get(value, 'component', '');
     const definition: string = get(value, 'props.definition', '');
-    if ((component === 'devsapp/fnf' || component === 'fnf') && definition) {
-      definitionPaths[key] = definition;
+    const fnfComponents = ['devsapp/fnf', 'fnf', 'devsapp/fnf@dev', 'fnf@dev']
+    if (includes(fnfComponents, component) && definition) {
+      definitionPaths[key] = definition
     }
   });
   if (isEmpty(definitionPaths)) return [];
@@ -100,7 +101,6 @@ async function getUploadUrl(codeUri: string): Promise<string> {
   const versionEnMd = getContentText(path.join(codeUri, 'version_body_en.md'));
   const readme = getContentText(path.join(codeUri, 'readme.md'));
   const readmeEn = getContentText(path.join(codeUri, 'readme_en.md'));
-
   const requestBodyIRequest: IRequest = {
     publish: publishYaml,
     publish_en: publishEnYaml,
