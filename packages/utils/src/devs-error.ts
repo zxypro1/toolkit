@@ -14,6 +14,16 @@ interface IOptions {
 class DevsError extends Error {
   readonly CODE = 'DevsError';
   static readonly CODE = 'DevsError';
+  exitCode?: number;
+  prefix?: string;
+  tips?: string;
+  data?: {
+    RequestID: string;
+    Code: string;
+    Message: string;
+    statusCode: number;
+  };
+  stack?: string;
   constructor(message: string, options: IOptions = {}) {
     super(message);
     for (const key in options) {
