@@ -376,9 +376,6 @@ class LoadApplication {
   private async doLoad() {
     const { logger } = this.options;
     const zipball_url = this.version ? await this.doZipballUrlWithVersion() : await this.doZipballUrl();
-    if (isEmpty(zipball_url)) {
-      throw new Error('zipball_url is empty');
-    }
     await download(zipball_url, {
       dest: this.tempPath,
       logger,
@@ -397,7 +394,7 @@ class LoadApplication {
     const res = await axios.get(url);
     debug(`res: ${JSON.stringify(res.data)}`);
     const zipball_url = get(res, 'data.Response.zipball_url');
-    if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);
+    if (isEmpty(zipball_url)) throw new Error(`Application ${this.name} is not found`);
     return zipball_url;
   }
   private async doZipballUrlWithVersion() {
@@ -411,7 +408,7 @@ class LoadApplication {
     debug(`res: ${JSON.stringify(res.data)}`);
     const obj = find(get(res, 'data.Response'), (item: any) => item.tag_name === this.version);
     if (isEmpty(obj)) {
-      throw new Error(`${this.name}@${this.version} is not found`);
+      throw new Error(`Application ${this.name}@${this.version} is not found`);
     }
     return obj.zipball_url;
   }
