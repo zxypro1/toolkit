@@ -1,5 +1,6 @@
 import { IPropsOptions, IMateValue } from './types';
 import { blackBright, greenBright } from 'chalk';
+import { transport } from '../utils';
 const CliProgressFooter = require('cli-progress-footer');
 
 export default class ProgressFooter extends Map<string, IMateValue> {
@@ -50,12 +51,12 @@ export default class ProgressFooter extends Map<string, IMateValue> {
       const config = this.get(id) as IMateValue;
       this.set(id, {
         ...config,
-        message,
+        message: transport.transportSecrets(message),
       });
     } else {
       this.set(id, {
         timer: new Date().getTime(),
-        message,
+        message: transport.transportSecrets(message),
       });
     }
     this.reader();

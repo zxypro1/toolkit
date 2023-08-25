@@ -5,7 +5,7 @@ import prettyjson, { RendererOptions } from 'prettyjson';
 import os from 'os';
 import ConsoleTransport from './console-transport';
 import FileTransport from './file-transport';
-import { transport } from './utils';
+import { transport } from '../utils';
 import { IOptions } from './type';
 import chalk from 'chalk';
 

@@ -3,7 +3,7 @@ import path from 'path';
 import { IOptions } from './type';
 import EngineLogger from './engine-logger';
 import ProgressFooter from './progress-footer';
-import { transport } from './engine-logger/utils';
+import { transport } from './utils';
 import * as stdoutFormatter from './stdout-formatter';
 
 export { default as EngineLogger } from './engine-logger';
@@ -60,7 +60,7 @@ export default class Logger extends Map<string, ILoggerInstance> {
         message = formatFunction(...rest);
       }
       logger.debug(message);
-      this.__progressFooter.upsert(instanceKey, message);
+      this.__progressFooter.upsert(instanceKey, transport.transportSecrets(message));
     };
 
     super.set(instanceKey, logger);

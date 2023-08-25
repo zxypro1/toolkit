@@ -1,6 +1,6 @@
 import { FileTransport as _FileTransport, LoggerMeta, FileTransportOptions } from 'egg-logger';
 import { get } from 'lodash';
-import { transport, sliceEggLoggerFormatterTime } from './utils';
+import { transport, sliceEggLoggerFormatterTime } from '../utils';
 
 export default class FileTransport extends _FileTransport {
   constructor(options: FileTransportOptions) {

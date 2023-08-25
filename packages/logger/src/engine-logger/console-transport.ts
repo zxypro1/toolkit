@@ -1,7 +1,7 @@
 import { LoggerLevel, ConsoleTransport as _ConsoleTransport, LoggerMeta } from 'egg-logger';
 import chalk from 'chalk';
 import { get } from 'lodash';
-import { transport, sliceEggLoggerFormatterTime } from './utils';
+import { transport, sliceEggLoggerFormatterTime } from '../utils';
 import { ConsoleTransportOptions } from './type';
 
 export default class ConsoleTransport extends _ConsoleTransport {
