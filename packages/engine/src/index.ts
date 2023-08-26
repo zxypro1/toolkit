@@ -43,19 +43,27 @@ export * from './types';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
+/**
+ * Engine Class
+ * 
+ * This class provides an engine to handle Serverless Devs operations and steps.
+ * It operates based on the xstate state machine library, ensuring that execution follows 
+ * the predefined flow and states.
+ */
 class Engine {
   public context = {
-    status: STEP_STATUS.PENING,
+    status: STEP_STATUS.PENDING,
     completed: false,
     error: [] as IEngineError[],
   } as IContext;
-  private record = { status: STEP_STATUS.PENING, editStatusAble: true } as IRecord;
+  private record = { status: STEP_STATUS.PENDING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
   private glog!: Logger;
   private logger!: ILoggerInstance;
   private parseSpecInstance!: ParseSpec;
   private globalActionInstance!: Actions; // 全局的 action
   private actionInstance!: Actions; // 项目的 action
+
   constructor(private options: IEngineOptions) {
     debug('engine start');
     // 初始化参数
@@ -64,6 +72,10 @@ class Engine {
     this.options.template = utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
+
+  /**
+   * Initialization steps before starting the engine.
+   */
   private async beforeStart() {
     // 初始化 logger
     this.glog = this.getLogger() as Logger;
@@ -83,9 +95,19 @@ class Engine {
     this.validate();
     this.context.steps = await this.download(_steps);
   }
-  // engine应收敛所有的异常，不应该抛出异常
+
+  /**
+   * Start the engine.
+   * 
+   * This is the primary execution function for the engine. It is responsible for starting 
+   * the entire engine and handling each step.
+   * 
+   * @note engine应收敛所有的异常，不应该抛出异常 
+   */
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
+    // Haoran: should set this.record.status to RUNNING?
+    this.record.status = STEP_STATUS.RUNNING;
     try {
       await this.beforeStart();
     } catch (error) {
@@ -118,14 +140,18 @@ class Engine {
       await this.doCompleted();
       return this.context;
     }
+
+    // Assign the id, pending status and etc for all steps.
     this.context.steps = map(this.context.steps, (item) => {
-      return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENING, done: false };
+      return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENDING, done: false };
     });
     const res: IContext = await new Promise(async (resolve) => {
+      // Every states object has two fixed states, "init" and "final".
       const states: any = {
         init: {
           on: {
-            INIT: get(this.context.steps, '[0].stepCount'),
+            // Haoran: May this.context.steps be empty?
+            INIT: this.context.steps.length === 0 ? 'final' : get(this.context.steps, '[0].stepCount'),
           },
         },
         final: {
@@ -149,6 +175,7 @@ class Engine {
         },
       };
 
+      // Every states object has dynamic state, that based on the step.StepCount.
       each(this.context.steps, (item, index) => {
         const target = this.context.steps[index + 1]
           ? get(this.context.steps, `[${index + 1}].stepCount`)
@@ -194,6 +221,11 @@ class Engine {
     this.glog.__clear();
     return res;
   }
+
+  /**
+   * Extracts and returns an object containing the output of each step.
+   * The object's key is the project name and the value is the output of that project.
+   */
   private getOutput() {
     const output = {};
     each(this.context.steps, (item) => {
@@ -203,11 +235,22 @@ class Engine {
     });
     return output;
   }
+
+  /**
+   * Validates the 'steps' and 'command' present in 'this.spec'.
+   * Throws an error if either 'steps' or 'command' are missing.
+   */
   private validate() {
     const { steps, command } = this.spec;
     assert(!isEmpty(steps), 'steps is required');
     assert(command, 'command is required');
   }
+
+  /**
+   * Asynchronously downloads and initializes the given steps.
+   * For each step, it loads the specified component and associates a logger with it.
+   * Returns an array containing the initialized steps.
+   */
   private async download(steps: IParseStep[]) {
     const newSteps = [];
     for (const step of steps) {
@@ -220,6 +263,7 @@ class Engine {
     }
     return newSteps;
   }
+
   private getLogger() {
     const customLogger = get(this.options, 'logConfig.customLogger');
     if (customLogger) {
@@ -236,6 +280,13 @@ class Engine {
       level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),
     });
   }
+
+  /**
+   * Updates the context for the given step based on the provided options.
+   *
+   * @param item - The current step being processed.
+   * @param options - An object containing details like status, error, output, etc. to update the step's context.
+   */
   private recordContext(item: IStepOptions, options: Record<string, any> = {}) {
     const { status, error, output, process_time, props, done } = options;
     this.context.stepCount = item.stepCount as string;
@@ -264,6 +315,12 @@ class Engine {
       return obj;
     });
   }
+
+  /**
+   * Generates a context data for the given step containing details like cwd, vars, and other steps' outputs and props.
+   * @param item - The current step being processed.
+   * @returns - The generated context data.
+   */
   private getFilterContext(item?: IStepOptions) {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
@@ -285,6 +342,14 @@ class Engine {
     }
     return data;
   }
+
+  /**
+   * Handles the subsequent operations after a step has been completed.
+   * 1. Marks the step as completed.
+   * 2. If the step status is FAILURE, attempts to trigger the global FAIL hook.
+   * 3. If the step status is SUCCESS, attempts to trigger the global SUCCESS hook.
+   * 4. Regardless of the step's status, tries to trigger the global COMPLETE hook to denote completion.
+   */
   private async doCompleted() {
     this.context.completed = true;
     if (this.context.status === STEP_STATUS.FAILURE) {
@@ -310,13 +375,20 @@ class Engine {
       this.context.error.push(error as DevsError);
     }
   }
+
+  /**
+   * Handles the execution process for a project step.
+   * @param item - The project step to handle.
+   */
   private async handleSrc(item: IStepOptions) {
     const { command } = this.spec;
+
+    // Attempt to execute pre-hook and component logic for the project step.
     try {
       // project pre hook and project component
       await this.handleAfterSrc(item);
     } catch (error) {
-      // project fail hook
+      // On error, attempt to trigger the project's fail hook and update the recorded context.
       try {
         const res = await this.actionInstance.start(IHookType.FAIL, this.record.componentProps);
         this.recordContext(item, get(res, 'pluginOutput', {}));
@@ -325,7 +397,9 @@ class Engine {
         this.recordContext(item, { error });
       }
     }
+
     // 若记录的全局状态为true，则进行输出成功的日志
+    // If the global record status is SUCCESS, attempt to trigger the project's success hook.
     if (this.record.status === STEP_STATUS.SUCCESS) {
       // project success hook
       try {
@@ -341,7 +415,8 @@ class Engine {
         this.recordContext(item, { error });
       }
     }
-    // project complete hook
+
+    // Attempt to trigger the project's complete hook regardless of status.
     try {
       const res = await this.actionInstance.start(IHookType.COMPLETE, {
         ...this.record.componentProps,
@@ -352,10 +427,12 @@ class Engine {
       this.record.status = STEP_STATUS.FAILURE;
       this.recordContext(item, { error });
     }
+
     // 记录项目已经执行完成
     const process_time = getProcessTime(this.record.startTime);
     this.recordContext(item, { done: true, process_time });
 
+    // Log output based on the record status.
     if (this.record.status === STEP_STATUS.SUCCESS) {
       this.logger.write(
         `${chalk.green('✔')} ${chalk.gray(`[${item.projectName}] completed (${process_time}s)`)}`,
@@ -368,17 +445,31 @@ class Engine {
         )}`,
       );
     }
+
     // step执行完成后，释放logger
     this.glog.__unset(item.projectName);
   }
+
+  /**
+   * Handles the logic after a project step's execution.
+   * @param item - The project step to handle.
+   */
   private async handleAfterSrc(item: IStepOptions) {
     try {
+      // Print detailed information of the project step for debugging purposes.
       debug(`project item: ${stringify(item)}`);
+
+      // Extract the command from the specification.
       const { command } = this.spec;
+
+      // Retrieve the credentials for the project step.
       item.credential = await getCredential(item.access, this.logger);
+      // Set a secret for each credential.
       each(item.credential, (v) => {
         this.glog.__setSecret([v]);
       });
+
+      // Parse actions for the project step and initialize a new action instance.
       const newAction = this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
       debug(`project actions: ${JSON.stringify(newAction)}`);
       this.actionInstance = new Actions(newAction, {
@@ -387,18 +478,29 @@ class Engine {
         logger: item.logger,
         skipActions: this.spec.skipActions,
       });
+
+      // Set values for the action instance.
       this.actionInstance.setValue('magic', this.getFilterContext(item));
       this.actionInstance.setValue('step', item);
       this.actionInstance.setValue('command', command);
+
+      // Retrieve properties for the project step.
       const newInputs = await this.getProps(item);
+<<<<<<< HEAD
       this.actionInstance.setValue('componentProps', newInputs);
+=======
+
+      // Start the pre-hook and execute the logic for the project step.
+>>>>>>> 1e0222a (Add comments and unit tests for engine.)
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
+
       // 记录全局的执行状态
       if (this.record.editStatusAble) {
         this.record.status = STEP_STATUS.SUCCESS;
       }
-      // id 添加状态
+
+      // If the project step has an ID, update the corresponding record status and output.
       if (item.id) {
         this.record.steps = {
           ...this.record.steps,
@@ -408,11 +510,16 @@ class Engine {
           },
         };
       }
+
+      // Update the project step's context to SUCCESS.
       this.recordContext(item, { status: STEP_STATUS.SUCCESS, output: response });
     } catch (e) {
       const error = e as Error;
+
+      // Determine the status based on the project step's "continue-on-error" attribute.
       const status =
         item['continue-on-error'] === true ? STEP_STATUS.ERROR_WITH_CONTINUE : STEP_STATUS.FAILURE;
+
       // 记录全局的执行状态
       if (this.record.editStatusAble) {
         this.record.status = status as IStatus;
@@ -421,6 +528,8 @@ class Engine {
         // 全局的执行状态一旦失败，便不可修改
         this.record.editStatusAble = false;
       }
+
+      // If the project step has an ID, update the corresponding record status.
       if (item.id) {
         this.record.steps = {
           ...this.record.steps,
@@ -429,6 +538,8 @@ class Engine {
           },
         };
       }
+
+      // Handle the error based on the project step's "continue-on-error" attribute.
       if (item['continue-on-error']) {
         this.recordContext(item, { status });
       } else {
@@ -437,6 +548,12 @@ class Engine {
       }
     }
   }
+
+  /**
+   * Retrieve properties for a specific project step.
+   * @param item - The project step for which properties are to be retrieved.
+   * @returns An object containing properties related to the project step.
+   */
   private async getProps(item: IStepOptions) {
     const magic = this.getFilterContext(item);
     debug(`magic context: ${JSON.stringify(magic)}`);
@@ -466,12 +583,27 @@ class Engine {
     debug(`get props: ${JSON.stringify(result)}`);
     return result;
   }
+
+  /**
+   * Executes the appropriate action based on the provided project step.
+   * @param item - The project step to be executed.
+   * @param data - Additional data which may contain plugin output.
+   * @returns Result of the executed action, if applicable.
+   */
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
+    // Extract command and projectName from the specification.
     const { command = '', projectName } = this.spec;
+
+    // Retrieve properties for the given project step.
     const newInputs = await this.getProps(item);
+
+    // Set component properties based on the provided data or the newly retrieved properties.
     this.record.componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;
+
     debug(`component props: ${stringify(this.record.componentProps)}`);
+
     this.actionInstance.setValue('componentProps', this.record.componentProps);
+
     // 服务级操作
     if (projectName) {
       if (isFunction(item.instance[command])) {
@@ -499,11 +631,10 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${
-          item.component
-        } has the ${command} command. Serverless Devs documents：${chalk.underline(
-          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-        )}`,
+        tips: `Please check the component ${item.component
+          } has the ${command} command. Serverless Devs documents：${chalk.underline(
+            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+          )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
       });
     }
@@ -531,8 +662,14 @@ class Engine {
       `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`,
     );
   }
+
+  /**
+   * Handles the project step that is marked to be skipped.
+   * @param item - The project step to be skipped.
+   * @returns A resolved Promise.
+   */
   private async doSkip(item: IStepOptions) {
-    // id 添加状态
+    // If the step has an 'id', set its status to 'SKIP' in the record.
     if (item.id) {
       this.record.steps = {
         ...this.record.steps,
@@ -541,7 +678,10 @@ class Engine {
         },
       };
     }
+
+    // Mark the step's status as 'SKIP' and set its processing time to 0.
     this.recordContext(item, { status: STEP_STATUS.SKIP, process_time: 0 });
+
     return Promise.resolve();
   }
 }

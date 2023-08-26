@@ -40,7 +40,7 @@ export enum STEP_STATUS_BASE {
   SUCCESS = 'success',
   FAILURE = 'failure',
   RUNNING = 'running',
-  PENING = 'pending',
+  PENDING = 'pending',
   ERROR_WITH_CONTINUE = 'error-with-continue',
 }
 
