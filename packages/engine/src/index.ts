@@ -45,9 +45,9 @@ const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
 /**
  * Engine Class
- * 
+ *
  * This class provides an engine to handle Serverless Devs operations and steps.
- * It operates based on the xstate state machine library, ensuring that execution follows 
+ * It operates based on the xstate state machine library, ensuring that execution follows
  * the predefined flow and states.
  */
 class Engine {
@@ -98,11 +98,11 @@ class Engine {
 
   /**
    * Start the engine.
-   * 
-   * This is the primary execution function for the engine. It is responsible for starting 
+   *
+   * This is the primary execution function for the engine. It is responsible for starting
    * the entire engine and handling each step.
-   * 
-   * @note engine应收敛所有的异常，不应该抛出异常 
+   *
+   * @note engine应收敛所有的异常，不应该抛出异常
    */
   async start() {
     this.context.status = STEP_STATUS.RUNNING;
@@ -151,7 +151,8 @@ class Engine {
         init: {
           on: {
             // Haoran: May this.context.steps be empty?
-            INIT: this.context.steps.length === 0 ? 'final' : get(this.context.steps, '[0].stepCount'),
+            INIT:
+              this.context.steps.length === 0 ? 'final' : get(this.context.steps, '[0].stepCount'),
           },
         },
         final: {
@@ -631,10 +632,11 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${item.component
-          } has the ${command} command. Serverless Devs documents：${chalk.underline(
-            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-          )}`,
+        tips: `Please check the component ${
+          item.component
+        } has the ${command} command. Serverless Devs documents：${chalk.underline(
+          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+        )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
       });
     }
