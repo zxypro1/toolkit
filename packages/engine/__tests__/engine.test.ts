@@ -93,6 +93,7 @@ const mockSteps = [{
     access: 'mock-access',
     logger: mockLogger,
     stepCount: '1',
+    credential: {},
 }]
 
 const mockYaml = {
