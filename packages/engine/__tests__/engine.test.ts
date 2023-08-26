@@ -1,7 +1,5 @@
 jest.mock('@serverless-devs/load-component');
 
-//jest.mock('xstate');
-
 import OriginalParseSpec, {
     ISpec,
     IStep,
@@ -114,17 +112,12 @@ const mockYaml = {
     projects: {}
 }
 
-const mockAction = {
-    start: jest.fn,
-    setValue: jest.fn,
-};
-
 jest.mock('../src/actions', () => {
     const realImports = jest.requireActual('../src/actions');
     function MockActions() { }
     MockActions.prototype = Object.create(realImports.default.prototype);
     MockActions.prototype.start = jest.fn();
-    MockActions.prototype.setValue = jest.fn;
+    MockActions.prototype.setValue = jest.fn();
     return {
         // Make Jest know it should be treated as a ES6 module and mock the default export correctly.
         // Ortherwise we should get the "TypeError: parse_spec_1.default is not a constructor" error.
@@ -184,6 +177,7 @@ import ParseSpec from '@serverless-devs/parse-spec';
 import chalk from 'chalk';
 import { fail } from 'assert';
 import { getCredential } from '../src/utils';
+import Actions from '../src/actions';
 
 describe('Engine Class', () => {
     let engine: Engine;
@@ -198,7 +192,7 @@ describe('Engine Class', () => {
         engine = new Engine(mockOptions);
         (engine as any).glog = (engine as any).getLogger() as Logger;
         (engine as any).logger = mockLogger;
-        (engine as any).actionInstance = mockAction;
+        (engine as any).actionInstance = new Actions();
         (engine as any).parseSpecInstance = new ParseSpec();
         mockDownload = jest.spyOn(engine as any, 'download');
         mockDownload.mockImplementation(() => Promise.resolve());
@@ -242,7 +236,7 @@ describe('Engine Class', () => {
     describe('start() method', () => {
         it('should set initial status to RUNNING and handle no steps', async () => {
             // Mock necessary functions to make sure success.
-            (engine as any).globalActionInstance = mockAction;
+            (engine as any).globalActionInstance = new Actions();
             engine['spec'] = { steps: mockSteps, yaml: mockYaml, command: '' };
             //engine['context'].steps = mockSteps;
             (getCredential as jest.Mock).mockResolvedValue('mocked-credential');
@@ -273,7 +267,7 @@ describe('Engine Class', () => {
         });
 
         it('should handle global pre-hook failure', async () => {
-            (engine as any).globalActionInstance = mockAction;
+            (engine as any).globalActionInstance = new Actions();
             jest.spyOn(engine as any, 'beforeStart').mockResolvedValue(undefined);
             jest.spyOn(engine as any, 'doSkip').mockResolvedValue(undefined);
             jest.spyOn(engine as any, 'doCompleted').mockResolvedValue(undefined);
@@ -293,7 +287,7 @@ describe('Engine Class', () => {
 
         it('should skip subsequent steps if global status is FAILURE', async () => {
             // Mock necessary functions to make sure success.
-            (engine as any).globalActionInstance = mockAction;
+            (engine as any).globalActionInstance = new Actions();
             engine['spec'] = { steps: mockSteps, yaml: mockYaml, command: '' };
             engine['context'].steps = mockSteps;
             (getCredential as jest.Mock).mockResolvedValue('mocked-credential');
@@ -334,7 +328,7 @@ describe('Engine Class', () => {
 
         it('handles step execution success', async () => {
             // Mock necessary functions to make sure success.
-            (engine as any).globalActionInstance = mockAction;
+            (engine as any).globalActionInstance = new Actions();
             engine['spec'] = { steps: mockSteps, yaml: mockYaml, command: '' };
             engine['context'].steps = mockSteps;
             (getCredential as jest.Mock).mockResolvedValue('mocked-credential');
