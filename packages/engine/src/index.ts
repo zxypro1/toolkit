@@ -487,12 +487,9 @@ class Engine {
 
       // Retrieve properties for the project step.
       const newInputs = await this.getProps(item);
-<<<<<<< HEAD
       this.actionInstance.setValue('componentProps', newInputs);
-=======
 
       // Start the pre-hook and execute the logic for the project step.
->>>>>>> 1e0222a (Add comments and unit tests for engine.)
       const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
 
@@ -632,11 +629,10 @@ class Engine {
       // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
-        tips: `Please check the component ${
-          item.component
-        } has the ${command} command. Serverless Devs documents：${chalk.underline(
-          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
-        )}`,
+        tips: `Please check the component ${item.component
+          } has the ${command} command. Serverless Devs documents：${chalk.underline(
+            'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+          )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
       });
     }
