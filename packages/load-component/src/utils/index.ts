@@ -14,7 +14,7 @@ export function readJsonFile(filePath: string) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) { }
+    } catch (error) {}
   }
 }
 
