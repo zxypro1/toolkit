@@ -33,7 +33,7 @@ export class Component {
       dest: componentCachePath,
       filename: `${componentName}${componentVersion ? `@${componentVersion}` : ''}`,
       extract: true,
-      headers: registry.getSignHeaders({ ignoreError: true }),
+      headers: registry.getSignHeaders(),
     });
     fs.writeFileSync(lockPath, JSON.stringify({ version, lastUpdateCheck: Date.now() }));
   }
@@ -55,7 +55,7 @@ export class Component {
       dest: componentCachePath,
       filename: `${componentName}${componentVersion ? `@${componentVersion}` : ''}`,
       extract: true,
-      headers: registry.getSignHeaders({ ignoreError: true }),
+      headers: registry.getSignHeaders(),
     });
     fs.writeFileSync(lockPath, JSON.stringify({ version, lastUpdateCheck: Date.now() }));
     return await buildComponentInstance(componentCachePath, this.params);

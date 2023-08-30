@@ -14,7 +14,7 @@ export function readJsonFile(filePath: string) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) {}
+    } catch (error) { }
   }
 }
 
@@ -81,7 +81,7 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
   const url = componentVersion ? getUrlWithVersion(componentName, componentVersion) : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
   try {
-    const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
+    const res = await axios.get(url, { headers: registry.getSignHeaders() });
     debug(`res: ${JSON.stringify(res.data)}`);
     const zipball_url = get(res, 'data.body.zipball_url');
     if (isEmpty(zipball_url)) throw new Error(`url: ${url} is not found`);

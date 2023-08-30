@@ -365,14 +365,14 @@ class LoadApplication {
       dest: this.tempPath,
       logger,
       extract: true,
-      headers: registry.getSignHeaders({ ignoreError: true }),
+      headers: registry.getSignHeaders(),
       filename: this.name,
     });
   }
   private getZipballUrl = async () => {
     const url = this.version ? getUrlWithVersion(this.name, this.version) : getUrlWithLatest(this.name);
     debug(`url: ${url}`);
-    const res = await axios.get(url, { headers: registry.getSignHeaders({ ignoreError: true }) });
+    const res = await axios.get(url, { headers: registry.getSignHeaders() });
     debug(`res: ${JSON.stringify(res.data)}`);
     const zipball_url = get(res, 'data.body.zipball_url');
     const template = this.version ? `${this.name}@${this.version}` : this.name;

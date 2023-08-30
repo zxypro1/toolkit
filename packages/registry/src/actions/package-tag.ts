@@ -12,6 +12,9 @@ export const detail = async (name: string, page?: string) => {
   const headers = registry.getSignHeaders();
   const { body, request_id } = await request.new_request_get(uri, headers);
   logger.debug(`Get registry ${name} detail responseId: ${request_id}`);
+  if (typeof body === 'string') {
+    throw new Error(body);
+  }
   return body;
 };
 

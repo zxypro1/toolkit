@@ -1,11 +1,12 @@
 {
   "name": "@serverless-devs/registry",
-  "version": "0.0.2-beta.10",
+  "version": "0.0.2-beta.11",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
     "build": "tsc",
+    "watch": "tsc -w",
     "prepublishOnly": "npm run build",
     "pub": "pnpm publish --no-git-checks"
   },
