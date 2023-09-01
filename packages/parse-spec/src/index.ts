@@ -13,7 +13,7 @@ import order from './order';
 import ParseContent from './parse-content';
 import { each, filter, find, get, includes, isEmpty, keys, map, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
-import { REGX } from './contants';
+import { ENVIRONMENT_KEY, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -42,6 +42,8 @@ class ParseSpec {
     throw new Error(`The specified template file does not exist: ${filePath}`);
   }
   private async doYamlinit() {
+    this.yaml.appName = get(this.yaml.content, 'name');
+    this.yaml.useEnvironment = includes(fs.readFileSync(this.yaml.path, 'utf-8'), ENVIRONMENT_KEY)
     await this.doExtend();
     this.yaml.access = get(this.yaml.content, 'access');
     const projectKey = this.yaml.use3x ? 'resources' : 'services';
@@ -49,7 +51,6 @@ class ParseSpec {
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
-    this.yaml.appName = get(this.yaml.content, 'name');
     expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env') }));
   }
   private async doExtend() {
@@ -57,6 +58,13 @@ class ParseSpec {
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
     if (this.yaml.useExtend) {
+      // if environment exist, will conflict to extend
+      if (this.yaml.useEnvironment) {
+        // TODO: text
+        throw new utils.DevsError('environment and extend is conflict', {
+          tips: 'please remove environment or extend in yaml',
+        });
+      }
       const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
       expand(dotenv.config({ path: path.join(extendPath, '.env') }));
       const extendContent = utils.getYamlContent(extendPath);

@@ -75,6 +75,7 @@ export interface IYaml {
   template?: Record<string, any>;
   useFlow?: boolean;
   projects?: Record<string, any>;
+  useEnvironment?: boolean;
 }
 export type ISpec = IRecord & {
   steps: IStep[];
