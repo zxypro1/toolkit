@@ -12,6 +12,7 @@ interface IOptions {
   basePath: string;
   projectName?: string; // 指定项目
   access?: string; // 全局的access
+  environment?: Record<string, any>;
 }
 
 class ParseContent {
@@ -23,8 +24,15 @@ class ParseContent {
       content,
     };
   }
+  private getEnvMagic() {
+    return {
+      __runtime: 'parse',
+      environment: omit(this.options.environment, ['props']),
+    };
+  }
   private getCommonMagic() {
     return {
+      ...this.getEnvMagic(),
       cwd: path.dirname(this.options.basePath),
       vars: this.content.vars,
       __runtime: 'parse',
@@ -60,6 +68,7 @@ class ParseContent {
       ...this.content,
       ...getInputs(rest, this.getCommonMagic()),
     };
+    this.options.environment = getInputs(this.options.environment, this.getEnvMagic());
     const steps = [];
     // projectName 存在，说明指定了项目
     const temp = this.options.projectName ? { [this.options.projectName]: resources[this.options.projectName] } : resources;
@@ -68,13 +77,14 @@ class ParseContent {
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
-      const access = this.getAccess(element);
+      const access = this.getAccess();
       const credential = await getCredential(access, this.options.logger);
 
       const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
-      set(real, 'props', extend2(true, {}, template, real.props));
+      set(real, 'props', extend2(true, {}, template, real.props, get(this.options.environment, 'props', {})));
       this.content = {
         ...this.content,
+        access,
         resources: {
           ...this.content.resources,
           [project]: real,
@@ -90,11 +100,10 @@ class ParseContent {
     }
     return { steps, content: this.content };
   }
-  // TODO:后续可以删除 项目的access
-  private getAccess(data: Record<string, any>) {
-    // 全局的access > 项目的access > yaml的access
+  private getAccess() {
     if (this.options.access) return this.options.access;
-    if (get(data, 'access')) return get(data, 'access');
+    const accessFromEnvironmentFile = get(this.options, 'environment.access');
+    if (accessFromEnvironmentFile) return accessFromEnvironmentFile;
     if (this.content.access) return this.content.access;
   }
 }

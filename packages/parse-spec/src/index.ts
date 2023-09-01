@@ -2,6 +2,7 @@ export { default as compile } from './compile';
 export { default as order } from './order';
 export { default as getInputs } from './get-inputs';
 export * from './types';
+export * from './contants';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
@@ -13,7 +14,7 @@ import order from './order';
 import ParseContent from './parse-content';
 import { each, filter, find, get, includes, isEmpty, keys, map, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
-import { ENVIRONMENT_KEY, REGX } from './contants';
+import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_KEY, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -42,15 +43,16 @@ class ParseSpec {
     throw new Error(`The specified template file does not exist: ${filePath}`);
   }
   private async doYamlinit() {
-    this.yaml.appName = get(this.yaml.content, 'name');
-    this.yaml.useEnvironment = includes(fs.readFileSync(this.yaml.path, 'utf-8'), ENVIRONMENT_KEY)
+    this.yaml.useEnvironment = includes(fs.readFileSync(this.yaml.path, 'utf-8'), ENVIRONMENT_KEY);
     await this.doExtend();
+    this.checkEnvironment();
     this.yaml.access = get(this.yaml.content, 'access');
     const projectKey = this.yaml.use3x ? 'resources' : 'services';
     this.yaml.projectNames = keys(get(this.yaml.content, projectKey, {}));
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
+    this.yaml.appName = get(this.yaml.content, 'name');
     expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env') }));
   }
   private async doExtend() {
@@ -58,9 +60,8 @@ class ParseSpec {
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
     if (this.yaml.useExtend) {
-      // if environment exist, will conflict to extend
       if (this.yaml.useEnvironment) {
-        // TODO: text
+        // TODO: @封崇
         throw new utils.DevsError('environment and extend is conflict', {
           tips: 'please remove environment or extend in yaml',
         });
@@ -81,12 +82,34 @@ class ParseSpec {
     }
     this.yaml.use3x = String(get(this.yaml.content, 'edition')) === '3.0.0';
   }
+  private checkEnvironment() {
+    if (!this.yaml.useEnvironment) return;
+    if (isEmpty(this.record.env)) {
+      // TODO: @封崇
+      throw new utils.DevsError('If you want to use environment, you must specify --env', {
+        tips: 'please use --env to specify environment',
+      });
+    }
+    const environmentFilePath = path.join(path.dirname(this.yaml.path), ENVIRONMENT_FILE_NAME);
+    const environmentContent = utils.getYamlContent(environmentFilePath);
+    debug(`environment content: ${JSON.stringify(environmentContent)}`);
+    const environment = find(environmentContent, item => item.name === this.record.env);
+    if (isEmpty(environment)) {
+      // TODO: @封崇
+      throw new utils.DevsError(`env ${this.record.env} was not found`, {
+        tips: 'please check env name',
+      });
+    }
+    debug(`use environment: ${JSON.stringify(environment)}`);
+    this.yaml.environment = environment;
+  }
   private getParsedContentOptions(basePath: string) {
     return {
       logger: this.options.logger,
       basePath,
       projectName: this.record.projectName,
       access: this.record.access,
+      environment: this.yaml.environment,
     };
   }
   async start(): Promise<ISpec> {
@@ -139,6 +162,7 @@ class ParseSpec {
     this.record.output = get(argv, 'output');
     this.record.skipActions = get(argv, 'skip-actions');
     this.record.debug = get(argv, 'debug');
+    this.record.env = get(argv, 'env');
     if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
       this.record.command = _[1];

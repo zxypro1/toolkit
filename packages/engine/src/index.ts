@@ -113,17 +113,16 @@ class Engine {
     }
 
     // Assign the id, pending status and etc for all steps.
-    this.context.steps = map(this.context.steps, (item) => {
+    this.context.steps = map(this.context.steps, item => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENDING, done: false };
     });
-    const res: IContext = await new Promise(async (resolve) => {
+    const res: IContext = await new Promise(async resolve => {
       // Every states object has two fixed states, "init" and "final".
       const states: any = {
         init: {
           on: {
             // Haoran: May this.context.steps be empty?
-            INIT:
-              this.context.steps.length === 0 ? 'final' : get(this.context.steps, '[0].stepCount'),
+            INIT: this.context.steps.length === 0 ? 'final' : get(this.context.steps, '[0].stepCount'),
           },
         },
         final: {
@@ -424,7 +423,7 @@ class Engine {
       // Retrieve the credentials for the project step.
       item.credential = await getCredential(item.access, this.logger);
       // Set a secret for each credential.
-      each(item.credential, (v) => {
+      each(item.credential, v => {
         this.glog.__setSecret([v]);
       });
 
@@ -473,8 +472,7 @@ class Engine {
       const error = e as Error;
 
       // Determine the status based on the project step's "continue-on-error" attribute.
-      const status =
-        item['continue-on-error'] === true ? STEP_STATUS.ERROR_WITH_CONTINUE : STEP_STATUS.FAILURE;
+      const status = item['continue-on-error'] === true ? STEP_STATUS.ERROR_WITH_CONTINUE : STEP_STATUS.FAILURE;
 
       // 记录全局的执行状态
       if (this.record.editStatusAble) {

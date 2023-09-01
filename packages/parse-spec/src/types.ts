@@ -76,6 +76,7 @@ export interface IYaml {
   useFlow?: boolean;
   projects?: Record<string, any>;
   useEnvironment?: boolean;
+  environment?: Record<string, any>;
 }
 export type ISpec = IRecord & {
   steps: IStep[];
@@ -90,6 +91,7 @@ export interface IRecord {
   skipActions?: boolean;
   help?: boolean;
   debug?: boolean;
+  env?: string;
 }
 
 export enum IOutput {
