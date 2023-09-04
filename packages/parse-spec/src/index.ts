@@ -1,5 +1,4 @@
 export { default as compile } from './compile';
-export { default as order } from './order';
 export { default as getInputs } from './get-inputs';
 export * from './types';
 export * from './contants';
@@ -10,9 +9,9 @@ import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
-import order from './order';
+import Order from './order';
 import ParseContent from './parse-content';
-import { each, filter, find, get, includes, isEmpty, keys, map, split } from 'lodash';
+import { each, filter, find, get, includes, isEmpty, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_KEY, REGX } from './contants';
 const extend2 = require('extend2');
@@ -100,6 +99,8 @@ class ParseSpec {
         tips: 'please check env name',
       });
     }
+    const regionFromEnvironmentFile = get(environment, 'region');
+    regionFromEnvironmentFile && set(environment, 'props.region', get(environment, 'props.region', regionFromEnvironmentFile));
     debug(`use environment: ${JSON.stringify(environment)}`);
     this.yaml.environment = environment;
   }
@@ -120,14 +121,14 @@ class ParseSpec {
     // 再次解析参数，比如projectNames
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
-    const { steps, content } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
+    const { steps, content, originStep } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
     // 获取到真实值后，重新赋值
     this.yaml.content = content;
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
     this.yaml.actions = this.parseActions(actions);
     const result = {
-      steps: this.record.projectName ? steps : this.doFlow(steps),
+      steps: this.record.projectName ? steps : this.doFlow(steps, originStep),
       yaml: this.yaml,
       ...this.record,
     };
@@ -170,10 +171,11 @@ class ParseSpec {
     }
     this.record.command = _[0];
   }
-  private doFlow(steps: IStep[]) {
+  private doFlow(steps: IStep[], originStep: IStep[]) {
     const newSteps: IStep[] = [];
     const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
-    const { steps: orderSteps, dependencies } = order(steps);
+    const orderInstance = new Order(originStep).start();
+    const { steps: orderSteps, dependencies } = orderInstance.sort(steps);
     if (!flowObj) return orderSteps;
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const projectOrder = {} as Record<string, number>;

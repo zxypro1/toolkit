@@ -1,0 +1,47 @@
+edition: 3.0.0
+name: cadt2s_A6BCYU3L6B1HA31L
+access: default
+resources:
+  bucket_1692254589:
+    component: v3test
+    props:
+      bucket: xl-2001-bucket
+      acl: private
+  fc_function_1692458291:
+    component: v3test
+    props:
+      region: cn-huhehaote
+      function:
+        functionName: fc3_1
+        runtime: nodejs14
+        handler: index.handler
+        environmentVariables:
+          TZ: Asia/Shanghai
+          aaaa: bbbbbbb
+          stackName: ${resources.cadt_A6BCYU3L6B1HA31L.props.name}
+        code: fc3_1
+  logProject_1693214088:
+    component: v3test
+    props:
+      name: xl-2001-log-project
+      description: test log project
+  logStore_test_logstore_1693214088:
+    component: v3test
+    props:
+      project: xl-2001-log-project
+      name: test-logstore
+  logStore_job_logstore_1693214088:
+    component: v3test
+    props:
+      project: xl-2001-log-project
+      name: job-logstore
+  cadt_A6BCYU3L6B1HA31L:
+    component: v3test
+    props:
+      region: cn-huhehaote
+      name: cadt_A6BCYU3L6B1HA31L
+      refs:
+        - ${resources.bucket_1692254589.output}
+        - ${resources.logProject_1693214088.output}
+        - ${resources.logStore_test_logstore_1693214088.output}
+        - ${resources.logStore_job_logstore_1693214088.output}

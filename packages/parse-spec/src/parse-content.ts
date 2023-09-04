@@ -16,12 +16,13 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
   async start() {
-    const { steps, content } = await this.getSteps();
+    const { steps, content, originStep } = await this.getSteps();
     return {
       steps,
       content,
+      originStep,
     };
   }
   private getEnvMagic() {
@@ -70,6 +71,7 @@ class ParseContent {
     };
     this.options.environment = getInputs(this.options.environment, this.getEnvMagic());
     const steps = [];
+    const originStep = [];
     // projectName 存在，说明指定了项目
     const temp = this.options.projectName ? { [this.options.projectName]: resources[this.options.projectName] } : resources;
     for (const project in temp) {
@@ -97,8 +99,15 @@ class ParseContent {
         access,
         credential,
       });
+      originStep.push({
+        ...element,
+        projectName: project,
+        component,
+        access,
+        credential,
+      });
     }
-    return { steps, content: this.content };
+    return { steps, content: this.content, originStep };
   }
   private getAccess() {
     if (this.options.access) return this.options.access;

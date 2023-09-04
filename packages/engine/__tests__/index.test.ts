@@ -90,7 +90,7 @@ test('s projectName deploy', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('extend', async () => {
+test('extend', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/extend/extend.yaml'),
     args: ['deploy']
@@ -103,6 +103,17 @@ test.only('extend', async () => {
 test('order', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/order.yaml'),
+    args: ['deploy']
+  });
+  const context = await engine.start();
+  console.log(context.error);
+
+  expect(context.status).toBe('success');
+});
+
+test.only('cadt-order', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/cadt-order.yaml'),
     args: ['deploy']
   });
   const context = await engine.start();

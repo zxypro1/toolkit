@@ -5,24 +5,28 @@ const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
   private orderMap = {} as Record<string, any>;
-  constructor(private steps: IStep[]) {}
-  run() {
-    const dependencies = this.getDependencies();
-    if (isEmpty(dependencies)) return { steps: this.steps, dependencies };
-    this.analysis(dependencies);
-    return { steps: this.sort(), dependencies };
+  private dependencies = {} as Record<string, any>;
+  // origin value
+  constructor(private steps: IStep[]) { }
+  start() {
+    this.dependencies = this.getDependencies();
+    this.analysis();
+    return this;
   }
-  sort() {
-    const newSteps = map(this.steps, item => ({
+  // real value
+  sort(steps: IStep[]) {
+    if (isEmpty(this.dependencies)) return { steps, dependencies: this.dependencies };
+    const newSteps = map(steps, item => ({
       ...item,
       order: this.orderMap[item.projectName],
     }));
     const result = sortBy(newSteps, item => -item.order);
-    return result;
+    return { steps: result, dependencies: this.dependencies };
+
   }
-  analysis(dependencies: Record<string, any>) {
-    for (const project in dependencies) {
-      const element = dependencies[project];
+  private analysis() {
+    for (const project in this.dependencies) {
+      const element = this.dependencies[project];
       for (const key in element) {
         if (this.orderMap[key]) {
           set(this.orderMap, key, this.orderMap[key] + 1);
@@ -31,7 +35,7 @@ class Order {
     }
     debug(`order map: ${JSON.stringify(this.orderMap)}`);
   }
-  getDependencies() {
+  private getDependencies() {
     const projectNameList = map(this.steps, item => {
       set(this.orderMap, item.projectName, 1);
       return item.projectName;
@@ -82,6 +86,4 @@ class Order {
   }
 }
 
-export default (steps: IStep[]) => {
-  return new Order(steps).run();
-};
+export default Order;
