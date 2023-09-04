@@ -114,7 +114,10 @@ test('order', async () => {
 test.only('cadt-order', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/cadt-order.yaml'),
-    args: ['deploy']
+    args: ['deploy'],
+    logConfig: {
+      level: 'DEBUG'
+    }
   });
   const context = await engine.start();
   console.log(context.error);

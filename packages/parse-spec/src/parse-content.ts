@@ -44,7 +44,6 @@ class ParseContent {
     const temp = {} as Record<string, any>;
     each(resources, (item, key) => {
       set(temp, `${key}.props`, item.props || {});
-      set(temp, `${key}.output`, {});
     });
     const name = item.projectName as string;
     const res = {
