@@ -73,3 +73,9 @@ test('this', () => {
   console.log(res);
   expect(res).toBe('test');
 });
+
+test.only('regx', () => {
+  const res = compile("complete-${regx('deploy')}", { command: 'error' });
+  console.log(res);
+  expect(res).toBe('complete-false');
+});

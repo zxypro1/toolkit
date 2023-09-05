@@ -58,6 +58,8 @@ class ParseContent {
         output: temp[name].output,
       },
     };
+    // parse props magic
+    set(res, 'that.props', getInputs(temp[name].props, res));
     debug(`getMagicProps: ${JSON.stringify(res)}`);
     return res;
   }

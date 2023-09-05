@@ -5,6 +5,7 @@ import { REGX } from './contants';
 import { get, isEmpty, isNil } from 'lodash';
 
 artTemplate.defaults.imports.$escape = (value: any, magic: string, ignoreError: boolean) => {
+  if (typeof value === 'boolean') return value;
   if (value) return value;
   if (ignoreError) return magic;
   throw new Error(`${magic} not found`);

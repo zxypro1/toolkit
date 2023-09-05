@@ -111,7 +111,7 @@ test('order', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('cadt-order', async () => {
+test('cadt-order', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/cadt-order.yaml'),
     args: ['deploy'],

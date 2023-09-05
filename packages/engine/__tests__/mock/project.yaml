@@ -45,7 +45,7 @@ resources:
         memorySize: 1024
         runtime: nodejs12
         environmentVariables:
-          test: test-${env('desc')}-${resources.framework.props.function.name}-${resources.framework.output.hello}
+          test: test-${env('desc')}-${resources.framework.props.function.name}
           AccountID: ${config('AccountID')}
           name: ${this.name}
           access: ${this.access}
