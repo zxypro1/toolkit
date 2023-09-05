@@ -300,12 +300,11 @@ test('utils_2.DevsError is not a constructor', async () => {
 test('validate', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/project.yaml'),
+    args: ['framework']
   });
   const context = await engine.start();
   console.log(context);
   expect(get(context, 'error[0]')).toBeInstanceOf(AssertionError);
   expect(get(context, 'error[0].message')).toBe(`command is required`);
   expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
-
-
 });
