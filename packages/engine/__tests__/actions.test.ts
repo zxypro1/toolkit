@@ -9,7 +9,7 @@ jest.mock('fs-extra');
 jest.mock('execa');
 jest.mock('@serverless-devs/load-component');
 
-describe.skip('Actions class', () => {
+describe('Actions class', () => {
 
     let logger: ILoggerInstance;
     let actionsInstance: Actions;

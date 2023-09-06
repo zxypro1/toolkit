@@ -179,7 +179,7 @@ import { fail } from 'assert';
 import { getCredential } from '../src/utils';
 import Actions from '../src/actions';
 
-describe.skip('Engine Class', () => {
+describe('Engine Class', () => {
     let engine: Engine;
     const mockOptions = {
         args: ['deploy'],
