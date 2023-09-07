@@ -95,6 +95,7 @@ class LoadApplication {
   }
 
   private async check() {
+    if (this.options.y) return true;
     if (isCiCdEnvironment()) return true;
     if (!fs.existsSync(this.filePath)) return true;
     const res = await inquirer.prompt([

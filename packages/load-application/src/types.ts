@@ -35,7 +35,14 @@ export interface IOptions {
    * Use specify uri, Eg: remote url, local dir, local zip file
    */
   uri?: string;
+  /**
+   * reserve comments or not
+   */
   reserveComments?: boolean;
+  /**
+   * Assume that the answer to any question which would be asked is yes
+   */
+  y?: boolean;
 }
 
 export enum IProvider {
