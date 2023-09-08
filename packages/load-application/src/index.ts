@@ -6,6 +6,7 @@ import { includes } from 'lodash';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
 export default async (template: string, options: IOptions = {}) => {
+  debug(`load application, template: ${template}, options: ${JSON.stringify(options)}`);
   if (options.uri) {
     return await v3(template, options);
   }
@@ -16,6 +17,7 @@ export default async (template: string, options: IOptions = {}) => {
   try {
     return await v3(template, options);
   } catch (error) {
+    debug(`v3 error, ${error}`)
     return await v2(template, options);
   }
 };
