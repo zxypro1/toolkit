@@ -33,7 +33,7 @@ test('v3 shltest@dev.0.1', async () => {
   expect(res).toBe(path.join(dest, 'shltest'))
 });
 
-test('-y', async () => {
+test('-y with v3', async () => {
   const dest = path.join(__dirname, '_temp');
   const res = await loadApplication('shltest', {
     dest,
@@ -44,7 +44,18 @@ test('-y', async () => {
   })
   expect(res).toBe(path.join(dest, 'shltest'))
 });
-test.only('-y --parameters', async () => {
+
+test.only('-y with v2', async () => {
+  const dest = path.join(__dirname, '_temp');
+  const template = 'start-yida-faas-connect-node'
+  const res = await loadApplication(template, {
+    dest,
+    y: true
+  })
+  expect(res).toBe(path.join(dest, template))
+});
+
+test('-y --parameters', async () => {
   const dest = path.join(__dirname, '_temp');
   const res = await loadApplication('shltest', {
     dest,

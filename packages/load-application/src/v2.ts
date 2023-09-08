@@ -131,7 +131,9 @@ class LoadApplication {
     fs.removeSync(this.tempPath);
   }
 
-  private parseAppName(data: string) {
+  private parseAppName(_data: string) {
+    if (isEmpty(this.spath)) return;
+    const data = _data || fs.readFileSync(this.spath, 'utf-8');
     const { appName } = this.options;
     if (isEmpty(appName)) return;
     const newData = parse({ appName }, data);
@@ -139,6 +141,7 @@ class LoadApplication {
   }
 
   private async parseTemplateYaml(postData: Record<string, any>) {
+    if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
     return this.doArtTemplate(this.spath, this.publishData);
   }
@@ -209,6 +212,7 @@ class LoadApplication {
       this.publishData = this.parsePublishWithParameters(publishPath);
       return;
     }
+    if (this.options.y) return;
     this.publishData = await this.parsePublishWithInquire(publishPath);
   }
   private async parsePublishWithInquire(publishPath: string) {
