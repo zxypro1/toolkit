@@ -11,13 +11,88 @@ test('loadApplication template is not devsapp', async () => {
   );
 });
 
-test.only('v3 start-cadt-app', async () => {
+test('v3 start-cadt-app', async () => {
   const dest = path.join(__dirname, '_temp');
   const template = 'start-cadt-app@0.0.3'
   const res = await loadApplication(template, {
     dest,
     projectName: template,
-    parameters: { cadtJsonString: { "bucket_1689926909": { "component": "aliyun_oss_bucket@dev", "props": { "bucket": "cadt-test-1111", "acl": "private", "storage_class": "Standard", "redundancy_type": "LRS" } }, "instance_1689926942": { "component": "aliyun_ots_instance@dev", "props": { "name": "cadt-inst-1111", "accessed_by": "Any", "instance_type": "HighPerformance" } }, "table_app_table_1689926942": { "component": "aliyun_ots_table@dev", "props": { "instance_name": "cadt-inst-1111", "table_name": "app_table", "primary_key": [{ "name": "id", "type": "String" }], "time_to_live": -1, "max_version": 1, "deviation_cell_version_in_sec": 86400, "depends_on": ["instance_1689926942"] } }, "cadt_HIIRNI7MVKJYL7FH": { "component": "ros_transformer@dev", "props": { "region": "cn-beijing", "name": "cadt_HIIRNI7MVKJYL7FH" } } } },
+    parameters: {
+      cadtJsonString: {
+        "bucket_1691151092": {
+          "component": "aliyun_oss_bucket@dev",
+          "props": {
+            "bucket": "xl-bucket-3002",
+            "redundancy_type": "LRS",
+          }
+        },
+        "logStore_sourcelog_1693965436": {
+          "component": "aliyun_sls_logstore@dev",
+          "props": {
+            "depends_on": [
+              "logProject_1693965436"
+            ],
+          }
+        },
+        "fc_function_1693882938": {
+          "component": "fc3@dev",
+          "actions": {
+            "pre-deploy": [
+              {
+                "path": "./",
+                "run": "bash init_code.sh nodejs16 xl-fc-3002 index.js"
+              }
+            ]
+          },
+          "props": {
+            "function": {
+              "handler": "index.handler",
+              "diskSize": 512,
+              "memorySize": 512,
+              "code": "xl-fc-3002",
+              "functionName": "xl-fc-3002",
+              "environmentVariables": {
+                "TZ": "Asia/Shanghai",
+                "stackName": "${resources.cadt_9U8TNE2C4Z5EO3UF.props.name}"
+              },
+              "runtime": "nodejs16",
+              "cpu": 0.35,
+              "timeout": 60
+            },
+            "region": "cn-huhehaote",
+          }
+        },
+        "logProject_1693965436": {
+          "component": "aliyun_sls_project@dev",
+          "props": {
+            "name": "xl-sls-3002",
+            "description": "xl 3002 test log project"
+          }
+        },
+        "logStore_joblog_1693965436": {
+          "component": "aliyun_sls_logstore@dev",
+          "props": {
+            "depends_on": [
+              "logProject_1693965436"
+            ],
+            "retention_forever": false,
+          }
+        },
+        "cadt_9U8TNE2C4Z5EO3UF": {
+          "component": "ros_transformer@dev",
+          "props": {
+            "refs": [
+              "${resources.bucket_1691151092.output}",
+              "${resources.logProject_1693965436.output}",
+              "${resources.logStore_sourcelog_1693965436.output}",
+              "${resources.logStore_joblog_1693965436.output}"
+            ],
+            "name": "cadt_9U8TNE2C4Z5EO3UF",
+            "region": "cn-huhehaote"
+          }
+        }
+      }
+    },
     appName: 'appname-test',
     access: 'default',
     reserveComments: false,
@@ -35,7 +110,7 @@ test('v3 shltest@dev.0.1', async () => {
   expect(res).toBe(path.join(dest, 'shltest'))
 });
 
-test('-y with v3', async () => {
+test.only('-y with v3', async () => {
   const dest = path.join(__dirname, '_temp');
   const res = await loadApplication('shltest', {
     dest,

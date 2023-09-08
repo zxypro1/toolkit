@@ -7,10 +7,11 @@ export const getInputs = (inputs: Record<string, any> = {}, context: Record<stri
     if (typeof obj === 'object') {
       for (var i in obj) {
         let val = obj[i];
-        if (typeof val === 'string') {
-          val = artTemplate.compile(val)(context);
+        if (typeof val === 'object') {
+          result[i] = deepCopy(val);
+        } else {
+          result[i] = artTemplate.compile(val)(context);
         }
-        result[i] = typeof val === 'object' ? deepCopy(val) : val;
       }
     } else {
       result = obj;
