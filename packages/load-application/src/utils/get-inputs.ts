@@ -10,7 +10,7 @@ export const getInputs = (inputs: Record<string, any> = {}, context: Record<stri
         if (typeof val === 'object') {
           result[i] = deepCopy(val);
         } else {
-          result[i] = artTemplate.compile(val)(context);
+          result[i] = typeof val === 'string' ? artTemplate.compile(val)(context) : val;
         }
       }
     } else {
