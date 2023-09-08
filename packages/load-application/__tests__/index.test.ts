@@ -11,16 +11,18 @@ test('loadApplication template is not devsapp', async () => {
   );
 });
 
-test('v3 shltest', async () => {
+test.only('v3 start-cadt-app', async () => {
   const dest = path.join(__dirname, '_temp');
-  const res = await loadApplication('shltest', {
+  const template = 'start-cadt-app@0.0.3'
+  const res = await loadApplication(template, {
     dest,
-    projectName: 'shltest',
-    parameters: { cadtYamlString: { "bucket_1689926909": { "component": "aliyun_oss_bucket@dev", "props": { "bucket": "cadt-test-1111", "acl": "private", "storage_class": "Standard", "redundancy_type": "LRS" } }, "instance_1689926942": { "component": "aliyun_ots_instance@dev", "props": { "name": "cadt-inst-1111", "accessed_by": "Any", "instance_type": "HighPerformance" } }, "table_app_table_1689926942": { "component": "aliyun_ots_table@dev", "props": { "instance_name": "cadt-inst-1111", "table_name": "app_table", "primary_key": [{ "name": "id", "type": "String" }], "time_to_live": -1, "max_version": 1, "deviation_cell_version_in_sec": 86400, "depends_on": ["instance_1689926942"] } }, "cadt_HIIRNI7MVKJYL7FH": { "component": "ros_transformer@dev", "props": { "region": "cn-beijing", "name": "cadt_HIIRNI7MVKJYL7FH" } } } },
+    projectName: template,
+    parameters: { cadtJsonString: { "bucket_1689926909": { "component": "aliyun_oss_bucket@dev", "props": { "bucket": "cadt-test-1111", "acl": "private", "storage_class": "Standard", "redundancy_type": "LRS" } }, "instance_1689926942": { "component": "aliyun_ots_instance@dev", "props": { "name": "cadt-inst-1111", "accessed_by": "Any", "instance_type": "HighPerformance" } }, "table_app_table_1689926942": { "component": "aliyun_ots_table@dev", "props": { "instance_name": "cadt-inst-1111", "table_name": "app_table", "primary_key": [{ "name": "id", "type": "String" }], "time_to_live": -1, "max_version": 1, "deviation_cell_version_in_sec": 86400, "depends_on": ["instance_1689926942"] } }, "cadt_HIIRNI7MVKJYL7FH": { "component": "ros_transformer@dev", "props": { "region": "cn-beijing", "name": "cadt_HIIRNI7MVKJYL7FH" } } } },
     appName: 'appname-test',
-    access: 'default'
+    access: 'default',
+    reserveComments: false,
   })
-  expect(res).toBe(path.join(dest, 'shltest'))
+  expect(res).toBe(path.join(dest, template))
 });
 test('v3 shltest@dev.0.1', async () => {
   const dest = path.join(__dirname, '_temp');
@@ -45,7 +47,7 @@ test('-y with v3', async () => {
   expect(res).toBe(path.join(dest, 'shltest'))
 });
 
-test.only('-y with v2', async () => {
+test('-y with v2', async () => {
   const dest = path.join(__dirname, '_temp');
   const template = 'start-yida-faas-connect-node'
   const res = await loadApplication(template, {

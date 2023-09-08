@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-application",
-  "version": "0.0.3-beta.13",
+  "version": "0.0.3-beta.14",
   "description": "load application for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@serverless-cd/debug": "^4.3.4",
-    "@serverless-devs/art-template": "^4.13.2",
+    "@serverless-devs/art-template": "^4.13.7",
     "@serverless-devs/credential": "workspace:^",
     "@serverless-devs/downloads": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
