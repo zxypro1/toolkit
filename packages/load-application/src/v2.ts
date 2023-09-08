@@ -5,11 +5,11 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys, find } from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, find } from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, REGISTRY } from './constant';
-import { getInputs, randomId, getAllCredential } from './utils';
+import { getInputs, getAllCredential, getDefaultValue } from './utils';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -274,7 +274,7 @@ class LoadApplication {
             message: item.title,
             name,
             prefix,
-            default: endsWith(item.default, RANDOM_PATTERN) ? replace(item.default, RANDOM_PATTERN, randomId()) : item.default,
+            default: getDefaultValue(item.default),
             validate,
           });
         }
@@ -343,7 +343,7 @@ class LoadApplication {
       if (has(parameters, key)) {
         set(data, key, parameters[key]);
       } else if (ele.hasOwnProperty('default')) {
-        set(data, key, ele.default);
+        set(data, key, getDefaultValue(ele.default));
       } else if (includes(requiredList, key)) {
         throw new Error(`parameter ${key} is required`);
       }

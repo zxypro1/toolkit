@@ -4,11 +4,11 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, endsWith, replace, map, concat, keys } from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import { getInputs, getUrlWithLatest, getUrlWithVersion, randomId, getAllCredential } from './utils';
+import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue } from './utils';
 import assert from 'assert';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
@@ -121,8 +121,9 @@ class LoadApplication {
     fs.removeSync(this.tempPath);
   }
 
-  private parseAppName(data: string) {
+  private parseAppName(_data: string) {
     if (isEmpty(this.spath)) return;
+    const data = _data || fs.readFileSync(this.spath, 'utf-8');
     const { appName } = this.options;
     if (isEmpty(appName)) return;
     const newData = parse({ appName }, data);
@@ -196,6 +197,7 @@ class LoadApplication {
       this.publishData = this.parsePublishWithParameters(publishPath);
       return;
     }
+    if (this.options.y) return;
     this.publishData = await this.parsePublishWithInquire(publishPath);
   }
   private async parsePublishWithInquire(publishPath: string) {
@@ -261,7 +263,7 @@ class LoadApplication {
             message: item.title,
             name,
             prefix,
-            default: endsWith(item.default, RANDOM_PATTERN) ? replace(item.default, RANDOM_PATTERN, randomId()) : item.default,
+            default: getDefaultValue(item.default),
             validate,
           });
         }
@@ -330,7 +332,7 @@ class LoadApplication {
       if (has(parameters, key)) {
         set(data, key, parameters[key]);
       } else if (ele.hasOwnProperty('default')) {
-        set(data, key, ele.default);
+        set(data, key, getDefaultValue(ele.default));
       } else if (includes(requiredList, key)) {
         throw new Error(`parameter ${key} is required`);
       }

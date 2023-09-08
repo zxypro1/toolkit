@@ -22,13 +22,37 @@ test('v3 shltest', async () => {
   })
   expect(res).toBe(path.join(dest, 'shltest'))
 });
-test.only('v3 shltest@dev.0.1', async () => {
+test('v3 shltest@dev.0.1', async () => {
   const dest = path.join(__dirname, '_temp');
   const res = await loadApplication('shltest@dev.0.1', {
     dest,
     projectName: 'shltest',
     appName: 'appname-test',
     access: 'default'
+  })
+  expect(res).toBe(path.join(dest, 'shltest'))
+});
+
+test('-y', async () => {
+  const dest = path.join(__dirname, '_temp');
+  const res = await loadApplication('shltest', {
+    dest,
+    projectName: 'shltest',
+    appName: 'appname-test',
+    access: 'default',
+    y: true
+  })
+  expect(res).toBe(path.join(dest, 'shltest'))
+});
+test.only('-y --parameters', async () => {
+  const dest = path.join(__dirname, '_temp');
+  const res = await loadApplication('shltest', {
+    dest,
+    projectName: 'shltest',
+    appName: 'appname-test',
+    access: 'default',
+    parameters: { runtime: 'node16' },
+    y: true
   })
   expect(res).toBe(path.join(dest, 'shltest'))
 });
