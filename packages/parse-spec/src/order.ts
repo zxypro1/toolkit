@@ -7,7 +7,7 @@ class Order {
   private orderMap = {} as Record<string, any>;
   private dependencies = {} as Record<string, any>;
   // origin value
-  constructor(private steps: IStep[]) { }
+  constructor(private steps: IStep[]) {}
   start() {
     this.dependencies = this.getDependencies();
     this.analysis();
@@ -22,7 +22,6 @@ class Order {
     }));
     const result = sortBy(newSteps, item => -item.order);
     return { steps: result, dependencies: this.dependencies };
-
   }
   private analysis() {
     for (const project in this.dependencies) {

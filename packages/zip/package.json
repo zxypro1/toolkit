@@ -1,10 +1,11 @@
 {
   "name": "@serverless-devs/zip",
-  "version": "0.0.3-beta.5",
+  "version": "0.0.3-beta.6",
   "description": "zip for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
+    "watch": "tsc -w",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "pub": "pnpm publish --no-git-checks"

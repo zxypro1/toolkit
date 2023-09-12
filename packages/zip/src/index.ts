@@ -83,7 +83,9 @@ class Zip {
         if (!bar) {
           bar = new ProgressService(ProgressType.Bar, { total: _.get(processOptions, 'fs.totalBytes') }, `Zipping ((:bar)) :current/:total(Bytes) :percent :etas`);
         }
-        bar.update(_.get(processOptions, 'fs.processedBytes'));
+        if (_.get(processOptions, 'fs.processedBytes')) {
+          bar.update(_.get(processOptions, 'fs.processedBytes'));
+        }
       });
       output.on('close', () => {
         const compressedSize = zipArchiver.pointer();
@@ -156,7 +158,6 @@ class Zip {
 
     // TODO: 可能需要控制运行的个数
     await Promise.all(filesPromise);
-
     return zipFiles.length;
   }
 
