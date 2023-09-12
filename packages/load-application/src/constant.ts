@@ -11,3 +11,4 @@ export const REGISTRY = {
 
 export const CONFIGURE_LATER = 'configure_later';
 export const DEFAULT_MAGIC_ACCESS = '{{ access }}';
+export const DOUBLE_CURLY_BRACES = /{{([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*}}/;

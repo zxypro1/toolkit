@@ -54,7 +54,7 @@ class LoadApplication {
     this.name = name;
     this.version = version;
     this.options.projectName = this.options.projectName || name;
-    this.options.reserveComments = 'reserveComments' in this.options ? this.options.reserveComments : true;
+    this.options.reserveComments = typeof this.options.reserveComments === 'boolean' ? this.options.reserveComments : true;
     this.filePath = path.join(this.options.dest, this.options.projectName);
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }

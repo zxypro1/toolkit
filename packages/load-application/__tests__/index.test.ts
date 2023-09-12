@@ -11,7 +11,7 @@ test('loadApplication template is not devsapp', async () => {
   );
 });
 
-test('v3 start-cadt-app', async () => {
+test.only('v3 start-cadt-app', async () => {
   const dest = path.join(__dirname, '_temp');
   const template = 'start-cadt-app@0.0.3'
   const res = await loadApplication(template, {
@@ -99,6 +99,24 @@ test('v3 start-cadt-app', async () => {
   })
   expect(res).toBe(path.join(dest, template))
 });
+
+test('v3 start-fc3-nodejs@dev', async () => {
+  const dest = path.join(__dirname, '_temp');
+  const template = 'start-fc3-nodejs@dev'
+  const res = await loadApplication(template, {
+    dest,
+    projectName: template,
+    parameters: {
+      region: 'cn-huhehaote',
+      functionName: 'start-nodejs-abd',
+      runtime: 'nodejs14'
+    },
+    appName: 'appname-test',
+    access: 'default',
+    reserveComments: false,
+  })
+  expect(res).toBe(path.join(dest, template))
+});
 test('v3 shltest@dev.0.1', async () => {
   const dest = path.join(__dirname, '_temp');
   const res = await loadApplication('shltest@dev.0.1', {
@@ -110,7 +128,7 @@ test('v3 shltest@dev.0.1', async () => {
   expect(res).toBe(path.join(dest, 'shltest'))
 });
 
-test.only('-y with v3', async () => {
+test('-y with v3', async () => {
   const dest = path.join(__dirname, '_temp');
   const res = await loadApplication('shltest', {
     dest,
