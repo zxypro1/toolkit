@@ -354,7 +354,7 @@ class Engine {
     } catch (error) {
       // On error, attempt to trigger the project's fail hook and update the recorded context.
       try {
-        const res = await this.actionInstance.start(IHookType.FAIL, this.record.componentProps);
+        const res = await this.actionInstance?.start(IHookType.FAIL, this.record.componentProps);
         this.recordContext(item, get(res, 'pluginOutput', {}));
       } catch (error) {
         this.record.status = STEP_STATUS.FAILURE;
@@ -369,7 +369,7 @@ class Engine {
       try {
         // 项目的output, 再次获取魔法变量
         this.actionInstance.setValue('magic', this.getFilterContext(item));
-        const res = await this.actionInstance.start(IHookType.SUCCESS, {
+        const res = await this.actionInstance?.start(IHookType.SUCCESS, {
           ...this.record.componentProps,
           output: get(item, 'output', {}),
         });
@@ -382,7 +382,7 @@ class Engine {
 
     // Attempt to trigger the project's complete hook regardless of status.
     try {
-      const res = await this.actionInstance.start(IHookType.COMPLETE, {
+      const res = await this.actionInstance?.start(IHookType.COMPLETE, {
         ...this.record.componentProps,
         output: get(item, 'output', {}),
       });
@@ -447,7 +447,7 @@ class Engine {
       this.actionInstance.setValue('componentProps', newInputs);
 
       // Start the pre-hook and execute the logic for the project step.
-      const pluginResult = await this.actionInstance.start(IHookType.PRE, newInputs);
+      const pluginResult = await this.actionInstance?.start(IHookType.PRE, newInputs);
       const response: any = await this.doSrc(item, pluginResult);
 
       // 记录全局的执行状态
