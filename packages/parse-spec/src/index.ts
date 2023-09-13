@@ -11,7 +11,7 @@ import { getDefaultYamlPath, isExtendMode } from './utils';
 import compile from './compile';
 import Order from './order';
 import ParseContent from './parse-content';
-import { each, filter, find, get, includes, isEmpty, keys, map, set, split } from 'lodash';
+import { each, filter, find, get, includes, isArray, isEmpty, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_KEY, REGX } from './contants';
 const extend2 = require('extend2');
@@ -218,6 +218,9 @@ class ParseSpec {
     const actionList = [];
     for (const action in actions) {
       const element = actions[action];
+      if (!isArray(element)) {
+        throw new utils.DevsError(`${level} action ${action} is invalid, it must be array`)
+      }
       const actionInfo = this.matchAction(action);
       debug(`action: ${action}, useAction: ${JSON.stringify(actionInfo)}`);
       if (actionInfo.validate) {
