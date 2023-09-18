@@ -76,6 +76,7 @@ export interface IYaml {
   useFlow?: boolean;
   projects?: Record<string, any>;
   useEnvironment?: boolean;
+  envPath?: string;
   environment?: Record<string, any>;
 }
 export type ISpec = IRecord & {

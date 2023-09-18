@@ -34,11 +34,11 @@ test('env name was not found', async () => {
   });
   const context = await engine.start();
   console.log(context);
-  expect(get(context, 'error[0].message')).toMatch(`env ${envName} was not found`);
+  expect(get(context, 'error[0].message')).toMatch(`env [${envName}] was not found`);
 });
 
-test('baisc', async () => {
-  const envName = 'prod'
+test.only('baisc', async () => {
+  const envName = 'testing'
   const engine = new Engine({
     template: 's.yaml',
     args: ['deploy', '--env', envName],

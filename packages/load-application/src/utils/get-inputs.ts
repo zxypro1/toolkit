@@ -8,9 +8,9 @@ export const getInputs = (inputs: Record<string, any> = {}, context: Record<stri
       return val;
     }
     if (DOUBLE_CURLY_BRACES.test(val)) {
-      return artTemplate.compile(val)(context)
+      return artTemplate.compile(val)(context);
     }
-    return val
+    return val;
   }
   function deepCopy(obj: any) {
     let result: any = obj.constructor === Array ? [] : {};

@@ -7,7 +7,7 @@ export { default as getInputs } from './get-inputs';
 export const tryfun = async (fn: Function, ...args: any[]) => {
   try {
     return await fn(...args);
-  } catch (ex) { }
+  } catch (ex) {}
 };
 
 export const getUrlWithLatest = (name: string) => `${REGISTRY.V3}/packages/${name}/release/latest`;
@@ -22,5 +22,5 @@ export const getAllCredential = async ({ logger }: any) => {
 
 export const getDefaultValue = (value: any) => {
   if (typeof value !== 'string') return;
-  return endsWith(value, RANDOM_PATTERN) ? replace(value, RANDOM_PATTERN, randomId()) : value
-}
+  return endsWith(value, RANDOM_PATTERN) ? replace(value, RANDOM_PATTERN, randomId()) : value;
+};

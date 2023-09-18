@@ -16,7 +16,7 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
   async start() {
     const { steps, content, originStep } = await this.getSteps();
     return {
@@ -25,15 +25,16 @@ class ParseContent {
       originStep,
     };
   }
-  private getEnvMagic() {
+  private getEnvMagic(data: Record<string, any> = {}) {
     return {
+      ...data,
       __runtime: 'parse',
-      environment: omit(this.options.environment, ['props']),
+      project: get(this.options.environment, '__project'),
+      that: omit(this.options.environment, ['infrastructure', 'overlays']),
     };
   }
   private getCommonMagic() {
     return {
-      ...this.getEnvMagic(),
       cwd: path.dirname(this.options.basePath),
       vars: this.content.vars,
       __runtime: 'parse',
@@ -70,7 +71,6 @@ class ParseContent {
       ...this.content,
       ...getInputs(rest, this.getCommonMagic()),
     };
-    this.options.environment = getInputs(this.options.environment, this.getEnvMagic());
     const steps = [];
     const originStep = [];
     // projectName 存在，说明指定了项目
@@ -84,7 +84,11 @@ class ParseContent {
       const credential = await getCredential(access, this.options.logger);
 
       const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
-      set(real, 'props', extend2(true, {}, template, real.props, get(this.options.environment, 'props', {})));
+      const target = extend2(true, {}, template, real.props);
+      const environment = getInputs(this.options.environment, this.getEnvMagic({ target, credential }));
+      debug(`real environment: ${JSON.stringify(environment)}`)
+      // 覆盖的优先级：resources > global > s.yaml
+      set(real, 'props', extend2(true, {}, target, get(environment, 'overlays.global', {}), get(environment, 'overlays.resources', {})));
       this.content = {
         ...this.content,
         access,
@@ -111,6 +115,7 @@ class ParseContent {
     return { steps, content: this.content, originStep };
   }
   private getAccess() {
+    // 全局的 -a > env.yaml 的 access > s.yaml 的 access
     if (this.options.access) return this.options.access;
     const accessFromEnvironmentFile = get(this.options, 'environment.access');
     if (accessFromEnvironmentFile) return accessFromEnvironmentFile;

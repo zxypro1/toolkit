@@ -17,7 +17,7 @@ export default async (template: string, options: IOptions = {}) => {
   try {
     return await v3(template, options);
   } catch (error) {
-    debug(`v3 error, ${error}`)
+    debug(`v3 error, ${error}`);
     return await v2(template, options);
   }
 };
