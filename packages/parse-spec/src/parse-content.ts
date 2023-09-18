@@ -16,7 +16,7 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
   async start() {
     return await this.getSteps();
   }
