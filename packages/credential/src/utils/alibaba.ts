@@ -18,8 +18,8 @@ export default class Alibaba {
       endpoint: 'https://sts.cn-hangzhou.aliyuncs.com',
       apiVersion: '2015-04-01',
       opts: {
-        timeout: 10000
-      }
+        timeout: 10000,
+      },
     };
     const client = new Core(params);
 

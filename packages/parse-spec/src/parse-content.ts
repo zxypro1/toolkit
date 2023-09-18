@@ -16,7 +16,7 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
   async start() {
     const { steps, content, originStep } = await this.getSteps();
     return {
@@ -86,7 +86,7 @@ class ParseContent {
       const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
       const target = extend2(true, {}, template, real.props);
       const environment = getInputs(this.options.environment, this.getEnvMagic({ target, credential }));
-      debug(`real environment: ${JSON.stringify(environment)}`)
+      debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > global > s.yaml
       set(real, 'props', extend2(true, {}, target, get(environment, 'overlays.global', {}), get(environment, 'overlays.resources', {})));
       this.content = {

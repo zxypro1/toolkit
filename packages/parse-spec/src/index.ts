@@ -13,7 +13,7 @@ import Order from './order';
 import ParseContent from './parse-content';
 import { each, filter, find, get, has, includes, isArray, isEmpty, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
-import { ENVIRONMENT_KEY, REGX } from './contants';
+import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_KEY, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -43,7 +43,7 @@ class ParseSpec {
   }
   private async doYamlinit() {
     await this.doExtend();
-    await this.checkEnvironment();
+    this.doEnvironment();
     this.yaml.access = get(this.yaml.content, 'access');
     const projectKey = this.yaml.use3x ? 'resources' : 'services';
     this.yaml.projectNames = keys(get(this.yaml.content, projectKey, {}));
@@ -55,17 +55,9 @@ class ParseSpec {
   }
   private async doExtend() {
     this.yaml.content = utils.getYamlContent(this.yaml.path);
-    this.yaml.useEnvironment = has(this.yaml.content, ENVIRONMENT_KEY);
-    this.yaml.envPath = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY), path.dirname(this.yaml.path));
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
     if (this.yaml.useExtend) {
-      if (this.yaml.useEnvironment) {
-        // TODO: @封崇
-        throw new utils.DevsError('environment and extend is conflict', {
-          tips: 'please remove environment or extend in yaml',
-        });
-      }
       const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
       expand(dotenv.config({ path: path.join(extendPath, '.env') }));
       const extendContent = utils.getYamlContent(extendPath);
@@ -82,28 +74,81 @@ class ParseSpec {
     }
     this.yaml.use3x = String(get(this.yaml.content, 'edition')) === '3.0.0';
   }
-  private async checkEnvironment() {
-    if (!this.yaml.useEnvironment) return;
-    if (isEmpty(this.record.env)) {
-      // TODO: @封崇
-      throw new utils.DevsError('If you want to use environment, you must specify --env', {
-        tips: 'please use --env to specify environment',
-      });
-    }
-    const { project, environments } = utils.getYamlContent(this.yaml.envPath as string);
-    debug(`environment content: ${JSON.stringify(environments)}`);
-    const environment = find(environments, item => item.name === this.record.env);
-    debug(`use environment: ${JSON.stringify(environment)}`);
+  /**
+   * # 指定--env时：
+  - s.yaml使用extend，则报错
+  - 如果s.yaml声明了env yaml，则使用指定的env.yaml,  否则使用默认的env.yaml
+  - 如果env.yaml不存在，则报错
+  - 指定的env找不到，则报错
+  - s deploy --env test
 
-    if (isEmpty(environment)) {
-      // TODO: @封崇
-      throw new utils.DevsError(`env [${this.record.env}] was not found`, {
-        tips: 'please check env name',
-      });
-    }
+  # 不指定--env时
+  ## s.yaml使用extend
+  - s.yaml声明了env yaml, 则报错，没声明env yaml，则不使用多环境
+  - s deploy
+  ## s.yaml未使用extend
+  - s.yaml声明了env yaml，如果env.yaml不存在，则报错
+  - 使用指定env.yaml的默认环境，如果没有指定默认环境，则报错
+  - 如果指定的默认环境找不到，则报错。
+  - s deploy
+  */
+  private doEnvironment() {
+    // specify --env
+    const envInfo = this.record.env ? this.doEnvWithSpecify() : this.doEnvWithNotSpecify();
+    const { project, environment } = envInfo as { project: string; environment: Record<string, any> };
+    debug(`use environment: ${JSON.stringify(environment)}`);
     set(environment, 'overlays.resources.region', get(environment, 'region'));
     set(environment, '__project', project);
     this.yaml.environment = environment;
+  }
+  // not specify --env
+  private doEnvWithNotSpecify() {
+    if (this.yaml.useExtend) {
+      if (has(this.yaml.content, ENVIRONMENT_KEY)) {
+        throw new utils.DevsError('environment and extend is conflict');
+      }
+    }
+    if (has(this.yaml.content, ENVIRONMENT_KEY)) {
+      const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY), path.dirname(this.yaml.path));
+      const envYamlContent = utils.getYamlContent(envPath);
+      // env file is not exist
+      if (isEmpty(envYamlContent)) {
+        throw new utils.DevsError(`environment file [${envPath}] is not exist`);
+      }
+      //TODO: 使用默认的env环境，否则报错
+      const defaultEnv = 'testing';
+      const { project, environments } = envYamlContent;
+      const environment = find(environments, item => item.name === defaultEnv);
+      // env name is not found
+      if (isEmpty(environment)) {
+        // TODO: @封崇
+        throw new utils.DevsError(`default env [${defaultEnv}] was not found`);
+      }
+      return { project, environment };
+    }
+  }
+  // specify --env
+  private doEnvWithSpecify() {
+    // env and extend is conflict
+    if (this.yaml.useExtend) {
+      // TODO: @封崇
+      throw new utils.DevsError('environment and extend is conflict');
+    }
+    const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY, ENVIRONMENT_FILE_NAME), path.dirname(this.yaml.path));
+    const envYamlContent = utils.getYamlContent(envPath);
+    // env file is not exist
+    if (isEmpty(envYamlContent)) {
+      throw new utils.DevsError(`environment file [${envPath}] is not exist`);
+    }
+    debug(`environment content: ${JSON.stringify(envYamlContent)}`);
+    const { project, environments } = envYamlContent;
+    const environment = find(environments, item => item.name === this.record.env);
+    // env name is not found
+    if (isEmpty(environment)) {
+      // TODO: @封崇
+      throw new utils.DevsError(`env [${this.record.env}] was not found`);
+    }
+    return { project, environment };
   }
   private getParsedContentOptions(basePath: string) {
     return {
