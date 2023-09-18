@@ -13,7 +13,7 @@ import Order from './order';
 import ParseContent from './parse-content';
 import { each, filter, find, get, has, includes, isArray, isEmpty, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
-import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_KEY, REGX } from './contants';
+import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -112,18 +112,31 @@ class ParseSpec {
     if (has(this.yaml.content, ENVIRONMENT_KEY)) {
       const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY), path.dirname(this.yaml.path));
       const envYamlContent = utils.getYamlContent(envPath);
-      // env file is not exist
+      // env.yaml is not exist
       if (isEmpty(envYamlContent)) {
-        throw new utils.DevsError(`environment file [${envPath}] is not exist`);
+        throw new utils.DevsError(`environment file [${envPath}] is not found`, {
+          tips: 'You can create a new environment file by running `s env init`'
+        });
       }
-      //TODO: 使用默认的env环境，否则报错
-      const defaultEnv = 'testing';
+      // default-env.json is not exist
+      if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
+        throw new utils.DevsError('Default env is not found', {
+          tips: 'You can set a default environment by running `s env default`'
+        });
+      }
       const { project, environments } = envYamlContent;
+      const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
+      const defaultEnv = get(defaultEnvContent, project);
+      // project is not found in default-env.json
+      if (!defaultEnv) {
+        throw new utils.DevsError('Default env is not found', {
+          tips: 'You can set a default environment by running `s env default`'
+        });
+      }
       const environment = find(environments, item => item.name === defaultEnv);
-      // env name is not found
+      // default env is not found in env.yaml
       if (isEmpty(environment)) {
-        // TODO: @封崇
-        throw new utils.DevsError(`default env [${defaultEnv}] was not found`);
+        throw new utils.DevsError(`Default env [${defaultEnv}] was not found`);
       }
       return { project, environment };
     }

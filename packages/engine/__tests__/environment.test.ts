@@ -1,8 +1,9 @@
 import Engine from '../src';
 import path from 'path';
+import fs from 'fs-extra';
 import { get } from 'lodash';
 import * as utils from '@serverless-devs/utils'
-import { ENVIRONMENT_KEY } from '@serverless-devs/parse-spec';
+import { ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY } from '@serverless-devs/parse-spec';
 const cwd = path.join(__dirname, './mock/environment');
 
 describe('specify --env', () => {
@@ -57,6 +58,9 @@ describe('specify --env', () => {
 
 
 describe('not specify --env', () => {
+  beforeEach(() => {
+    jest.resetModules();
+  })
   test('environment and extend is conflict', async () => {
     const engine = new Engine({
       template: 'extend.yaml',
@@ -77,9 +81,10 @@ describe('not specify --env', () => {
     const context = await engine.start();
     console.log(context);
     const content = utils.getYamlContent(path.join(cwd, template));
-    expect(get(context, 'error[0].message')).toMatch(`environment file [${utils.getAbsolutePath(get(content, ENVIRONMENT_KEY), cwd)}] is not exist`);
+    expect(get(context, 'error[0].message')).toMatch(`environment file [${utils.getAbsolutePath(get(content, ENVIRONMENT_KEY), cwd)}] is not found`);
   });
-  test.skip('env name was not found', async () => {
+  test('env name was not found', async () => {
+    fs.writeJSONSync(ENVIRONMENT_FILE_PATH, { 'demo': 'testing11' }, { spaces: 2 })
     const template = 's.yaml'
     const engine = new Engine({
       template,
@@ -88,9 +93,10 @@ describe('not specify --env', () => {
     });
     const context = await engine.start();
     console.log(context);
-    expect(get(context, 'error[0].message')).toMatch(`default env [testing1] was not found`);
+    expect(get(context, 'error[0].message')).toMatch('Default env [testing11] was not found');
   });
   test('basic', async () => {
+    fs.writeJSONSync(ENVIRONMENT_FILE_PATH, { 'demo': 'testing' }, { spaces: 2 })
     const template = 's.yaml'
     const engine = new Engine({
       template,
