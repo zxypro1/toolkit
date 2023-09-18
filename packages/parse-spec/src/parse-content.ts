@@ -16,14 +16,9 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
   async start() {
-    const { steps, content, originStep } = await this.getSteps();
-    return {
-      steps,
-      content,
-      originStep,
-    };
+    return await this.getSteps();
   }
   private getEnvMagic(data: Record<string, any> = {}) {
     return {
@@ -72,7 +67,7 @@ class ParseContent {
       ...getInputs(rest, this.getCommonMagic()),
     };
     const steps = [];
-    const originStep = [];
+    const originSteps = [];
     // projectName 存在，说明指定了项目
     const temp = this.options.projectName ? { [this.options.projectName]: resources[this.options.projectName] } : resources;
     for (const project in temp) {
@@ -104,7 +99,7 @@ class ParseContent {
         access,
         credential,
       });
-      originStep.push({
+      originSteps.push({
         ...element,
         projectName: project,
         component,
@@ -112,7 +107,7 @@ class ParseContent {
         credential,
       });
     }
-    return { steps, content: this.content, originStep };
+    return { steps, content: this.content, originSteps };
   }
   private getAccess() {
     // 全局的 -a > env.yaml 的 access > s.yaml 的 access

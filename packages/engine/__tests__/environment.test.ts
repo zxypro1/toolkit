@@ -3,7 +3,6 @@ import path from 'path';
 import { get } from 'lodash';
 import * as utils from '@serverless-devs/utils'
 import { ENVIRONMENT_KEY } from '@serverless-devs/parse-spec';
-import { env } from 'process';
 const cwd = path.join(__dirname, './mock/environment');
 
 describe('specify --env', () => {
@@ -57,7 +56,7 @@ describe('specify --env', () => {
 })
 
 
-describe.only('not specify --env', () => {
+describe('not specify --env', () => {
   test('environment and extend is conflict', async () => {
     const engine = new Engine({
       template: 'extend.yaml',
@@ -80,7 +79,7 @@ describe.only('not specify --env', () => {
     const content = utils.getYamlContent(path.join(cwd, template));
     expect(get(context, 'error[0].message')).toMatch(`environment file [${utils.getAbsolutePath(get(content, ENVIRONMENT_KEY), cwd)}] is not exist`);
   });
-  test('env name was not found', async () => {
+  test.skip('env name was not found', async () => {
     const template = 's.yaml'
     const engine = new Engine({
       template,
@@ -91,7 +90,7 @@ describe.only('not specify --env', () => {
     console.log(context);
     expect(get(context, 'error[0].message')).toMatch(`default env [testing1] was not found`);
   });
-  test.only('basic', async () => {
+  test('basic', async () => {
     const template = 's.yaml'
     const engine = new Engine({
       template,

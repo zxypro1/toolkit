@@ -93,8 +93,9 @@ class ParseSpec {
   - s deploy
   */
   private doEnvironment() {
-    // specify --env
     const envInfo = this.record.env ? this.doEnvWithSpecify() : this.doEnvWithNotSpecify();
+    // 不使用多环境, 则直接返回
+    if (isEmpty(envInfo)) return;
     const { project, environment } = envInfo as { project: string; environment: Record<string, any> };
     debug(`use environment: ${JSON.stringify(environment)}`);
     set(environment, 'overlays.resources.region', get(environment, 'region'));
@@ -167,14 +168,14 @@ class ParseSpec {
     // 再次解析参数，比如projectNames
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
-    const { steps, content, originStep } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
+    const { steps, content, originSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
     // 获取到真实值后，重新赋值
     this.yaml.content = content;
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     const actions = get(this.yaml.content, 'actions', {});
     this.yaml.actions = this.parseActions(actions);
     const result = {
-      steps: this.record.projectName ? steps : this.doFlow(steps, originStep),
+      steps: this.record.projectName ? steps : this.doFlow(steps, originSteps),
       yaml: this.yaml,
       ...this.record,
     };
@@ -217,10 +218,10 @@ class ParseSpec {
     }
     this.record.command = _[0];
   }
-  private doFlow(steps: IStep[], originStep: IStep[]) {
+  private doFlow(steps: IStep[], originSteps: IStep[]) {
     const newSteps: IStep[] = [];
     const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
-    const orderInstance = new Order(originStep).start();
+    const orderInstance = new Order(originSteps).start();
     const { steps: orderSteps, dependencies } = orderInstance.sort(steps);
     if (!flowObj) return orderSteps;
     debug(`find flow: ${JSON.stringify(flowObj)}`);
