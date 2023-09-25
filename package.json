@@ -22,6 +22,7 @@
     "test:parse-spec": "jest --testTimeout 10000 packages/parse-spec --watchAll",
     "test:load-component": "jest --testTimeout 10000 packages/load-component --watchAll",
     "test:engine": "jest --testTimeout 30000 packages/engine --watchAll",
+    "test:engine:coverage": "jest --coverage --testTimeout 30000 packages/engine --collectCoverageFrom=packages/engine/src/**/*.ts --coverageDirectory coverage/engine",
     "test:utils": "jest --testTimeout 10000 packages/utils --watchAll",
     "test:diff": "jest --testTimeout 10000 packages/diff --watchAll",
     "test:orm": "jest --testTimeout 10000 packages/orm --watchAll",
