@@ -6,7 +6,6 @@ logs/
 coverage/
 *.log
 *.zip
-.env
 .s
 lib
 replace-committers.sh*
