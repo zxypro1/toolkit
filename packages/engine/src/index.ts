@@ -9,8 +9,7 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
-import * as utils from '@serverless-devs/utils';
-import { DevsError } from '@serverless-devs/utils';
+import { DevsError, emoji, getAbsolutePath, getRootHome, traceid } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
 export * from './types';
@@ -43,7 +42,7 @@ class Engine {
     // 初始化参数
     this.options.args = get(this.options, 'args', process.argv.slice(2));
     this.options.cwd = get(this.options, 'cwd', process.cwd());
-    this.options.template = utils.getAbsolutePath(get(this.options, 'template'), this.options.cwd);
+    this.options.template = getAbsolutePath(get(this.options, 'template'), this.options.cwd);
     debug(`engine options: ${stringify(options)}`);
   }
 
@@ -91,7 +90,7 @@ class Engine {
       return this.context;
     }
     const { steps: _steps, yaml, command, access = yaml.access } = this.spec;
-    this.logger.write(`⌛ Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`);
+    this.logger.write(`${emoji('⌛')} Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`);
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -238,8 +237,8 @@ class Engine {
       throw new Error('customLogger must be instance of Logger');
     }
     return new Logger({
-      traceId: utils.traceid(),
-      logDir: path.join(utils.getRootHome(), 'logs'),
+      traceId: traceid(),
+      logDir: path.join(getRootHome(), 'logs'),
       ...this.options.logConfig,
       level: get(this.options, 'logConfig.level', this.spec.debug ? 'DEBUG' : undefined),
     });
