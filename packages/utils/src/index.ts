@@ -14,4 +14,5 @@ export { default as DevsError } from './devs-error';
 export { default as registry } from './registry';
 export { default as traceid } from './traceid';
 export { default as readJson } from './read-json';
+export { default as emoji } from './emoji';
 export const getLockFile = (basePath: string) => path.join(basePath, '.s.lock');
