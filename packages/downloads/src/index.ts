@@ -56,7 +56,7 @@ class Download {
       }
     }
     if (fs.existsSync(filePath)) {
-      await fs.unlink(filePath);
+      fs.removeSync(filePath);
     }
   }
   private async doDownload(url: string): Promise<string> {
