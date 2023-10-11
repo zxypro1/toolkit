@@ -56,7 +56,11 @@ class Download {
       }
     }
     if (fs.existsSync(filePath)) {
-      fs.removeSync(filePath);
+      try {
+        fs.removeSync(filePath);
+      } catch (error) {
+        // ignore error in windows
+      }
     }
   }
   private async doDownload(url: string): Promise<string> {
