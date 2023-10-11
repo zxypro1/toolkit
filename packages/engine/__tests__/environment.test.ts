@@ -84,6 +84,7 @@ describe('not specify --env', () => {
     expect(get(context, 'error[0].message')).toMatch(`environment file [${utils.getAbsolutePath(get(content, ENVIRONMENT_KEY), cwd)}] is not found`);
   });
   test('env name was not found', async () => {
+    fs.ensureFileSync(ENVIRONMENT_FILE_PATH);
     fs.writeJSONSync(ENVIRONMENT_FILE_PATH, { 'demo': 'testing11' }, { spaces: 2 })
     const template = 's.yaml'
     const engine = new Engine({
@@ -96,6 +97,7 @@ describe('not specify --env', () => {
     expect(get(context, 'error[0].message')).toMatch('Default env [testing11] was not found');
   });
   test('basic', async () => {
+    fs.ensureFileSync(ENVIRONMENT_FILE_PATH);
     fs.writeJSONSync(ENVIRONMENT_FILE_PATH, { 'demo': 'testing' }, { spaces: 2 })
     const template = 's.yaml'
     const engine = new Engine({
