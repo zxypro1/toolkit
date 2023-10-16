@@ -93,6 +93,7 @@ class ParseSpec {
   - s deploy
   */
   private doEnvironment() {
+    if (!this.yaml.use3x) return;
     const envInfo = this.record.env ? this.doEnvWithSpecify() : this.doEnvWithNotSpecify();
     // 不使用多环境, 则直接返回
     if (isEmpty(envInfo)) return;
@@ -106,7 +107,7 @@ class ParseSpec {
   private doEnvWithNotSpecify() {
     if (this.yaml.useExtend) {
       if (has(this.yaml.content, ENVIRONMENT_KEY)) {
-        throw new utils.DevsError('environment and extend is conflict');
+        throw new utils.DevsError('Environment and extend is conflict');
       }
     }
     if (has(this.yaml.content, ENVIRONMENT_KEY)) {
@@ -114,7 +115,7 @@ class ParseSpec {
       const envYamlContent = utils.getYamlContent(envPath);
       // env.yaml is not exist
       if (isEmpty(envYamlContent)) {
-        throw new utils.DevsError(`environment file [${envPath}] is not found`, {
+        throw new utils.DevsError(`Environment file [${envPath}] is not found`, {
           tips: 'You can create a new environment file by running `s env init`'
         });
       }
@@ -146,13 +147,13 @@ class ParseSpec {
     // env and extend is conflict
     if (this.yaml.useExtend) {
       // TODO: @封崇
-      throw new utils.DevsError('environment and extend is conflict');
+      throw new utils.DevsError('Environment and extend is conflict');
     }
     const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY, ENVIRONMENT_FILE_NAME), path.dirname(this.yaml.path));
     const envYamlContent = utils.getYamlContent(envPath);
     // env file is not exist
     if (isEmpty(envYamlContent)) {
-      throw new utils.DevsError(`environment file [${envPath}] is not exist`);
+      throw new utils.DevsError(`Environment file [${envPath}] is not exist`);
     }
     debug(`environment content: ${JSON.stringify(envYamlContent)}`);
     const { project, environments } = envYamlContent;
@@ -160,7 +161,7 @@ class ParseSpec {
     // env name is not found
     if (isEmpty(environment)) {
       // TODO: @封崇
-      throw new utils.DevsError(`env [${this.record.env}] was not found`);
+      throw new utils.DevsError(`Env [${this.record.env}] was not found`);
     }
     return { project, environment };
   }
