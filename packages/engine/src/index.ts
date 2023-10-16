@@ -422,9 +422,8 @@ class Engine {
       // Retrieve the credentials for the project step.
       item.credential = await getCredential(item.access, this.logger);
       // Set a secret for each credential.
-      each(item.credential, v => {
-        this.glog.__setSecret([v]);
-      });
+      const { AccessKeyID, AccessKeySecret } = item.credential;
+      this.glog.__setSecret([AccessKeyID, AccessKeySecret]);
 
       // Parse actions for the project step and initialize a new action instance.
       const newAction = this.parseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
