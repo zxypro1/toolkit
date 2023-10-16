@@ -72,22 +72,27 @@ function getFlowsYaml(str: string | undefined, codeUri: string) {
   if (!str) {
     return {};
   }
-  const { resources } = yaml.load(str) as Record<string, any>;
-  const definitionPaths: any = {};
-  forEach(resources, (value: any, key: string) => {
-    const component: string = get(value, 'component', '');
-    const definition: string = get(value, 'props.definition', '');
-    const fnfComponents = ['devsapp/fnf', 'fnf', 'devsapp/fnf@dev', 'fnf@dev'];
-    if (includes(fnfComponents, component) && definition) {
-      definitionPaths[key] = definition;
-    }
-  });
-  if (isEmpty(definitionPaths)) return [];
-  const flowsYaml: any[] = [];
-  forEach(definitionPaths, (value: string, key: string) => {
-    flowsYaml.push({ [key]: getYamlContentText(path.join(codeUri, 'src', value)) });
-  });
-  return flowsYaml;
+  // fix: s.yaml maybe contain if/else magic code
+  try {
+    const { resources } = yaml.load(str) as Record<string, any>;
+    const definitionPaths: any = {};
+    forEach(resources, (value: any, key: string) => {
+      const component: string = get(value, 'component', '');
+      const definition: string = get(value, 'props.definition', '');
+      const fnfComponents = ['devsapp/fnf', 'fnf', 'devsapp/fnf@dev', 'fnf@dev'];
+      if (includes(fnfComponents, component) && definition) {
+        definitionPaths[key] = definition;
+      }
+    });
+    if (isEmpty(definitionPaths)) return [];
+    const flowsYaml: any[] = [];
+    forEach(definitionPaths, (value: string, key: string) => {
+      flowsYaml.push({ [key]: getYamlContentText(path.join(codeUri, 'src', value)) });
+    });
+    return flowsYaml;
+  } catch (error) {
+    return []
+  }
 }
 
 async function getUploadUrl(codeUri: string): Promise<string> {
