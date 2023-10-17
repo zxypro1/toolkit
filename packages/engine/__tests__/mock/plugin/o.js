@@ -1,5 +1,5 @@
-module.exports = async function index(inputs, args) {
-  console.log("pluginO======", JSON.stringify(inputs));
+module.exports = async function index(inputs, args, logger) {
+  logger.info("pluginO======", JSON.stringify(inputs));
   return {
     ...inputs,
     output: {

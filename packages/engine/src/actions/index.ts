@@ -235,7 +235,7 @@ class Actions {
       // Determine the inputs for the plugin based on the record's pluginOutput.
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
       // Execute the plugin with the determined inputs and provided arguments.
-      this.record.pluginOutput = await instance(inputs, hook.args);
+      this.record.pluginOutput = await instance(inputs, hook.args, this.logger);
     } catch (e) {
       const error = e as Error;
       // Check if the failure is allowed based on the record's allowFailure setting.
