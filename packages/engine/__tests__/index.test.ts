@@ -125,6 +125,20 @@ test('cadt-order', async () => {
   expect(context.status).toBe('success');
 });
 
+test.only('cadt-order2', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/cadt-order2.yaml'),
+    args: ['deploy'],
+    logConfig: {
+      // level: 'DEBUG'
+    }
+  });
+  const context = await engine.start();
+  console.log(context.error);
+
+  expect(context.status).toBe('success');
+});
+
 test('指定服务 方法不存在时', async () => {
   const command = 'empty';
   const engine = new Engine({
