@@ -288,6 +288,7 @@ class Engine {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
+      __runtime: this.options.verify ? 'enigne' : 'parse',
       resources: {},
     } as Record<string, any>;
     for (const obj of this.context.steps) {
