@@ -1,4 +1,4 @@
-import { includes, map, split, set, sortBy, isEmpty, get, each, unset } from 'lodash';
+import { includes, map, split, set, sortBy, isEmpty, get, cloneDeep, unset } from 'lodash';
 import { REGXG } from './contants';
 import { IStep } from './types';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
@@ -22,18 +22,19 @@ class Order {
       order: this.orderMap[item.projectName],
     }));
     const result = sortBy(newSteps, item => item.order);
-    return { steps: result, dependencies: this.dependencies };
+    return { steps: result, dependencies: this.dependencies, useOrder: this.useOrder };
   }
   private analysis() {
+    const temp = cloneDeep(this.dependencies);
     let num = 0;
     const func = () => {
-      for (const project in this.dependencies) {
-        const element = this.dependencies[project];
+      for (const project in temp) {
+        const element = temp[project];
         if (isEmpty(element)) {
           set(this.orderMap, project, num++);
-          unset(this.dependencies, project);
-          for (const key in this.dependencies) {
-            unset(this.dependencies, [key, project]);
+          unset(temp, project);
+          for (const key in temp) {
+            unset(temp, [key, project]);
           }
           func();
         }

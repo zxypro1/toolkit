@@ -236,7 +236,7 @@ class ParseSpec {
     const newSteps: IStep[] = [];
     const flowObj = find(this.yaml.flow, (item, key) => this.matchFlow(key));
     const orderInstance = new Order(originSteps).start();
-    const { steps: orderSteps, dependencies } = orderInstance.sort(steps);
+    const { steps: orderSteps, dependencies, useOrder } = orderInstance.sort(steps);
     if (!flowObj) return orderSteps;
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const projectOrder = {} as Record<string, number>;
@@ -255,7 +255,7 @@ class ParseSpec {
     this.yaml.useFlow = true;
     debug(`flow projectOrder: ${JSON.stringify(projectOrder)}`);
     // 指定flow后，如果存在依赖关系，校验是否可以正常执行
-    if (!isEmpty(dependencies)) {
+    if (useOrder) {
       debug(`project dependencies: ${JSON.stringify(dependencies)}`);
       for (const p1 in dependencies) {
         const ele = dependencies[p1];
