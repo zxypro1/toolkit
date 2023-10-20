@@ -1,5 +1,5 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil } from 'lodash';
+import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
 import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
@@ -215,6 +215,7 @@ class Engine {
    * Returns an array containing the initialized steps.
    */
   private async download(steps: IParseStep[]) {
+    const { command } = this.spec;
     const newSteps = [];
     for (const step of steps) {
       const logger = this.glog.__generate(step.projectName);
@@ -222,7 +223,8 @@ class Engine {
         logger,
         engineLogger: this.logger,
       });
-      newSteps.push({ ...step, instance, logger });
+      const verify = get(instance, `commands.${command}.verify`);
+      newSteps.push({ ...step, instance, logger, verify: isUndefined(verify) ? true : verify });
     }
     return newSteps;
   }
@@ -288,8 +290,8 @@ class Engine {
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
-      __runtime: this.options.verify ? 'enigne' : 'parse',
       resources: {},
+      __steps: this.context.steps,
     } as Record<string, any>;
     for (const obj of this.context.steps) {
       data.resources[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };

@@ -307,8 +307,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.7
-        version: 4.13.7
+        specifier: ^4.13.8
+        version: 4.13.8
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -1109,6 +1109,21 @@ packages:
 
   /@serverless-devs/art-template@4.13.7:
     resolution: {integrity: sha512-Qvhwi9240m3JLUFPqQgilSWF51gBSIO8anyyDb8I5h1mnNMnYZ7xk8i4y0f9NZ2AuNDT6yaG4/TeMrnWYGr2Vw==}
+    engines: {node: '>= 1.0.0'}
+    dependencies:
+      acorn: 5.7.4
+      escodegen: 1.14.3
+      estraverse: 4.3.0
+      html-minifier: 3.5.21
+      is-keyword-js: 1.0.3
+      js-tokens: 3.0.2
+      lodash.get: 4.4.2
+      merge-source-map: 1.1.0
+      source-map: 0.5.7
+    dev: false
+
+  /@serverless-devs/art-template@4.13.8:
+    resolution: {integrity: sha512-SbXwK+mV1mffxCjU02uAyDf/v+Yt5o63O8q1ROZpOzxmnhKo4AYGLbEpRnmdAxaurAMtZolNK2QTZDbzS3MOrQ==}
     engines: {node: '>= 1.0.0'}
     dependencies:
       acorn: 5.7.4

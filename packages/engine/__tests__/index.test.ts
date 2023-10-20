@@ -125,7 +125,7 @@ test('cadt-order', async () => {
   expect(context.status).toBe('success');
 });
 
-test.only('cadt-order2', async () => {
+test('cadt-order2', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/cadt-order2.yaml'),
     args: ['deploy'],
@@ -321,4 +321,15 @@ test('validate', async () => {
   expect(get(context, 'error[0]')).toBeInstanceOf(AssertionError);
   expect(get(context, 'error[0].message')).toBe(`command is required`);
   expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
+});
+
+
+test.only('validate output', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/validate-output.yaml'),
+    args: ['plan']
+  });
+  const context = await engine.start();
+  console.log(context);
+  expect(get(context, 'status')).toBe('success');
 });

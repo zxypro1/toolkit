@@ -23,7 +23,7 @@ artTemplate.defaults.rules.push({
 const compile = (value: string, _context: Record<string, any> = {}) => {
   // 仅针对字符串进行魔法变量解析
   if (!value || typeof value !== 'string') return value;
-  const { __runtime, ...context } = _context;
+  const { __runtime, __steps, ...context } = _context;
   const env = { ...process.env, ...context.env };
   const cwd = context.cwd || process.cwd();
 
@@ -69,11 +69,12 @@ const compile = (value: string, _context: Record<string, any> = {}) => {
   };
   // fix: this. => that.
   const thatVal = value.replace(/\$\{this\./g, '${that.');
+  const params = { runtime: __runtime, steps: __steps };
   try {
-    const res = artTemplate.compile(thatVal, { runtime: __runtime })(context);
+    const res = artTemplate.compile(thatVal, params)(context);
     // 解析过后的值如果是字符串，且包含魔法变量，则再次解析
     if (typeof res === 'string' && REGX.test(res)) {
-      return artTemplate.compile(res, { runtime: __runtime })(context);
+      return artTemplate.compile(res, params)(context);
     }
     return res;
   } catch (e) {
