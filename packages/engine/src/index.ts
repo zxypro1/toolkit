@@ -291,6 +291,7 @@ class Engine {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
       resources: {},
+      __runtime: this.options.verify ? 'enigne' : 'parse',
       __steps: this.context.steps,
     } as Record<string, any>;
     for (const obj of this.context.steps) {

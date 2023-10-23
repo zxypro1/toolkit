@@ -11,6 +11,7 @@ export interface IEngineOptions {
   logConfig?: Partial<ILogConfig> & {
     customLogger?: Logger;
   };
+  verify?: boolean;
 }
 
 export type IStepOptions = IStep & {
