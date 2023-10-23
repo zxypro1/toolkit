@@ -4,21 +4,6 @@ import artTemplate from '@serverless-devs/art-template';
 import { REGX } from './contants';
 import { get, isEmpty, isNil } from 'lodash';
 
-artTemplate.defaults.imports.$escape = (value: any, magic: string, ignoreError: boolean) => {
-  if (typeof value === 'boolean') return value;
-  if (value) return value;
-  if (ignoreError) return magic;
-  throw new Error(`${magic} not found`);
-};
-artTemplate.defaults.rules.push({
-  test: REGX,
-  use: function (match: any, code: any) {
-    return {
-      code,
-      output: 'escape',
-    };
-  },
-});
 
 const compile = (value: string, _context: Record<string, any> = {}) => {
   // 仅针对字符串进行魔法变量解析
@@ -26,6 +11,33 @@ const compile = (value: string, _context: Record<string, any> = {}) => {
   const { __runtime, __steps, ...context } = _context;
   const env = { ...process.env, ...context.env };
   const cwd = context.cwd || process.cwd();
+
+  artTemplate.defaults.imports.$escape = (value: any, magic: string, ignoreError: boolean) => {
+    if (typeof value === 'boolean') return value;
+    if (value) return value;
+    if (ignoreError) return magic;
+    throw new Error(`${magic} not found`);
+  };
+
+  artTemplate.defaults.rules[2] = {
+    test: REGX,
+    use: function (match: any, code: any) {
+      return {
+        code,
+        output: 'escape',
+      };
+    },
+  }
+
+  artTemplate.defaults.rules.push({
+    test: REGX,
+    use: function (match: any, code: any) {
+      return {
+        code,
+        output: 'escape',
+      };
+    },
+  });
 
   artTemplate.defaults.imports.env = (value: string, defaultValue?: any) => {
     const res = env[value];
