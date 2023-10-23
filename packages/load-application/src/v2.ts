@@ -2,8 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import axios from 'axios';
 import download from '@serverless-devs/downloads';
-import _artTemplate from 'art-template';
-import _devsArtTemplate from '@serverless-devs/art-template';
+import artTemplate from 'art-template';
 import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, find } from 'lodash';
 import parse from './parse';
@@ -56,7 +55,6 @@ class LoadApplication {
     this.name = name;
     this.version = version;
     this.options.projectName = this.options.projectName || name;
-    this.options.reserveComments = this.options.reserveComments || true;
     this.filePath = path.join(this.options.dest, this.options.projectName);
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
@@ -146,7 +144,6 @@ class LoadApplication {
     return this.doArtTemplate(this.spath, this.publishData);
   }
   private doArtTemplate(filePath: string, data: Record<string, any>) {
-    const artTemplate = this.options.reserveComments ? _artTemplate : _devsArtTemplate;
     artTemplate.defaults.extname = path.extname(filePath);
     set(artTemplate.defaults, 'escape', false);
     const filterFilePath = path.join(this.tempPath, 'hook', 'filter.js');
@@ -156,14 +153,9 @@ class LoadApplication {
         artTemplate.defaults.imports[key] = filterHook[key];
       }
     }
-    if (this.options.reserveComments) {
-      const newData = artTemplate(this.spath, data);
-      fs.writeFileSync(filePath, newData, 'utf-8');
-      return newData;
-    }
-    const newData = getInputs(getYamlContent(filePath), data, artTemplate);
-    fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
-    return YAML.stringify(newData);
+    const newData = artTemplate(filePath, data);
+    fs.writeFileSync(filePath, newData, 'utf-8');
+    return newData;
   }
 
   private async postInit() {

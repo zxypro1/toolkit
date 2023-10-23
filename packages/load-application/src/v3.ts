@@ -147,7 +147,7 @@ class LoadApplication {
       }
     }
     if (this.options.reserveComments) {
-      const newData = artTemplate(this.spath, data);
+      const newData = artTemplate(filePath, data);
       fs.writeFileSync(filePath, newData, 'utf-8');
       return newData;
     }
