@@ -14,6 +14,7 @@ import ParseContent from './parse-content';
 import { each, filter, find, get, has, includes, isArray, isEmpty, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
+import assert from 'assert';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -241,6 +242,7 @@ class ParseSpec {
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const projectOrder = {} as Record<string, number>;
     const fn = (projects: string[] = [], index: number) => {
+      assert(isArray(projects), `flow ${this.record.command} data format is invalid`)
       for (const project of projects) {
         for (const step of steps) {
           if (project === step.projectName) {
