@@ -16,7 +16,8 @@ interface IOptions {
 }
 
 class ParseContent {
-  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) {}
+  private credential: Record<string, any> = {};
+  constructor(private content: Record<string, any> = {}, private options = {} as IOptions) { }
   async start() {
     return await this.getSteps();
   }
@@ -26,6 +27,7 @@ class ParseContent {
       __runtime: 'parse',
       project: get(this.options.environment, '__project'),
       that: omit(this.options.environment, ['infrastructure', 'overlays']),
+      credential: this.credential,
     };
   }
   private getCommonMagic() {
@@ -33,6 +35,7 @@ class ParseContent {
       cwd: path.dirname(this.options.basePath),
       vars: this.content.vars,
       __runtime: 'parse',
+      credential: this.credential,
     };
   }
   private getMagicProps(item: Partial<IStep>) {
@@ -45,7 +48,6 @@ class ParseContent {
     const res = {
       ...this.getCommonMagic(),
       resources: temp,
-      credential: item.credential,
       that: {
         name,
         access: item.access,
@@ -60,6 +62,8 @@ class ParseContent {
     return res;
   }
   private async getSteps() {
+    const access = this.getAccess();
+    this.credential = await getCredential(access, this.options.logger);
     // resources字段， 其它字段
     const { resources, ...rest } = this.content;
     this.content = {
@@ -75,12 +79,9 @@ class ParseContent {
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
-      const access = this.getAccess();
-      const credential = await getCredential(access, this.options.logger);
-
-      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component, credential }));
+      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
       const target = extend2(true, {}, template, real.props);
-      const environment = getInputs(this.options.environment, this.getEnvMagic({ target, credential }));
+      const environment = getInputs(this.options.environment, this.getEnvMagic({ target }));
       debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > global > s.yaml
       set(real, 'props', extend2(true, {}, target, get(environment, 'overlays.global', {}), get(environment, 'overlays.resources', {})));
@@ -97,14 +98,14 @@ class ParseContent {
         projectName: project,
         component,
         access,
-        credential,
+        credential: this.credential,
       });
       originSteps.push({
         ...element,
         projectName: project,
         component,
         access,
-        credential,
+        credential: this.credential,
       });
     }
     return { steps, content: this.content, originSteps };
