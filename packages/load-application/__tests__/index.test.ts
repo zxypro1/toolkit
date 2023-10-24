@@ -13,7 +13,7 @@ test('loadApplication template is not devsapp', async () => {
 
 test.only('v3 start-cadt-app', async () => {
   const dest = path.join(__dirname, '_temp');
-  const template = 'start-cadt-app@0.0.3'
+  const template = 'start-cadt-app@0.0.4'
   const res = await loadApplication(template, {
     dest,
     projectName: template,
@@ -95,7 +95,6 @@ test.only('v3 start-cadt-app', async () => {
     },
     appName: 'appname-test',
     access: 'default',
-    reserveComments: false,
   })
   expect(res).toBe(path.join(dest, template))
 });
@@ -113,7 +112,6 @@ test('v3 start-fc3-nodejs@dev', async () => {
     },
     appName: 'appname-test',
     access: 'default',
-    reserveComments: false,
   })
   expect(res).toBe(path.join(dest, template))
 });

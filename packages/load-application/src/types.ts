@@ -36,10 +36,6 @@ export interface IOptions {
    */
   uri?: string;
   /**
-   * reserve comments or not
-   */
-  reserveComments?: boolean;
-  /**
    * Assume that the answer to any question which would be asked is yes
    */
   y?: boolean;

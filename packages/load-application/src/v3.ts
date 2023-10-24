@@ -14,7 +14,7 @@ import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
-import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, gray, RANDOM_PATTERN } from './constant';
+import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, gray } from './constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
 class LoadApplication {
@@ -42,6 +42,11 @@ class LoadApplication {
    * s.yaml 的路径
    */
   private spath!: string;
+
+  /**
+  * publish.yaml 的路径
+  */
+  private publishPath!: string;
   /**
    * 密码类型的参数
    */
@@ -54,7 +59,6 @@ class LoadApplication {
     this.name = name;
     this.version = version;
     this.options.projectName = this.options.projectName || name;
-    this.options.reserveComments = typeof this.options.reserveComments === 'boolean' ? this.options.reserveComments : true;
     this.filePath = path.join(this.options.dest, this.options.projectName);
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
@@ -136,7 +140,9 @@ class LoadApplication {
     return this.doArtTemplate(this.spath, this.publishData);
   }
   private doArtTemplate(filePath: string, data: Record<string, any>) {
-    const artTemplate = this.options.reserveComments ? _artTemplate : _devsArtTemplate;
+    const publishData = getYamlContent(this.publishPath);
+    const jsonParse = get(publishData, 'Parameters.jsonParse');
+    const artTemplate = jsonParse ? _devsArtTemplate : _artTemplate;
     artTemplate.defaults.extname = path.extname(filePath);
     set(artTemplate.defaults, 'escape', false);
     const filterFilePath = path.join(this.tempPath, 'hook', 'filter.js');
@@ -146,14 +152,14 @@ class LoadApplication {
         artTemplate.defaults.imports[key] = filterHook[key];
       }
     }
-    if (this.options.reserveComments) {
-      const newData = artTemplate(filePath, data);
-      fs.writeFileSync(filePath, newData, 'utf-8');
-      return newData;
+    if (jsonParse) {
+      const newData = getInputs(getYamlContent(filePath), data, artTemplate);
+      fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
+      return YAML.stringify(newData);
     }
-    const newData = getInputs(getYamlContent(filePath), data, artTemplate);
-    fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
-    return YAML.stringify(newData);
+    const newData = artTemplate(filePath, data);
+    fs.writeFileSync(filePath, newData, 'utf-8');
+    return newData;
   }
 
   private async postInit() {
@@ -185,8 +191,8 @@ class LoadApplication {
    * @tip parameters 的参数需要在 publish.yaml 里定义，另外会获取 publish.yaml 里的默认值
    */
   private async parsePublishYaml() {
-    const publishPath = path.join(this.tempPath, 'publish.yaml');
-    if (!fs.existsSync(publishPath)) return;
+    this.publishPath = path.join(this.tempPath, 'publish.yaml');
+    if (!fs.existsSync(this.publishPath)) return;
     fs.moveSync(path.join(this.tempPath, 'src'), this.filePath, { overwrite: true });
     const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
     if (isEmpty(spath)) return;
@@ -194,14 +200,14 @@ class LoadApplication {
     const { parameters = {} } = this.options;
     // 如果有parameters参数，或者是 CI/CD 环境，就不需要提示用户输入参数了
     if (!isEmpty(parameters) || isCiCdEnvironment()) {
-      this.publishData = this.parsePublishWithParameters(publishPath);
+      this.publishData = this.parsePublishWithParameters();
       return;
     }
     if (this.options.y) return;
-    this.publishData = await this.parsePublishWithInquire(publishPath);
+    this.publishData = await this.parsePublishWithInquire();
   }
-  private async parsePublishWithInquire(publishPath: string) {
-    const publishData = getYamlContent(publishPath);
+  private async parsePublishWithInquire() {
+    const publishData = getYamlContent(this.publishPath);
     const properties = get(publishData, 'Parameters.properties');
     const requiredList = get(publishData, 'Parameters.required');
     const promptList = [];
@@ -321,8 +327,8 @@ class LoadApplication {
       return data?.access;
     }
   }
-  private parsePublishWithParameters(publishPath: string) {
-    const publishData = getYamlContent(publishPath);
+  private parsePublishWithParameters() {
+    const publishData = getYamlContent(this.publishPath);
     const properties = get(publishData, 'Parameters.properties', {});
     const requiredList = get(publishData, 'Parameters.required', []);
     const { parameters = {} } = this.options;
