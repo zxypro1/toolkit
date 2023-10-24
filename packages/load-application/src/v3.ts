@@ -137,9 +137,10 @@ class LoadApplication {
   private async parseTemplateYaml(postData: Record<string, any>) {
     if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
-    return this.doArtTemplate(this.spath, this.publishData);
+    return this.doArtTemplate(this.spath);
   }
-  private doArtTemplate(filePath: string, data: Record<string, any>) {
+  private doArtTemplate(filePath: string) {
+    this.publishData = { ...this.publishData, access: this.options.access };
     const publishData = getYamlContent(this.publishPath);
     const jsonParse = get(publishData, 'Parameters.jsonParse');
     const artTemplate = jsonParse ? _devsArtTemplate : _artTemplate;
@@ -153,11 +154,11 @@ class LoadApplication {
       }
     }
     if (jsonParse) {
-      const newData = getInputs(getYamlContent(filePath), data, artTemplate);
+      const newData = getInputs(getYamlContent(filePath), this.publishData, artTemplate);
       fs.writeFileSync(filePath, YAML.stringify(newData), 'utf-8');
       return YAML.stringify(newData);
     }
-    const newData = artTemplate(filePath, data);
+    const newData = artTemplate(filePath, this.publishData);
     fs.writeFileSync(filePath, newData, 'utf-8');
     return newData;
   }
@@ -166,7 +167,6 @@ class LoadApplication {
     const hookPath = path.join(this.tempPath, 'hook');
     if (!fs.existsSync(hookPath)) return;
     const { logger } = this.options;
-    const { parameters, access } = this.options;
     const hook = await require(hookPath);
     const data = {
       name: this.name,
@@ -177,7 +177,7 @@ class LoadApplication {
       fs,
       lodash: require('lodash'),
       artTemplate: (filePath: string) => {
-        this.doArtTemplate(path.join(this.filePath, filePath), { ...parameters, access });
+        this.doArtTemplate(path.join(this.filePath, filePath));
       },
     };
     try {

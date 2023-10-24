@@ -141,9 +141,10 @@ class LoadApplication {
   private async parseTemplateYaml(postData: Record<string, any>) {
     if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
-    return this.doArtTemplate(this.spath, this.publishData);
+    return this.doArtTemplate(this.spath);
   }
-  private doArtTemplate(filePath: string, data: Record<string, any>) {
+  private doArtTemplate(filePath: string) {
+
     artTemplate.defaults.extname = path.extname(filePath);
     set(artTemplate.defaults, 'escape', false);
     const filterFilePath = path.join(this.tempPath, 'hook', 'filter.js');
@@ -153,7 +154,7 @@ class LoadApplication {
         artTemplate.defaults.imports[key] = filterHook[key];
       }
     }
-    const newData = artTemplate(filePath, data);
+    const newData = artTemplate(filePath, { ...this.publishData, access: this.options.access });
     fs.writeFileSync(filePath, newData, 'utf-8');
     return newData;
   }
@@ -174,7 +175,7 @@ class LoadApplication {
       fs,
       lodash: require('lodash'),
       artTemplate: (filePath: string) => {
-        this.doArtTemplate(path.join(this.filePath, filePath), { ...parameters, access });
+        this.doArtTemplate(path.join(this.filePath, filePath));
       },
     };
     try {
