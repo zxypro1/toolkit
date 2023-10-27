@@ -199,8 +199,8 @@ class LoadApplication {
     const { parameters = {} } = this.options;
     // 如果有parameters参数，或者是 CI/CD 环境，就不需要提示用户输入参数了
     if (!isEmpty(parameters) || isCiCdEnvironment()) {
-      this.publishData = this.parsePublishWithParameters();
-      this.publishData = { ...this.publishData, access: this.options.access };
+      const publishData = this.parsePublishWithParameters();
+      this.publishData = { ...publishData, access: this.options.access };
       return;
     }
     if (this.options.y) return;
