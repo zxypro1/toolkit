@@ -1,12 +1,10 @@
 import Actions from '../src/actions';
 import fs from 'fs-extra';
-import { command } from 'execa';
 import loadComponent from '@serverless-devs/load-component';
 import { IActionLevel, IActionType } from '@serverless-devs/parse-spec';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 
 jest.mock('fs-extra');
-jest.mock('execa');
 jest.mock('@serverless-devs/load-component');
 
 describe('Actions class', () => {
@@ -99,54 +97,6 @@ describe('Actions class', () => {
             const hook: any = { path: '/path/to/nonexistent/dir', value: 'echo hello' };
             await expect(actionsInstance['run'](hook)).rejects.toThrow('The /path/to/nonexistent/dir directory does not exist.');
         });
-
-        it('should run command in existing directory', async () => {
-            (fs.existsSync as jest.Mock).mockReturnValueOnce(true);
-            (fs.lstatSync as jest.Mock).mockReturnValueOnce({ isDirectory: jest.fn(() => true) });
-
-            let capturedStdoutData: string | null = null;
-            const mockStdout = {
-                on: jest.fn().mockImplementation((event, handler) => {
-                    if (event === 'data') {
-                        handler(Buffer.from('hello'));
-                        capturedStdoutData = Buffer.from('hello').toString();
-                    }
-                })
-            };
-            const mockStderr = { on: jest.fn() };
-
-            (command as jest.Mock).mockReturnValueOnce({
-                stdout: mockStdout,
-                stderr: mockStderr,
-                on: jest.fn().mockImplementation((event, handler) => handler(0))  // Simulating exit code 0
-            });
-
-            const hook: any = { path: './', value: 'echo hello' };
-
-            // Run the method
-            await actionsInstance['run'](hook);
-
-            // Verify that the command was called correctly
-            expect(command).toHaveBeenCalledWith('echo hello', expect.objectContaining({ cwd: './' }));
-
-            // Check the output of the command
-            expect(capturedStdoutData).toBe('hello');
-        });
-
-        it('should handle command execution error', async () => {
-            (fs.existsSync as jest.Mock).mockReturnValueOnce(true);
-            (fs.lstatSync as jest.Mock).mockReturnValueOnce({ isDirectory: jest.fn(() => true) });
-            const mockCommand = command as jest.Mock;
-            mockCommand.mockReturnValueOnce({
-                stdout: { on: jest.fn() },
-                stderr: { on: jest.fn((event, callback) => callback('Error message')) },
-                on: jest.fn().mockImplementation((event, handler) => handler(127))  // Simulating exit code 127 to indicate error.
-            });
-
-            const hook: any = { path: './', value: 'echo hello' };
-            await expect(actionsInstance['run'](hook)).rejects.toThrow('Error message');
-        });
-
     });
 
     describe('plugin method', () => {

@@ -3,7 +3,7 @@ import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import { DevsError } from '@serverless-devs/utils';
 import fs from 'fs-extra';
-import { command } from 'execa';
+import { spawn } from 'child_process';
 import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
 import { getAllowFailure, getProcessTime, stringify } from '../utils';
@@ -178,7 +178,7 @@ class Actions {
     if (fs.existsSync(hook.path) && fs.lstatSync(hook.path).isDirectory()) {
       try {
         // Execute the command in the specified directory.
-        const cp = command(hook.value, {
+        const cp = spawn(hook.value, {
           cwd: hook.path,
           shell: true,
         });

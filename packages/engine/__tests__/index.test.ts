@@ -324,7 +324,7 @@ test('validate', async () => {
 });
 
 
-test.only('validate output', async () => {
+test('validate output', async () => {
   const engine = new Engine({
     template: path.join(__dirname, './mock/validate-output.yaml'),
     args: ['plan']
