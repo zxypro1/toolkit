@@ -154,7 +154,7 @@ class LoadApplication {
         artTemplate.defaults.imports[key] = filterHook[key];
       }
     }
-    const newData = artTemplate(filePath, { ...this.publishData, access: this.options.access });
+    const newData = artTemplate(filePath, this.publishData);
     fs.writeFileSync(filePath, newData, 'utf-8');
     return newData;
   }
@@ -195,14 +195,13 @@ class LoadApplication {
     }
     fs.moveSync(path.join(this.tempPath, 'src'), this.filePath, { overwrite: true });
     const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
-    if (isEmpty(spath)) {
-      throw new Error('s.yaml/s.yml is not found');
-    }
+    if (isEmpty(spath)) return;
     this.spath = spath as string;
     const { parameters = {} } = this.options;
     // 如果有parameters参数，或者是 CI/CD 环境，就不需要提示用户输入参数了
     if (!isEmpty(parameters) || isCiCdEnvironment()) {
       this.publishData = this.parsePublishWithParameters(publishPath);
+      this.publishData = { ...this.publishData, access: this.options.access };
       return;
     }
     if (this.options.y) return;

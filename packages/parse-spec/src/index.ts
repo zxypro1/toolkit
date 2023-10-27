@@ -128,7 +128,7 @@ class ParseSpec {
       }
       const { project, environments } = envYamlContent;
       const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
-      const defaultEnv = get(defaultEnvContent, project);
+      const defaultEnv = get(find(defaultEnvContent, {project: project}), 'default');
       // project is not found in default-env.json
       if (!defaultEnv) {
         throw new utils.DevsError('Default env is not found', {
