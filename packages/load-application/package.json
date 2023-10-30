@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-application",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "load application for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
