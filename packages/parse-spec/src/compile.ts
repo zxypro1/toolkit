@@ -75,7 +75,7 @@ const compile = (value: string, _context: Record<string, any> = {}) => {
       throw new Error(`file('${filePath}') not found`);
     }
   };
-  artTemplate.defaults.imports.regx = (value: string) => {
+  artTemplate.defaults.imports.regex = (value: string) => {
     const r = new RegExp(value);
     return r.test(context.command);
   };

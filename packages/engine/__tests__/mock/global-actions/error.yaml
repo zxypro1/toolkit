@@ -28,7 +28,7 @@ vars: # 全局变量
     description: hello world by serverless devs
 
 actions:
-  pre-${regx('.')}:
+  pre-${regex('.')}:
     # - run: npm run error
     - run: echo ${vars.region}-${env('desc')}
     - plugin: ${path('../plugin/a.js')}
@@ -36,7 +36,7 @@ actions:
         testKey: testValue
   success-deploy:
     - run: echo success-deploy
-  complete-${regx('deploy')}:
+  complete-${regex('deploy')}:
     - run: echo complete-deploy
     - plugin: ${path('../plugin/a.js')}
       args:
@@ -49,7 +49,7 @@ actions:
 
 resources:
   helloworld: # 业务名称/模块名称
-    component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    component: fc3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
     actions: # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
       pre-deploy: # 在deploy之前运行
         - run: echo pre-deploy # 要执行的系统命令，类似于一种钩子的形式
@@ -124,7 +124,7 @@ resources:
                 - GET
                 - POST
   next-helloworld-2: # 业务名称/模块名称
-    component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    component: fc3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
     # actions:       # 自定义执行逻辑，关于actions 的使用，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#行为描述
     #   pre-deploy: # 在deploy之前运行
     #     - run: echo pre-deploy        # 要执行的系统命令，类似于一种钩子的形式

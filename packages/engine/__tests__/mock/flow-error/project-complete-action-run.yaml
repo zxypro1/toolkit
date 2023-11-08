@@ -28,19 +28,19 @@ vars: # 全局变量
     description: hello world by serverless devs
 
 actions:
-  pre-${regx('.')}:
+  pre-${regex('.')}:
     - plugin: ${path('../plugin/a.js')}
       args:
         testKey: testValue
     - run: echo global pre ${vars.region}-${env('desc')}
-  success-${regx('.')}:
+  success-${regex('.')}:
     - run: echo success-deploy
-  complete-${regx('.')}:
+  complete-${regex('.')}:
     - run: echo complete-deploy
     - plugin: ${path('../plugin/a.js')}
       args:
         testKey: testValue
-  fail-${regx('.')}:
+  fail-${regex('.')}:
     - run: echo fail-${vars.region}-${env('desc')}
     - plugin: ${path('../plugin/a.js')}
       args:
@@ -48,9 +48,9 @@ actions:
 
 resources:
   helloworld: # 业务名称/模块名称
-    component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    component: fc3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
     actions:
-      pre-${regx('.')}:
+      pre-${regex('.')}:
         - run: echo helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}
         - plugin: ${path('../plugin/a.js')}
           args:
@@ -58,16 +58,16 @@ resources:
         - plugin: ${path('../plugin/b.js')}
           args:
             testKey: testValue
-      success-${regx('.')}:
+      success-${regex('.')}:
         - run: echo success-deploy
-      complete-${regx('.')}:
+      complete-${regex('.')}:
         - run: echo complete-deploy
         - run: npm run error
         - plugin: ${path('../plugin/a.js')}
           args:
             testKey: testValue
-        - component: v3test deploy
-      fail-${regx('.')}:
+        - component: fc3test deploy
+      fail-${regex('.')}:
         - plugin: ${path('../plugin/e.js')}
           args:
             testKey: testValue
@@ -98,9 +98,9 @@ resources:
                 - GET
                 - POST
   next-helloworld: # 业务名称/模块名称
-    component: v3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
+    component: fc3test # 组件名称，Serverless Devs 工具本身类似于一种游戏机，不具备具体的业务能力，组件类似于游戏卡，用户通过向游戏机中插入不同的游戏卡实现不同的功能，即通过使用不同的组件实现不同的具体业务能力
     actions:
-      pre-${regx('.')}:
+      pre-${regex('.')}:
         # - run: npm run error
         - run: echo next-helloworld ${vars.region}-${env('desc')}-${this.props.service.name}-${this.props.function.name}-${resources.helloworld.output.hello}
         - plugin: ${path('../plugin/a.js')}
@@ -111,12 +111,12 @@ resources:
             testKey: testValue
       success-deploy:
         - run: echo success-deploy--${this.props.service.name}-${this.props.function.name}-${resources.helloworld.output.hello}
-      complete-${regx('deploy')}:
+      complete-${regex('deploy')}:
         - run: echo complete-deploy
         - plugin: ${path('../plugin/a.js')}
           args:
             testKey: testValue
-        - component: v3test deploy -e '{"word_file":"example.docx"}'
+        - component: fc3test deploy -e '{"word_file":"example.docx"}'
       fail-deploy:
         - run: echo fail-${vars.region}-${env('desc')}
         - plugin: ${path('../plugin/a.js')}

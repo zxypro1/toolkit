@@ -5,19 +5,19 @@ env: env.yaml
 
 resources:
   function-a:
-    component: v3test
-    props: 
+    component: fc3test
+    props:
       functionName: fcv3-function
-      codeUri: './code'
+      codeUri: "./code"
       runtime: python3.9
       handler: index.app
       timeout: 60
 
   function-b:
-    component: v3test
+    component: fc3test
     props:
       functionName: fcv3-function-b
-      codeUri: './code1'
+      codeUri: "./code1"
       runtime: python3.9
       handler: index.app
       timeout: 60

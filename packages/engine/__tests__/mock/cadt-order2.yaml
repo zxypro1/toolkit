@@ -2,7 +2,7 @@ edition: 3.0.0
 name: cadtApp
 resources:
   cadt_PL950W7GRN2X2LVR:
-    component: v3test
+    component: fc3test
     props:
       refs:
         - ${resources.vpc_1697600652.output}
@@ -14,7 +14,7 @@ resources:
       name: cadt_PL950W7GRN2X2LVR
       region: cn-beijing
   vswitch_1697600653:
-    component: v3test
+    component: fc3test
     props:
       zone_id: cn-beijing-k
       depends_on:
@@ -23,7 +23,7 @@ resources:
       cidr_block: 192.168.0.0/24
       vswitch_name: vswitch_1
   kafka_topic_1697600654_test_topic:
-    component: v3test
+    component: fc3test
     props:
       depends_on:
         - kafka_inst_1697600654
@@ -33,12 +33,12 @@ resources:
       local_topic: "false"
       partition_num: 12
   vpc_1697600652:
-    component: v3test
+    component: fc3test
     props:
       vpc_name: vpc
       cidr_block: 192.168.0.0/16
   kafka_consumer_group_1697600654:
-    component: v3test
+    component: fc3test
     props:
       consumer_id: test-group
       depends_on:
@@ -46,14 +46,14 @@ resources:
       instance_id: ${resources.kafka_inst_1697600654.output.hello}
       description: test group
   sg_1697600656:
-    component: v3test
+    component: fc3test
     props:
       depends_on:
         - vpc_1697600652
       vpc_id: ${resources.vpc_1697600652.output.hello}
       name: security_group
   kafka_inst_1697600654:
-    component: v3test
+    component: fc3test
     props:
       depends_on:
         - vswitch_1697600653
@@ -72,7 +72,7 @@ resources:
       io_max: 20
       partition_num: 0
   fc_function_1697600655:
-    component: v3test
+    component: fc3test
     props:
       handler: index.handler
       diskSize: 512

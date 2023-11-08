@@ -20,7 +20,7 @@ name: framework #  项目名称
 access: default
 
 flow:
-  ${regx('deploy')}: # 支持正则
+  ${regex('deploy')}: # 支持正则
     - [framework, website]
     - [next-function]
   info: # 支持正则
@@ -36,7 +36,7 @@ vars: # 全局变量
 resources:
   framework: # 业务名称/模块名称
     # component: ${path('./fc.js')} # 组件名称
-    component: v3test # 组件名称
+    component: fc3test # 组件名称
     props: # 组件的属性值
       region: ${vars.region}
       # service: ${vars.service}
@@ -56,7 +56,7 @@ resources:
           access: ${this.access}
           codeUri: ${this.props.function.codeUri}
   website: # 第二个函数的案例，仅供参考
-    component: v3test
+    component: fc3test
     props:
       region: ${vars.region}
       service: ${vars.service} # 应用整体的服务配置
@@ -68,7 +68,7 @@ resources:
         memorySize: 1024
         runtime: nodejs12
   next-function: # 第二个函数的案例，仅供参考
-    component: v3test
+    component: fc3test
     props:
       region: ${vars.region}
       service: ${vars.service} # 应用整体的服务配置
