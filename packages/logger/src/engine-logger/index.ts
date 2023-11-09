@@ -1,5 +1,5 @@
 import { Logger, LoggerLevel, EggLoggerOptions } from 'egg-logger';
-import { getGlobalConfig } from '@serverless-devs/utils';
+import { getGlobalConfig, parseArgv } from '@serverless-devs/utils';
 import { set, get } from 'lodash';
 import prettyjson, { RendererOptions } from 'prettyjson';
 import os from 'os';
@@ -11,6 +11,8 @@ import chalk from 'chalk';
 
 export default class EngineLogger extends Logger {
   private eol: string;
+  private key: string;
+  private level: LoggerLevel;
 
   constructor(props: IOptions) {
     super({} as EggLoggerOptions);
@@ -24,7 +26,9 @@ export default class EngineLogger extends Logger {
     const eol = get(props, 'eol', os.EOL);
     const level = process.env.NODE_CONSOLE_LOGGRE_LEVEL as LoggerLevel;
 
+    this.level = level || get(props, 'level', 'INFO');
     this.eol = eol;
+    this.key = key;
 
     const consoleTransport = new ConsoleTransport({
       level: level || get(props, 'level', 'INFO'),
@@ -32,7 +36,13 @@ export default class EngineLogger extends Logger {
       // file: consoleLogPath,
       key,
     });
-    this.set('console', consoleTransport);
+
+    const argv = process.argv.slice(2);
+    const { silent } = parseArgv(argv);
+
+    if(!silent) {
+      this.set('console', consoleTransport);
+    }
 
     if (getGlobalConfig('log') !== 'disable') {
       const fileTransport = new FileTransport({
@@ -83,5 +93,25 @@ export default class EngineLogger extends Logger {
     if (f) {
       set(f, 'options.eol', eol);
     }
+  }
+
+  silent() {
+    const consoleTransport = new ConsoleTransport({
+      level: 'NONE',
+      eol: this.eol,
+      // file: consoleLogPath,
+      key: this.key,
+    });
+    this.set('console', consoleTransport);
+  }
+
+  unsilent() {
+    const consoleTransport = new ConsoleTransport({
+      level: this.level,
+      eol: this.eol,
+      // file: consoleLogPath,
+      key: this.key,
+    });
+    this.set('console', consoleTransport);
   }
 }

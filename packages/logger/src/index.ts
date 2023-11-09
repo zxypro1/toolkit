@@ -5,6 +5,7 @@ import EngineLogger from './engine-logger';
 import ProgressFooter from './progress-footer';
 import { transport } from './utils';
 import * as stdoutFormatter from './stdout-formatter';
+import { parseArgv } from '@serverless-devs/utils';
 
 export { default as EngineLogger } from './engine-logger';
 export { default as ProgressFooter } from './progress-footer';
@@ -45,11 +46,13 @@ export default class Logger extends Map<string, ILoggerInstance> {
     if (super.has(instanceKey)) {
       return super.get(instanceKey) as ILoggerInstance;
     }
+    const argv = process.argv.slice(2);
+    const { silent } = parseArgv(argv);
     const logger = new EngineLogger(this.__getEggLoggerConfig(instanceKey)) as ILoggerInstance;
 
     logger.progress = (message: string) => {
       logger.debug(message);
-      this.__progressFooter.upsert(instanceKey, message);
+      if (!silent) this.__progressFooter.upsert(instanceKey, message);
     };
 
     logger.spin = (type: keyof typeof stdoutFormatter, ...rest: any[]) => {
@@ -60,7 +63,7 @@ export default class Logger extends Map<string, ILoggerInstance> {
         message = formatFunction(...rest);
       }
       logger.debug(message);
-      this.__progressFooter.upsert(instanceKey, transport.transportSecrets(message));
+      if (!silent) this.__progressFooter.upsert(instanceKey, transport.transportSecrets(message));
     };
 
     super.set(instanceKey, logger);
