@@ -8,6 +8,7 @@ import path from 'path';
 import { IOptions } from './types';
 import { DEFAULT_FILENAME } from './constants';
 import assert from 'assert';
+import { fieldEncryption } from '@serverless-devs/utils';
 
 class Download {
   constructor(private url: string, private options: IOptions = {}) {
@@ -20,13 +21,18 @@ class Download {
     const uri = new URL(this.url);
     const write = logger.write ? (...args: any) => logger.write.apply(logger, args) : logger.log;
     write(`Downloading[${chalk.green(decodeURIComponent(uri.pathname))}]...`);
-    try {
-      const filePath = await this.doDownload(this.url);
-      await this.doDecompress(filePath);
-      write(`Download ${this.options.filename} successfully`);
-    } catch (error) {
-      write(`Download ${this.options.filename} failed`);
-      throw error;
+    for (let index = 0; index < 3; index++) {
+      try {
+        const filePath = await this.doDownload(this.url);
+        await this.doDecompress(filePath);
+        write(`Download ${this.options.filename} successfully`);
+        break;
+      } catch (error) {
+        if (index === 2) {
+          write(`Download ${this.options.filename} failed`);
+          throw error;
+        }
+      }
     }
   }
   async uri() {
@@ -64,13 +70,23 @@ class Download {
     }
   }
   private async doDownload(url: string): Promise<string> {
-    const { headers } = this.options;
+    const { headers, logger } = this.options;
     const dest = this.options.dest as string;
     const filename = this.options.filename as string;
     const uri = new URL(url);
     const pkg = url.toLowerCase().startsWith('https:') ? https : http;
     return new Promise((resolve, reject) => {
+      logger.debug(`Url: ${uri.href}`);
+      // 对sign_code和token手动脱敏下
+      if (headers?.sign_code) {
+        headers.sign_code = fieldEncryption(headers.sign_code);
+      }
+      if (headers?.token) {
+        headers.token = fieldEncryption(headers.token);
+      }
+      logger.debug(`Request headers: ${JSON.stringify(headers)}`);
       pkg.get(uri.href, { headers }).on('response', (response: IncomingMessage) => {
+        logger.debug(`Response headers: ${JSON.stringify(response.headers)}`);
         fs.ensureDirSync(dest);
         const filePath = path.join(dest, `${filename}.zip`);
         if (response.statusCode === 200) {

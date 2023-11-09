@@ -17,6 +17,7 @@
     "url": "https://github.com/Serverless-Devs/toolkit"
   },
   "dependencies": {
+    "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",
     "decompress": "^4.2.1",
     "fs-extra": "^11.1.0"
