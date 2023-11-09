@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/logger",
-  "version": "0.0.2-beta.15",
+  "version": "0.0.2-beta.16",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
