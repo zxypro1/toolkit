@@ -307,8 +307,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.8
-        version: 4.13.8
+        specifier: ^4.13.10
+        version: 4.13.10
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -1107,8 +1107,8 @@ packages:
       - supports-color
     dev: false
 
-  /@serverless-devs/art-template@4.13.7:
-    resolution: {integrity: sha512-Qvhwi9240m3JLUFPqQgilSWF51gBSIO8anyyDb8I5h1mnNMnYZ7xk8i4y0f9NZ2AuNDT6yaG4/TeMrnWYGr2Vw==}
+  /@serverless-devs/art-template@4.13.10:
+    resolution: {integrity: sha512-zhPpUMp1yiKG0GTEO1+laF4VWFIIGOSYvALnseTePVASpcMwf1w45SviKOO3wBIliSr01q25ca1W5GBqB4q8AA==}
     engines: {node: '>= 1.0.0'}
     dependencies:
       acorn: 5.7.4
@@ -1122,8 +1122,8 @@ packages:
       source-map: 0.5.7
     dev: false
 
-  /@serverless-devs/art-template@4.13.8:
-    resolution: {integrity: sha512-SbXwK+mV1mffxCjU02uAyDf/v+Yt5o63O8q1ROZpOzxmnhKo4AYGLbEpRnmdAxaurAMtZolNK2QTZDbzS3MOrQ==}
+  /@serverless-devs/art-template@4.13.7:
+    resolution: {integrity: sha512-Qvhwi9240m3JLUFPqQgilSWF51gBSIO8anyyDb8I5h1mnNMnYZ7xk8i4y0f9NZ2AuNDT6yaG4/TeMrnWYGr2Vw==}
     engines: {node: '>= 1.0.0'}
     dependencies:
       acorn: 5.7.4

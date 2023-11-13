@@ -1,7 +1,7 @@
 {
   "name": "@serverless-devs/parse-spec",
-  "version": "0.0.7",
-  "description": "request for serverless-devs",
+  "version": "0.0.8",
+  "description": "a parse yaml spec lib for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib node_modules",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@serverless-cd/debug": "^4.3.4",
-    "@serverless-devs/art-template": "^4.13.8",
+    "@serverless-devs/art-template": "^4.13.10",
     "@serverless-devs/credential": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",
