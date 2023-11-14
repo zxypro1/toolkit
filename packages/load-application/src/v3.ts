@@ -192,7 +192,9 @@ class LoadApplication {
   private async parsePublishYaml() {
     this.publishPath = path.join(this.tempPath, 'publish.yaml');
     if (!fs.existsSync(this.publishPath)) return;
-    fs.moveSync(path.join(this.tempPath, 'src'), this.filePath, { overwrite: true });
+    // keep behavior of fs.moveSync()
+    fs.emptyDirSync(this.filePath);
+    fs.copySync(path.join(this.tempPath, 'src'), this.filePath);
     const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
     if (isEmpty(spath)) return;
     this.spath = spath as string;
