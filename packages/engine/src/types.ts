@@ -12,6 +12,7 @@ export interface IEngineOptions {
     customLogger?: Logger;
   };
   verify?: boolean;
+  serverlessDevsVersion?: string;
 }
 
 export type IStepOptions = IStep & {

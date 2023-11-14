@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { get, includes, find, split, filter, isEmpty } from 'lodash';
 import axios from 'axios';
-import { getRootHome, registry } from '@serverless-devs/utils';
+import { getRootHome, getYamlContent, registry } from '@serverless-devs/utils';
 import { BASE_URL } from '../constant';
 import assert from 'assert';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
@@ -49,6 +49,11 @@ export const buildComponentInstance = async (componentPath: string, params?: any
     const componentInstance = new ChildComponent(params);
     if (componentInstance) {
       componentInstance.__path = componentPath;
+      const publishData = getYamlContent(path.join(componentPath, 'publish.yaml'));
+      const version = get(publishData, 'Version');
+      if (version) {
+        componentInstance.__version = version;
+      }
     }
     return componentInstance;
   } catch (error) {

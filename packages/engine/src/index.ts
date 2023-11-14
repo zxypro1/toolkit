@@ -517,6 +517,7 @@ class Engine {
     const { projectName, command } = this.spec;
     const result = {
       cwd: this.options.cwd,
+      userAgent: `serverless-devs-${this.options.serverlessDevsVersion}-${item.component}-${item.instance.__version}`,
       name: get(this.spec, 'yaml.appName'),
       props: newInputs,
       command,
