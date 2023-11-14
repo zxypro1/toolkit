@@ -307,8 +307,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.10
-        version: 4.13.10
+        specifier: ^4.13.11
+        version: 4.13.11
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -1107,8 +1107,8 @@ packages:
       - supports-color
     dev: false
 
-  /@serverless-devs/art-template@4.13.10:
-    resolution: {integrity: sha512-zhPpUMp1yiKG0GTEO1+laF4VWFIIGOSYvALnseTePVASpcMwf1w45SviKOO3wBIliSr01q25ca1W5GBqB4q8AA==}
+  /@serverless-devs/art-template@4.13.11:
+    resolution: {integrity: sha512-ZQDf0S72y+78JubM+bn1kyM4QlmvOnsKISw79fZnAIh7aFRDqCDxKig5GZr8FOThRAmEDQP4kZrSg+IZJbgCug==}
     engines: {node: '>= 1.0.0'}
     dependencies:
       acorn: 5.7.4
