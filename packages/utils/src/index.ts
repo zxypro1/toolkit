@@ -1,5 +1,6 @@
 import path from 'path';
 
+export * from './constants';
 export { default as getCurrentEnvironment } from './get-current-environment';
 export { default as isCiCdEnvironment } from './is-cicd-environment';
 export { default as isChinaUser } from './is-china-user';
@@ -16,4 +17,4 @@ export { default as traceid } from './traceid';
 export { default as readJson } from './read-json';
 export { default as emoji } from './emoji';
 export const getLockFile = (basePath: string) => path.join(basePath, '.s.lock');
-export * from './constants'
+export { default as getUserAgent } from './get-user-agent';

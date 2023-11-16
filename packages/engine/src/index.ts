@@ -9,7 +9,7 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
-import { DevsError, emoji, getAbsolutePath, getRootHome, traceid } from '@serverless-devs/utils';
+import { DevsError, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
 export * from './types';
@@ -517,7 +517,7 @@ class Engine {
     const { projectName, command } = this.spec;
     const result = {
       cwd: this.options.cwd,
-      userAgent: `serverless-devs-${this.options.serverlessDevsVersion}-${item.component}-${item.instance.__version}`,
+      userAgent: getUserAgent({ component: item.component, componentVersion: item.instance.__version }),
       name: get(this.spec, 'yaml.appName'),
       props: newInputs,
       command,
