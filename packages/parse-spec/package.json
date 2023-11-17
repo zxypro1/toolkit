@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/parse-spec",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "a parse yaml spec lib for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@serverless-cd/debug": "^4.3.4",
-    "@serverless-devs/art-template": "^4.13.11",
+    "@serverless-devs/art-template": "^4.13.12",
     "@serverless-devs/credential": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
     "chalk": "^4.1.2",

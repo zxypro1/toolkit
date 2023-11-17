@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/engine",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "a engine lib for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
