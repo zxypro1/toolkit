@@ -53,6 +53,7 @@ export const buildComponentInstance = async (componentPath: string, params?: any
       const version = get(publishData, 'Version');
       if (version) {
         componentInstance.__version = version;
+        componentInstance.__info = `${get(publishData, 'Name')}@${version}`;
       }
     }
     return componentInstance;

@@ -517,7 +517,7 @@ class Engine {
     const { projectName, command } = this.spec;
     const result = {
       cwd: this.options.cwd,
-      userAgent: getUserAgent({ component: item.component, componentVersion: item.instance.__version }),
+      userAgent: getUserAgent({ component: item.instance.__info }),
       name: get(this.spec, 'yaml.appName'),
       props: newInputs,
       command,

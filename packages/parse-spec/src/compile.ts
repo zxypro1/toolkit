@@ -3,6 +3,7 @@ import path from 'path';
 import artTemplate from '@serverless-devs/art-template';
 import { REGX } from './contants';
 import { get, isEmpty, isNil } from 'lodash';
+import { DevsError, ETrackerType } from '@serverless-devs/utils';
 
 
 const compile = (value: string, _context: Record<string, any> = {}) => {
@@ -93,7 +94,10 @@ const compile = (value: string, _context: Record<string, any> = {}) => {
     const error = e as Error;
     // fix: that. => this.
     const msg = error.message.replace(/\$\{that\./g, '${this.');
-    throw new Error(msg);
+    throw new DevsError(msg, {
+      stack: error.stack,
+      trackerType: __runtime === 'parse' ? ETrackerType.parseException : ETrackerType.runtimeException,
+    });
   }
 };
 

@@ -1,4 +1,11 @@
 import { set } from 'lodash';
+
+export enum ETrackerType {
+  parseException = 'parseException',
+  runtimeException = 'runtimeException',
+}
+
+type ITrackerType = `${ETrackerType}`;
 interface IOptions {
   exitCode?: number;
   prefix?: string;
@@ -10,6 +17,7 @@ interface IOptions {
     statusCode: number;
   };
   stack?: string;
+  trackerType?: ITrackerType;
 }
 class DevsError extends Error {
   readonly CODE = 'DevsError';
@@ -24,6 +32,7 @@ class DevsError extends Error {
     statusCode: number;
   };
   stack?: string;
+  trackerType?: ITrackerType;
   constructor(message: string, options: IOptions = {}) {
     super(message);
     for (const key in options) {

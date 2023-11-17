@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/parse-spec",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "a parse yaml spec lib for serverless-devs",
   "main": "lib/index.js",
   "scripts": {

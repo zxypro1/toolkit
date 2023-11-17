@@ -11,7 +11,7 @@ export { default as parseArgv } from './parse-argv';
 export { default as getYamlContent, getYamlPath, getAbsolutePath } from './get-yaml-content';
 export { default as fieldEncryption } from './field-encryption';
 export { default as isWindow } from './is-window';
-export { default as DevsError } from './devs-error';
+export { default as DevsError, ETrackerType } from './devs-error';
 export { default as registry } from './registry';
 export { default as traceid } from './traceid';
 export { default as readJson } from './read-json';
