@@ -1,7 +1,7 @@
 import { IAction, IActionLevel, IActionType, IAllowFailure, IComponentAction, IHookType, IPluginAction, IRunAction, getInputs } from '@serverless-devs/parse-spec';
 import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
-import { DevsError } from '@serverless-devs/utils';
+import { DevsError, ETrackerType } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import { spawn } from 'child_process';
 import loadComponent from '@serverless-devs/load-component';
@@ -201,6 +201,7 @@ class Actions {
           stack: error.stack,
           exitCode: EXIT_CODE.RUN,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+          trackerType: ETrackerType.runtimeException,
         });
       }
       return;
@@ -214,6 +215,7 @@ class Actions {
     throw new DevsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+      trackerType: ETrackerType.parseException,
     });
   }
 
@@ -249,6 +251,7 @@ class Actions {
         stack: error.stack,
         exitCode: EXIT_CODE.PLUGIN,
         prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+        trackerType: ETrackerType.runtimeException,
       });
     }
   }
@@ -299,6 +302,7 @@ class Actions {
           stack: error.stack,
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+          trackerType: ETrackerType.runtimeException,
         });
       }
     }
@@ -316,6 +320,7 @@ class Actions {
       tips: `Please check the component ${componentName} has the ${command} command. Serverless Devs documents：${chalk.underline(
         'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
       )}`,
+      trackerType: ETrackerType.parseException,
     });
   }
 }

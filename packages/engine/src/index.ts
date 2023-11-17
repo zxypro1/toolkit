@@ -9,7 +9,7 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
-import { DevsError, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
+import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
 export * from './types';
@@ -579,6 +579,7 @@ class Engine {
             stack: error.stack,
             exitCode: EXIT_CODE.COMPONENT,
             prefix: `[${item.projectName}] failed to [${command}]:`,
+            trackerType: ETrackerType.runtimeException,
           });
         }
       }
@@ -594,6 +595,7 @@ class Engine {
           'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
         )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
+        trackerType: ETrackerType.parseException,
       });
     }
     // 应用级操作
@@ -613,6 +615,7 @@ class Engine {
           stack: error.stack,
           exitCode: EXIT_CODE.COMPONENT,
           prefix: `[${item.projectName}] failed to [${command}]:`,
+          trackerType: ETrackerType.runtimeException,
         });
       }
     }

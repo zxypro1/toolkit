@@ -2,12 +2,14 @@ import path from 'path';
 import * as utils from '@serverless-devs/utils';
 import Credential from '@serverless-devs/credential';
 import { get } from 'lodash';
+import { ETrackerType } from '@serverless-devs/utils';
 
 export function getDefaultYamlPath() {
   const spath = utils.getYamlPath('s');
   if (spath) return path.resolve(spath);
   throw new utils.DevsError('the s.yaml/s.yml file was not found.', {
     tips: 'Please check if the s.yaml/s.yml file exists, you can also specify it with -t.',
+    trackerType: ETrackerType.parseException,
   });
 }
 

@@ -15,6 +15,7 @@ import { each, filter, find, get, has, includes, isArray, isEmpty, keys, map, se
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
 import assert from 'assert';
+import { DevsError, ETrackerType } from '@serverless-devs/utils';
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
@@ -108,7 +109,9 @@ class ParseSpec {
   private doEnvWithNotSpecify() {
     if (this.yaml.useExtend) {
       if (has(this.yaml.content, ENVIRONMENT_KEY)) {
-        throw new utils.DevsError('Environment and extend is conflict');
+        throw new DevsError('Environment and extend is conflict', {
+          trackerType: ETrackerType.parseException,
+        });
       }
     }
     if (has(this.yaml.content, ENVIRONMENT_KEY)) {
@@ -116,29 +119,34 @@ class ParseSpec {
       const envYamlContent = utils.getYamlContent(envPath);
       // env.yaml is not exist
       if (isEmpty(envYamlContent)) {
-        throw new utils.DevsError(`Environment file [${envPath}] is not found`, {
-          tips: 'You can create a new environment file by running `s env init`'
+        throw new DevsError(`Environment file [${envPath}] is not found`, {
+          tips: 'You can create a new environment file by running `s env init`',
+          trackerType: ETrackerType.parseException,
         });
       }
       // default-env.json is not exist
       if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
-        throw new utils.DevsError('Default env is not found', {
-          tips: 'You can set a default environment by running `s env default`'
+        throw new DevsError('Default env is not found', {
+          tips: 'You can set a default environment by running `s env default`',
+          trackerType: ETrackerType.parseException,
         });
       }
       const { project, environments } = envYamlContent;
       const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
-      const defaultEnv = get(find(defaultEnvContent, {project: project}), 'default');
+      const defaultEnv = get(find(defaultEnvContent, { project: project }), 'default');
       // project is not found in default-env.json
       if (!defaultEnv) {
-        throw new utils.DevsError('Default env is not found', {
-          tips: 'You can set a default environment by running `s env default`'
+        throw new DevsError('Default env is not found', {
+          tips: 'You can set a default environment by running `s env default`',
+          trackerType: ETrackerType.parseException,
         });
       }
       const environment = find(environments, item => item.name === defaultEnv);
       // default env is not found in env.yaml
       if (isEmpty(environment)) {
-        throw new utils.DevsError(`Default env [${defaultEnv}] was not found`);
+        throw new DevsError(`Default env [${defaultEnv}] was not found`, {
+          trackerType: ETrackerType.parseException,
+        });
       }
       return { project, environment };
     }
@@ -148,13 +156,17 @@ class ParseSpec {
     // env and extend is conflict
     if (this.yaml.useExtend) {
       // TODO: @封崇
-      throw new utils.DevsError('Environment and extend is conflict');
+      throw new DevsError('Environment and extend is conflict', {
+        trackerType: ETrackerType.parseException,
+      });
     }
     const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY, ENVIRONMENT_FILE_NAME), path.dirname(this.yaml.path));
     const envYamlContent = utils.getYamlContent(envPath);
     // env file is not exist
     if (isEmpty(envYamlContent)) {
-      throw new utils.DevsError(`Environment file [${envPath}] is not exist`);
+      throw new DevsError(`Environment file [${envPath}] is not exist`, {
+        trackerType: ETrackerType.parseException,
+      });
     }
     debug(`environment content: ${JSON.stringify(envYamlContent)}`);
     const { project, environments } = envYamlContent;
@@ -162,7 +174,9 @@ class ParseSpec {
     // env name is not found
     if (isEmpty(environment)) {
       // TODO: @封崇
-      throw new utils.DevsError(`Env [${this.record.env}] was not found`);
+      throw new DevsError(`Env [${this.record.env}] was not found`, {
+        trackerType: ETrackerType.parseException,
+      });
     }
     return { project, environment };
   }
@@ -282,7 +296,9 @@ class ParseSpec {
     for (const action in actions) {
       const element = actions[action];
       if (!isArray(element)) {
-        throw new utils.DevsError(`${level} action ${action} is invalid, it must be array`);
+        throw new DevsError(`${level} action ${action} is invalid, it must be array`, {
+          trackerType: ETrackerType.parseException,
+        });
       }
       const actionInfo = this.matchAction(action);
       debug(`action: ${action}, useAction: ${JSON.stringify(actionInfo)}`);

@@ -1,7 +1,7 @@
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
-import DevsError from './devs-error';
+import DevsError, { ETrackerType } from './devs-error';
 
 export const getAbsolutePath = (filePath: string = '', basePath: string = process.cwd()) => {
   if (!filePath) return filePath;
@@ -35,6 +35,7 @@ export default function getYamlContent(filePath: string): Record<string, any> {
       if (error.message) message += `: ${error.message}`;
       throw new DevsError(message, {
         tips: `Please check the configuration of ${filename}, Serverless Devs' Yaml specification document can refer to：'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/yaml.md'`,
+        trackerType: ETrackerType.parseException,
       });
     }
   }
