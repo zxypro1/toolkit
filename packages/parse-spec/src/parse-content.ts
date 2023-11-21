@@ -84,7 +84,7 @@ class ParseContent {
       const environment = getInputs(this.options.environment, this.getEnvMagic({ target }));
       debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > global > s.yaml
-      set(real, 'props', extend2(true, {}, target, get(environment, 'overlays.global', {}), get(environment, 'overlays.resources', {})));
+      set(real, 'props', extend2(true, {}, target, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {})));
       this.content = {
         ...this.content,
         access,
