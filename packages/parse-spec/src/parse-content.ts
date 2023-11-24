@@ -80,11 +80,11 @@ class ParseContent {
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
       const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
-      const target = extend2(true, {}, template, real.props);
-      const environment = getInputs(this.options.environment, this.getEnvMagic({ target }));
+      const source = extend2(true, {}, template, real.props); // 修改target为source
+      const environment = getInputs(this.options.environment, this.getEnvMagic({ source }));
       debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > global > s.yaml
-      set(real, 'props', extend2(true, {}, target, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {})));
+      set(real, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {})));
       this.content = {
         ...this.content,
         access,
