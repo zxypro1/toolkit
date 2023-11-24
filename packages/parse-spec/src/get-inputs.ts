@@ -1,4 +1,4 @@
-import compile from './compile';
+const compile = require('@serverless-devs/art-template/lib/devs-compile');
 import { isEmpty } from 'lodash';
 
 export const getInputs = (_inputs: Record<string, any> = {}, context: Record<string, any> = {}) => {

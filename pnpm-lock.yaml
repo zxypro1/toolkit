@@ -307,8 +307,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.12
-        version: 4.13.12
+        specifier: ^4.13.13
+        version: 4.13.13
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -1107,17 +1107,19 @@ packages:
       - supports-color
     dev: false
 
-  /@serverless-devs/art-template@4.13.12:
-    resolution: {integrity: sha512-Gu6abd2/InEdgLrZwLi6Piei06aFFa3zx9hB6wcIOMd+JHLNUcGbSPgoErsjxduGxbQHa+Q5Gk1KOXm0b1fxZw==}
+  /@serverless-devs/art-template@4.13.13:
+    resolution: {integrity: sha512-YIy2Fxh4Ehesr9UG/VZKTITPd1qK2mDW591xsmS3HIxewHyf5sVJKxRmhdgvBlwe+HNsU9P6aStAYO2jGX0htQ==}
     engines: {node: '>= 1.0.0'}
     dependencies:
+      '@serverless-devs/utils': 0.0.14
       acorn: 5.7.4
       escodegen: 1.14.3
       estraverse: 4.3.0
+      fs-extra: 11.1.1
       html-minifier: 3.5.21
       is-keyword-js: 1.0.3
       js-tokens: 3.0.2
-      lodash.get: 4.4.2
+      lodash: 4.17.21
       merge-source-map: 1.1.0
       source-map: 0.5.7
     dev: false
@@ -1159,6 +1161,16 @@ packages:
     dependencies:
       chalk: 4.1.2
       progress: 2.0.3
+    dev: false
+
+  /@serverless-devs/utils@0.0.14:
+    resolution: {integrity: sha512-E+vlcgwdIeRrSb2z20fD8jOANMyHrzS6mHJFwiAv6eKJX0UuH1um3dKqlrYwpjKzamERs4pT4IzGp/KB7jgXfw==}
+    dependencies:
+      js-yaml: 4.1.0
+      lodash: 4.17.21
+      md5: 2.3.0
+      minimist: 1.2.8
+      random-string: 0.2.0
     dev: false
 
   /@sinclair/typebox@0.25.24:
