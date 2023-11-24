@@ -2,8 +2,8 @@ import path from 'path';
 import getInputs from './get-inputs';
 import { IStep } from './types';
 import { getCredential } from './utils';
-import compile from './compile';
 import { each, get, omit, set } from 'lodash';
+const compile = require('@serverless-devs/art-template/lib/devs-compile');
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 

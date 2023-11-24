@@ -1,4 +1,3 @@
-export { default as compile } from './compile';
 export { default as getInputs } from './get-inputs';
 export * from './types';
 export * from './contants';
@@ -8,7 +7,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { getDefaultYamlPath, isExtendMode } from './utils';
-import compile from './compile';
+const compile = require('@serverless-devs/art-template/lib/devs-compile');
 import Order from './order';
 import ParseContent from './parse-content';
 import { each, filter, find, get, has, includes, isArray, isEmpty, keys, map, set, split } from 'lodash';
