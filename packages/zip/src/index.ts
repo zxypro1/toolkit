@@ -80,11 +80,13 @@ class Zip {
     return await new Promise((resolve, reject) => {
       let bar: ProgressService;
       zipArchiver.on('progress', processOptions => {
+        const { total, size, level } = this.bytesToSize(_.get(processOptions, 'fs.totalBytes'))
         if (!bar) {
-          bar = new ProgressService(ProgressType.Bar, { total: _.get(processOptions, 'fs.totalBytes') }, `Zipping ((:bar)) :current/:total(Bytes) :percent :etas`);
+          bar = new ProgressService(ProgressType.Bar, { total: Number(total) }, `Zipping ((:bar)) :current/:total(${size}) :percent :etas`);
         }
         if (_.get(processOptions, 'fs.processedBytes')) {
-          bar.update(_.get(processOptions, 'fs.processedBytes'));
+          const { total } = this.bytesToSize(_.get(processOptions, 'fs.processedBytes'), level)
+          bar.update(total);
         }
       });
       output.on('close', () => {
@@ -100,6 +102,13 @@ class Zip {
       }
     });
   }
+
+  private bytesToSize(bytes: number, level?: number) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes == 0) return { total: 0, size: 'Bytes', level: 0 };
+    const i = level || Math.floor(Math.log(bytes) / Math.log(1024));
+    return { total: Math.round(bytes / Math.pow(1024, i)), size: sizes[i], level: i };
+ };
 
   private async zipTo(zipArchiver: archiver.Archiver, codeUri: string): Promise<number> {
     const absCodeUri = path.resolve(codeUri);
