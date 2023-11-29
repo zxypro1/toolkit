@@ -81,6 +81,7 @@ class ParseContent {
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
       const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
       const source = extend2(true, {}, template, real.props); // 修改target为source
+      // 限制env解析的范围。例如overlays->components->fc3，则只在fc3组件的应用中解析，其他应用不解析
       const filteredEnv = cloneDeep(this.options.environment);
       if (filteredEnv && !isEmpty(get(filteredEnv, 'overlays.components'))) {
         filteredEnv.overlays.components = pickBy(filteredEnv.overlays.components, (value, key) => key === component);
