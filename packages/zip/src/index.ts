@@ -80,12 +80,12 @@ class Zip {
     return await new Promise((resolve, reject) => {
       let bar: ProgressService;
       zipArchiver.on('progress', processOptions => {
-        const { total, size, level } = this.bytesToSize(_.get(processOptions, 'fs.totalBytes'))
+        const { total, size, level } = this.bytesToSize(_.get(processOptions, 'fs.totalBytes'));
         if (!bar) {
           bar = new ProgressService(ProgressType.Bar, { total: Number(total) }, `Zipping ((:bar)) :current/:total(${size}) :percent :etas`);
         }
         if (_.get(processOptions, 'fs.processedBytes')) {
-          const { total } = this.bytesToSize(_.get(processOptions, 'fs.processedBytes'), level)
+          const { total } = this.bytesToSize(_.get(processOptions, 'fs.processedBytes'), level);
           bar.update(total);
         }
       });
@@ -108,7 +108,7 @@ class Zip {
     if (bytes == 0) return { total: 0, size: 'Bytes', level: 0 };
     const i = level || Math.floor(Math.log(bytes) / Math.log(1024));
     return { total: Math.round(bytes / Math.pow(1024, i)), size: sizes[i], level: i };
- };
+  }
 
   private async zipTo(zipArchiver: archiver.Archiver, codeUri: string): Promise<number> {
     const absCodeUri = path.resolve(codeUri);
@@ -130,15 +130,16 @@ class Zip {
       path: codeUri,
       includeEmpty: true,
     });
-
-    const filesPromise = zipFiles.map(async (f: string) => {
+    const fixedTime = new Date('2023-11-01'); // 将最后修改时间固定为 2023-11-01
+    for (const f of zipFiles) {
       const fPath = path.join(codeUri, f);
-      let s;
+      let s: any;
       try {
         s = await fs.lstat(fPath);
+        s.mtime = fixedTime;
       } catch (error) {
         this.logger.warn(`Before zip: could not found fPath ${fPath}, absolute fPath is ${path.resolve(fPath)}, exception is ${error}, skipping`);
-        return 0;
+        continue;
       }
 
       const absFilePath = path.resolve(fPath);
@@ -151,7 +152,7 @@ class Zip {
         if (content[0] === 'XSym' && content.length === 5) {
           const target = content[3];
           zipArchiver.symlink(relative, target, isBootstrap || isWindows ? s.mode | 73 : s.mode);
-          return 1;
+          continue;
         }
       }
 
@@ -161,12 +162,7 @@ class Zip {
         mode: isBootstrap || isWindows ? s.mode | 73 : s.mode,
         stats: s, // The archiver uses fs.stat by default, and pasing the result of lstat to ensure that the symbolic link is properly packaged
       });
-
-      return 1;
-    });
-
-    // TODO: 可能需要控制运行的个数
-    await Promise.all(filesPromise);
+    }
     return zipFiles.length;
   }
 

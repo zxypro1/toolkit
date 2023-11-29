@@ -126,7 +126,7 @@ test('较复杂的测试case', async () => {
   });
   outputFiles.push(outputFile);
 
-  expect(count).toBe(8);
+  expect(count).toBe(7);
   expect(outputFile).toBe(path.join(outputFilePath, outputFileName));
   expect(fse.existsSync(outputFile)).toBeTruthy();
 
@@ -139,7 +139,7 @@ test('较复杂的测试case', async () => {
         'apt-get.list',
         'dir-2/.hide-dir/apt-get.list',
         'dir-2/no-ignore/file',
-        'empty-dir/',
+        'dir-2/ignore-all/test',
         'ignore-non-root-dir/index',
         'index.js',
       ]),
