@@ -2,7 +2,7 @@ import path from 'path';
 import getInputs from './get-inputs';
 import { IStep } from './types';
 import { getCredential } from './utils';
-import { each, get, omit, set } from 'lodash';
+import { each, get, omit, set, pickBy, cloneDeep, isEmpty } from 'lodash';
 const compile = require('@serverless-devs/art-template/lib/devs-compile');
 const extend2 = require('extend2');
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
@@ -81,9 +81,16 @@ class ParseContent {
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
       const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
       const source = extend2(true, {}, template, real.props); // 修改target为source
-      const environment = getInputs(this.options.environment, this.getEnvMagic({ source }));
+      const filteredEnv = cloneDeep(this.options.environment);
+      if (filteredEnv && !isEmpty(get(filteredEnv, 'overlays.components'))) {
+        filteredEnv.overlays.components = pickBy(filteredEnv.overlays.components, (value, key) => key === component);
+      }
+      if (filteredEnv && !isEmpty(get(filteredEnv, 'overlays.resources'))) {
+        filteredEnv.overlays.resources = pickBy(filteredEnv.overlays.resources, (value, key) => key === project);
+      }
+      const environment = getInputs(filteredEnv, this.getEnvMagic({ source }));
       debug(`real environment: ${JSON.stringify(environment)}`);
-      // 覆盖的优先级：resources > global > s.yaml
+      // 覆盖的优先级：resources > components > s.yaml
       set(real, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {})));
       this.content = {
         ...this.content,
