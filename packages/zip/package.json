@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/zip",
-  "version": "0.0.3-beta.6",
+  "version": "0.0.3-beta.7",
   "description": "zip for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
