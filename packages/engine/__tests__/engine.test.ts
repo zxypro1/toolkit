@@ -373,19 +373,19 @@ describe('Engine Class', () => {
     });
 
     describe('validate() method', () => {
-        it('should throw an error if steps are missing', () => {
+        it('should throw an error if steps are missing', async () => {
             (engine as any).spec = { steps: [], command: 'mock-command' }
-            expect(() => (engine as any).validate()).toThrow();
+            await expect(() => (engine as any).validate()).rejects.toThrow();
         });
 
-        it('should throw an error if command is missing', () => {
+        it('should throw an error if command is missing', async () => {
             (engine as any).spec = { steps: mockSteps, command: '' };
-            expect(() => (engine as any).validate()).toThrow();
+            await expect(() => (engine as any).validate()).rejects.toThrow();
         });
 
-        it('should not throw any error if steps and command are present', () => {
+        it('should not throw any error if steps and command are present', async () => {
             (engine as any).spec = { steps: mockSteps, command: 'mock-command' }
-            expect(() => (engine as any).validate()).not.toThrow();
+            await expect(() => (engine as any).validate()).not.toThrow();
         });
     });
 
