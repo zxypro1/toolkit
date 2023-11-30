@@ -26,7 +26,7 @@ class ParseContent {
       ...data,
       __runtime: 'parse',
       project: get(this.options.environment, '__project'),
-      that: omit(this.options.environment, ['infrastructure', 'overlays']),
+      that: set(omit(this.options.environment, ['infrastructure', 'overlays']), 'project', get(this.options.environment, '__project')),
       credential: this.credential,
     };
   }
