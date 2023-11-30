@@ -1,5 +1,5 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined } from 'lodash';
+import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
 import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
@@ -65,7 +65,7 @@ class Engine {
     });
     const { steps: _steps } = this.spec;
     // 参数校验
-    this.validate();
+    await this.validate();
     this.context.steps = await this.download(_steps);
   }
 
@@ -200,13 +200,19 @@ class Engine {
   }
 
   /**
-   * Validates the 'steps' and 'command' present in 'this.spec'.
-   * Throws an error if either 'steps' or 'command' are missing.
+   * Validates the 'steps', 'command' and 'projectName' present in 'this.spec'.
+   * Throws an error if either 'steps' or 'command' are missing or 'projectName' is overlaps with a command.
    */
-  private validate() {
-    const { steps, command } = this.spec;
-    assert(!isEmpty(steps), 'steps is required');
-    assert(command, 'command is required');
+  private async validate() {
+    const { steps, command, projectName } = this.spec;
+    for (const step of steps) {
+      const instance = await loadComponent(step.component);
+      if (projectName && keys(instance.commands).includes(projectName)) {
+        assert(!projectName, `The name of the project [${projectName}] overlaps with a command, please change it's name`);
+      }
+    }
+    assert(!isEmpty(steps), 'Step is required');
+    assert(command, 'Command is required');
   }
 
   /**
