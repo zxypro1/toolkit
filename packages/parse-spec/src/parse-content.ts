@@ -90,9 +90,10 @@ class ParseContent {
         filteredEnv.overlays.resources = pickBy(filteredEnv.overlays.resources, (value, key) => key === project);
       }
       const environment = getInputs(filteredEnv, this.getEnvMagic({ source }));
+      const region = get(environment, 'infraStack.region') ? { region: get(environment, 'infraStack.region') } : {};
       debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > components > s.yaml
-      set(real, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {})));
+      set(real, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {}), region));
       this.content = {
         ...this.content,
         access,
