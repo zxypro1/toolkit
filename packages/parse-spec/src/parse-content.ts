@@ -79,8 +79,9 @@ class ParseContent {
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
-      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
-      const source = extend2(true, {}, template, real.props); // 修改target为source
+
+      // 先对env.yaml解析并覆盖
+      const source = extend2(true, {}, template, element.props); // 修改target为source
       // 限制env解析的范围。例如overlays->components->fc3，则只在fc3组件的应用中解析，其他应用不解析
       const filteredEnv = cloneDeep(this.options.environment);
       if (filteredEnv && !isEmpty(get(filteredEnv, 'overlays.components'))) {
@@ -93,7 +94,10 @@ class ParseContent {
       const region = get(environment, 'infraStack.region') ? { region: get(environment, 'infraStack.region') } : {};
       debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > components > s.yaml
-      set(real, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {}), region));
+      set(element, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {}), region));
+
+      // 解析s.yaml
+      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
       this.content = {
         ...this.content,
         access,
