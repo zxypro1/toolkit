@@ -319,10 +319,21 @@ test('validate', async () => {
   const context = await engine.start();
   console.log(context);
   expect(get(context, 'error[0]')).toBeInstanceOf(AssertionError);
-  expect(get(context, 'error[0].message')).toBe(`command is required`);
+  expect(get(context, 'error[0].message')).toBe(`Command is required`);
   expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
 });
 
+test('validate projectName', async () => {
+  const engine = new Engine({
+    template: path.join(__dirname, './mock/validate-projectName.yaml'),
+    args: ['deploy']
+  });
+  const context = await engine.start();
+  console.log(context);
+  expect(get(context, 'error[0]')).toBeInstanceOf(AssertionError);
+  expect(get(context, 'error[0].message')).toBe(`The name of the project [deploy] overlaps with a command, please change it's name`);
+  expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
+});
 
 test('validate output', async () => {
   const engine = new Engine({
