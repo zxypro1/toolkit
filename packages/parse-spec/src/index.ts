@@ -47,11 +47,21 @@ class ParseSpec {
     this.doEnvironment();
     this.yaml.access = get(this.yaml.content, 'access');
     const projectKey = this.yaml.use3x ? 'resources' : 'services';
+    const projects = get(this.yaml.content, projectKey, {});
     this.yaml.projectNames = keys(get(this.yaml.content, projectKey, {}));
     this.yaml.vars = get(this.yaml.content, 'vars', {});
     this.yaml.flow = get(this.yaml.content, 'flow', {});
     this.yaml.useFlow = false;
     this.yaml.appName = get(this.yaml.content, 'name');
+
+    // 兼容2.0: 加入项目的.env环境变量
+    for (const i of this.yaml.projectNames) {
+      if (get(projects, `${i}.props.code`)) {
+        const codePath = utils.getAbsolutePath(get(projects, `${i}.props.code`, ''));
+        expand(dotenv.config({ path: path.join(codePath, '.env') }));
+      }
+    }
+
     expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env') }));
   }
   private async doExtend() {
@@ -255,7 +265,7 @@ class ParseSpec {
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const projectOrder = {} as Record<string, number>;
     const fn = (projects: string[] = [], index: number) => {
-      assert(isArray(projects), `flow ${this.record.command} data format is invalid`)
+      assert(isArray(projects), `flow ${this.record.command} data format is invalid`);
       for (const project of projects) {
         for (const step of steps) {
           if (project === step.projectName) {
