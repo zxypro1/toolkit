@@ -206,7 +206,7 @@ class Engine {
   private async validate() {
     const { steps, command, projectName } = this.spec;
     for (const step of steps) {
-      const instance = await loadComponent(step.component);
+      const instance = await loadComponent(step.component, { engineLogger: this.logger });
       if (projectName && keys(get(instance, 'commands')).includes(projectName)) {
         assert(!projectName, `The name of the project [${projectName}] overlaps with a command, please change it's name`);
       }
