@@ -9,6 +9,7 @@ import { IOptions } from './types';
 import { DEFAULT_FILENAME } from './constants';
 import assert from 'assert';
 import { fieldEncryption } from '@serverless-devs/utils';
+import os from 'os';
 
 class Download {
   constructor(private url: string, private options: IOptions = {}) {
@@ -50,10 +51,20 @@ class Download {
     const { dest } = this.options;
     const { extract, filename, ...restOpts } = this.options;
     if (!extract) return;
+    const filter = (file: decompress.File) => {
+      if (file.type !== 'symlink') {
+        return true;
+      }
+      return false;
+    }
     // node-v12.22.1: end of central directory record signature not found
     for (let index = 0; index < 3; index++) {
       try {
-        await decompress(filePath, dest, restOpts);
+        await decompress(filePath, dest, {
+          ...restOpts,
+          // windows need admin permission to decompress symlink, skip
+          filter: os.platform() === 'win32' ? filter : undefined,
+        });
         break;
       } catch (error) {
         if (index === 2) {
