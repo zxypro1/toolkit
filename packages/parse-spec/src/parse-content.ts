@@ -124,11 +124,12 @@ class ParseContent {
     return { steps, content: this.content, originSteps };
   }
   private getAccess() {
-    // 全局的 -a > env.yaml 的 access > s.yaml 的 access
+    // 全局的 -a > env.yaml 的 access > s.yaml 的 access > default
     if (this.options.access) return this.options.access;
     const accessFromEnvironmentFile = get(this.options, 'environment.access');
     if (accessFromEnvironmentFile) return accessFromEnvironmentFile;
     if (this.content.access) return this.content.access;
+    return 'default';
   }
 }
 
