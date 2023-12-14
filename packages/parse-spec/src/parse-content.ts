@@ -129,7 +129,6 @@ class ParseContent {
     const accessFromEnvironmentFile = get(this.options, 'environment.access');
     if (accessFromEnvironmentFile) return accessFromEnvironmentFile;
     if (this.content.access) return this.content.access;
-    return 'default';
   }
 }
 
