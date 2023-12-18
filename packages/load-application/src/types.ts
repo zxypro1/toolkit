@@ -39,6 +39,10 @@ export interface IOptions {
    * Assume that the answer to any question which would be asked is yes
    */
   y?: boolean;
+  /**
+   * Whether overwrite all files in the destination directory
+   */
+  overwrite?: boolean;
 }
 
 export enum IProvider {

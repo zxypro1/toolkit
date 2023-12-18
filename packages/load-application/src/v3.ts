@@ -193,7 +193,7 @@ class LoadApplication {
     this.publishPath = path.join(this.tempPath, 'publish.yaml');
     if (!fs.existsSync(this.publishPath)) return;
     // keep behavior of fs.moveSync()
-    fs.emptyDirSync(this.filePath);
+    if (this.options.overwrite !== false) fs.emptyDirSync(this.filePath);
     fs.copySync(path.join(this.tempPath, 'src'), this.filePath);
     const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
     if (isEmpty(spath)) return;

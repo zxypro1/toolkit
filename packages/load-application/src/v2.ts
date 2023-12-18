@@ -194,7 +194,7 @@ class LoadApplication {
       throw new Error('publish.yaml is not found');
     }
     // keep behavior of fs.moveSync()
-    fs.emptyDirSync(this.filePath);
+    if (this.options.overwrite !== false) fs.emptyDirSync(this.filePath);
     fs.copySync(path.join(this.tempPath, 'src'), this.filePath);
     const spath = getYamlPath(path.join(this.filePath, 's.yaml'));
     if (isEmpty(spath)) return;
