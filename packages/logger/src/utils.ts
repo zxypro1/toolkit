@@ -41,8 +41,9 @@ class Transport {
     if (!isEmpty(secrets)) {
       each(newSecrets, str => {
         if (includes(msg, str)) {
-          const re = new RegExp(str, 'g');
-          msg = replace(msg, re, mark(str));
+          // Error on special tokens
+          // const re = new RegExp(str, 'g');
+          msg = replace(msg, str, mark(str));
         }
       });
     }
