@@ -42,8 +42,12 @@ class Transport {
       each(newSecrets, str => {
         if (includes(msg, str)) {
           // Error on special tokens
-          // const re = new RegExp(str, 'g');
-          msg = replace(msg, str, mark(str));
+          try {
+            const re = new RegExp(str, 'g');
+            msg = replace(msg, re, mark(str));
+          } catch (e) {
+            msg = msg.split(str).join(mark(str));
+          }
         }
       });
     }
