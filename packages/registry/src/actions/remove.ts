@@ -1,6 +1,7 @@
 import { request } from '../util';
 import logger from '../util/logger';
 import { getPackageUrl } from '../request-url';
+import chalk from 'chalk';
 
 export default async (name: string, versionId: string) => {
   const uri = getPackageUrl(name, versionId);
@@ -11,5 +12,7 @@ export default async (name: string, versionId: string) => {
   if (typeof body === 'string') {
     throw new Error(body);
   }
+
+  logger.write(chalk.green(`Delete package ${name}@${versionId} success.`));
   return body;
 };

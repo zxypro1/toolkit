@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/registry",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -23,6 +23,7 @@
   "dependencies": {
     "@serverless-devs/utils": "workspace:^",
     "@serverless-devs/zip": "workspace:^",
+    "chalk": "^5.3.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "opn": "^6.0.0",

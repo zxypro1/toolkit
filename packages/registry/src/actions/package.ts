@@ -8,6 +8,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import querystring from 'querystring';
 import { forEach, get, isEmpty, includes } from 'lodash';
+import chalk from 'chalk';
 
 interface IRequest {
   /**
@@ -127,6 +128,12 @@ async function getUploadUrl(codeUri: string): Promise<string> {
   return body.url;
 }
 
+function getNameAndVersion(codeUri: string): string {
+  const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
+  const { Edition, Name } = yaml.load(publishYaml) as Record<string, any>;
+  return `${Name}@${Edition}`;
+}
+
 export interface IList {
   category?: string;
   tag?: string;
@@ -153,11 +160,14 @@ export const publish = async (codeUri: string) => {
   // 发布版本，获取上传文件地址
   const uploadUrl = await getUploadUrl(codeUri);
   logger.debug(`Publish upload url: ${uploadUrl}`);
+  const packageInfo = getNameAndVersion(codeUri);
+  logger.debug(`Publish package info: ${packageInfo}`);
 
   // 压缩文件
   const zipResult = await zip({
     codeUri,
     outputFilePath: path.join(getRootHome(), 'cache', 'registry', 'publish'),
+    logger
   });
   logger.debug(`Zip file size: ${zipResult.compressedSize}`);
   logger.debug(`Zip file count: ${zipResult.count}`);
@@ -165,6 +175,7 @@ export const publish = async (codeUri: string) => {
 
   // 上传压缩文件
   await request.request_put(uploadUrl, zipResult.outputFile);
+  logger.write(`${chalk.green(`Publish package ${packageInfo} success.`)}`);
 
   // 删除压缩文件
   fs.unlinkSync(zipResult.outputFile);

@@ -10,6 +10,10 @@ class Logger {
     this.logger.log(...args);
   }
 
+  write(...args: any[]): void {
+    this.logger.write(...args);
+  }
+
   debug(...args: any[]): void {
     this.logger.debug(...args);
   }
