@@ -130,8 +130,8 @@ async function getUploadUrl(codeUri: string): Promise<string> {
 
 function getNameAndVersion(codeUri: string): string {
   const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
-  const { Edition, Name } = yaml.load(publishYaml) as Record<string, any>;
-  return `${Name}@${Edition}`;
+  const { Version, Name } = yaml.load(publishYaml) as Record<string, any>;
+  return `${Name}@${Version}`;
 }
 
 export interface IList {
