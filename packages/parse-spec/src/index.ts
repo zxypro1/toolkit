@@ -140,7 +140,10 @@ class ParseSpec {
           trackerType: ETrackerType.parseException,
         });
       }
-      const { project, environments } = envYamlContent;
+      const { environments } = envYamlContent;
+      // 若存在环境变量，默认项目为devsProject
+      const devsProject = process.env.ALIYUN_DEVS_REMOTE_PROJECT_NAME;
+      const project = devsProject ? devsProject : get(this.yaml.content, 'name');
       const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
       const defaultEnv = get(find(defaultEnvContent, { project: project }), 'default');
       // project is not found in default-env.json
@@ -178,7 +181,10 @@ class ParseSpec {
       });
     }
     debug(`environment content: ${JSON.stringify(envYamlContent)}`);
-    const { project, environments } = envYamlContent;
+    const { environments } = envYamlContent;
+    // 若存在环境变量，默认项目为devsProject
+    const devsProject = process.env.ALIYUN_DEVS_REMOTE_PROJECT_NAME;
+    const project = devsProject ? devsProject : get(this.yaml.content, 'name');
     const environment = find(environments, item => item.name === this.record.env);
     // env name is not found
     if (isEmpty(environment)) {

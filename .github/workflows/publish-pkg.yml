@@ -1,0 +1,61 @@
+name: Publish Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/*/package.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - component-interface
+          - component-manager
+          - credential
+          - diff
+          - downloads
+          - engine
+          - ignore-walk
+          - load-application
+          - load-component
+          - logger
+          - orm
+          - parse-spec
+          - progress-bar
+          - registry
+          - utils
+          - zip
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm run install:all
+
+    - name: Build packages
+      run: npm run build
+
+    - name: Publish package
+      run: |
+        PACKAGE_DIR=packages/${{ matrix.package }}
+        PACKAGE_JSON="${PACKAGE_DIR}/package.json"
+
+        # 检查 package.json 是否被修改
+        if git diff HEAD^ HEAD --name-only | grep -q "${PACKAGE_JSON}"; then
+          echo "Publishing ${{ matrix.package }}..."
+          cd $PACKAGE_DIR
+          npm run pub
+        else
+          echo "No changes in ${{ matrix.package }}/package.json"
+      env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
