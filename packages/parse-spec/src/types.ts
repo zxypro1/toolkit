@@ -15,6 +15,7 @@ export enum IHookType {
   SUCCESS = 'success',
   FAIL = 'fail',
   COMPLETE = 'complete',
+  POST = 'post',
 }
 
 export enum IActionType {

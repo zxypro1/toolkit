@@ -65,10 +65,12 @@ class ParseSpec {
     expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env') }));
   }
   private async doExtend() {
+    // this.yaml = { path: '' }
     this.yaml.content = utils.getYamlContent(this.yaml.path);
     this.yaml.extend = get(this.yaml.content, 'extend');
     this.yaml.useExtend = isExtendMode(this.yaml.extend, path.dirname(this.yaml.path));
     if (this.yaml.useExtend) {
+      // if useExtend, 则直接解析前后内容
       const extendPath = utils.getAbsolutePath(this.yaml.extend, path.dirname(this.yaml.path));
       expand(dotenv.config({ path: path.join(extendPath, '.env') }));
       const extendContent = utils.getYamlContent(extendPath);
@@ -207,12 +209,17 @@ class ParseSpec {
   async start(): Promise<ISpec> {
     debug('parse start');
     // 第一次尝试解析参数，比如全局access给 extend 用
-    this.parseArgv();
+    // 将命令行参数更新给 this.record
+    this.parseArgv();   
+    // 处理继承、多环境后, 将 s.yaml 文件信息传入 this.yaml
     await this.doYamlinit();
     // 再次解析参数，比如projectNames
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
     const { steps, content, originSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
+    // steps 存放每个FC组件/函数的 yaml 配置 ([content.resource] => steps)
+    // content 为 yaml 已解析的整体完整信息
+    // originSteps 为 steps 的未解析版
     // 获取到真实值后，重新赋值
     this.yaml.content = content;
     this.yaml.vars = get(this.yaml.content, 'vars', {});

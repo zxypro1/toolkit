@@ -97,12 +97,19 @@ class Actions {
   private async afterStart(hookType: `${IHookType}`, inputs: Record<string, any> = {}) {
     if (this.option.skipActions) return {};
     this.inputs = inputs;
+    // Attempt to fit post_<command> hook.
+    if(hookType === IHookType.COMPLETE && this.actions.find(item => item.hookType === IHookType.POST)) {
+      this.actions = this.actions.map(item => item.hookType === IHookType.POST ? {...item, hookType: IHookType.COMPLETE} : item);      
+      this.logger.warn(`The action hook 'post-<command>' has been renamed to 'complete-<command>'. 
+You can still use them now, but we suggest to modify them.`)
+    }
     const hooks = filter(this.actions, item => item.hookType === hookType);
     if (isEmpty(hooks)) return {};
     this.record.startTime = Date.now();
     this.record.lable = this.option.hookLevel === IActionLevel.PROJECT ? `[${this.option.projectName}]` : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
-    const newHooks = getInputs(hooks, this.record.magic);
+    // 确保 hooks 中的变量均为解析过后的真实值
+    const newHooks = getInputs(hooks, this.record.magic);  
     // post-action应获取componentProps, 先清空pluginOutput
     if (hookType !== IHookType.PRE) {
       this.record.pluginOutput = {};

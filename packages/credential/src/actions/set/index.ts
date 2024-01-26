@@ -11,7 +11,7 @@ export default class SetCredential {
   async run(options: setType.ISetOptions): Promise<setType.IResult | undefined> {
     const { access, force } = options;
     const credInformation = this.handlerArgv(options);
-
+    
     // 没有通过参数指定，交互式设置
     if (isEmpty(credInformation)) {
       const result = await inquirer.inputCredentials();
@@ -66,7 +66,9 @@ export default class SetCredential {
         Logger.logger.warn('The inputted AccountID does not match the actual obtained value, using the actual value');
       }
       set(credInformation, 'AccountID', accountId);
-    } catch (ex) {
+    } catch (ex: any) {
+      Logger.logger.warn(ex.data.Message);
+      Logger.logger.warn('Please make sure provided access is legal, or serverless-devs service on Cloud Providers may fail.');
       if (!uid) {
         throw ex;
       }
