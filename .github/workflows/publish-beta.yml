@@ -1,0 +1,47 @@
+name: Publish Beta Packages
+
+on:
+  push:
+    branches:
+      - main  # 或者你使用的任何其他分支
+    paths:
+      - 'packages/*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Check for Package Changes
+        id: changed
+        run: |
+          # 用于检测变化的自定义脚本，这里假设你有一个能够返回变化包名的脚本
+          # 你可以使用 git diff 或其他工具来检查每个 package 是否有变更
+          CHANGED_PACKAGES=$(node ./.github/check-changed-packages.js) # 你需要创建这个脚本
+          echo "::set-output name=packages::$CHANGED_PACKAGES"
+          echo "Changed packages: $CHANGED_PACKAGES"
+
+      - name: Publish Beta Versions
+        if: steps.changed.outputs.packages != '[]'
+        run: |
+          # 遍历变化的包并发布 beta 版本
+          for PACKAGE in ${{ steps.changed.outputs.packages }}; do
+            cd packages/$PACKAGE
+            node ../../.github/prepare-beta.js
+            pnpm publish --tag beta
+            cd -
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -41,6 +41,8 @@ export default class SetCredential {
       set(info, key, cipherText.toString());
     });
 
+    // if exist, delete first
+    if (get(content, aliasName as string)) delete content[aliasName as string];
     merge(content, { [aliasName as string]: info });
 
     await writeData(content);
