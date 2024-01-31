@@ -9,6 +9,8 @@ import yaml from 'js-yaml';
 import querystring from 'querystring';
 import { forEach, get, isEmpty, includes } from 'lodash';
 import chalk from 'chalk';
+import { publishSchema } from './constant';
+import Ajv from 'ajv';
 
 interface IRequest {
   /**
@@ -99,6 +101,30 @@ function getFlowsYaml(str: string | undefined, codeUri: string) {
 async function getUploadUrl(codeUri: string): Promise<string> {
   const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
   checkEdition(publishYaml);
+
+  const yamlObject = yaml.load(publishYaml) as Record<string, any>;
+  const errorMsg = `Publish.yaml illegal.
+  应用开发示例: https://docs.serverless-devs.com/serverless-devs/development-manual/readme#%E5%BA%94%E7%94%A8%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE
+  组件开发示例: https://docs.serverless-devs.com/serverless-devs/development-manual/component#%E7%BB%84%E4%BB%B6%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE
+  插件开发示例: https://docs.serverless-devs.com/serverless-devs/development-manual/plugin#%E6%8F%92%E4%BB%B6%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE
+  `  
+  const ajv = new Ajv({ allErrors: true });
+  const validate = ajv.compile(publishSchema);
+  if(!validate(yamlObject)) {
+    const errors = validate.errors;
+    if(errors) {
+      errors.forEach((error) => {
+        const {schemaPath, message} = error;
+        logger.error(`Publish.yaml illegal:\nyamlPath: ${path.join(codeUri, 'publish.yaml')}\nschemaPath: ${schemaPath}\nmessage: ${message}`)
+      })
+      throw new Error(errorMsg);
+    }
+  }
+  if(yamlObject.Type === 'Component' && (!yamlObject.Commands || yamlObject.Commands.length === 0)) {
+    logger.write('Publish.yaml illegal, \'Commands\' should be defined in Component\'s publish.yaml , please check the yaml.')
+    throw new Error(errorMsg);
+  }
+
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
   const flowYaml = getFlowsYaml(sYaml, codeUri);
