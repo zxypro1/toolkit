@@ -12,7 +12,7 @@ export const publishSchema = {
     "Category",
     "Service",
     // "Commands",
-    "Organization",
+    // "Organization",
     "Effective",
     "Parameters"
   ],
@@ -108,23 +108,25 @@ export const publishSchema = {
     },
     "Service": {
       "type": "object",
-      "patternProperties": {
-        "^(函数计算|对象存储|内容分发网络|资源编排|硬盘挂载|专有网络|日志服务|容器镜像服务|事件总线|表格存储|Serverless应用引擎|云数据库RDS MySQL 版|视频点播|智能媒体服务|媒体处理|低代码音视频工厂|音视频通信|其它|FC|OSS|CDN|ROS|NAS|VPC|SLS|CR|EventBridge|Tablestore|SAE|RDS MySQL|VOD|ICE|MTS|IMP|RTC|Other)$": {
-          "type": "object",
-          "properties": {
-            "Authorities": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "Runtime": {
-              "type": "string"
-            }
-          },
-          "required": ["Authorities"]
-        }
-      },
+      // schema 提示不友好，依赖后端错误返回结果
+      // "patternProperties": {
+      //   "^(函数计算|对象存储|内容分发网络|资源编排|硬盘挂载|专有网络|日志服务|容器镜像服务|事件总线|表格存储|Serverless应用引擎|云数据库RDS MySQL 版|视频点播|智能媒体服务|媒体处理|低代码音视频工厂|音视频通信|其它|FC|OSS|CDN|ROS|NAS|VPC|SLS|CR|EventBridge|Tablestore|SAE|RDS MySQL|VOD|ICE|MTS|IMP|RTC|Other)$": {
+      //     "type": "object",
+      //     "properties": {
+      //       "Authorities": {
+      //         "type": "array",
+      //         "items": {
+      //           "type": "string"
+      //         }
+      //       },
+      //       "Runtime": {
+      //         "type": "string"
+      //       }
+      //     },
+      //     "required": ["Authorities"]
+      //   }
+      // },
+      // "additionalProperties": false
     },
     "Organization": {
       "type": "string"
