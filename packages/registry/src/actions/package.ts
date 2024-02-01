@@ -104,9 +104,9 @@ async function getUploadUrl(codeUri: string): Promise<string> {
 
   const yamlObject = yaml.load(publishYaml) as Record<string, any>;
   const errorMsg = `Publish.yaml illegal.
-  应用开发示例: https://docs.serverless-devs.com/serverless-devs/development-manual/readme#%E5%BA%94%E7%94%A8%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE
-  组件开发示例: https://docs.serverless-devs.com/serverless-devs/development-manual/component#%E7%BB%84%E4%BB%B6%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE
-  插件开发示例: https://docs.serverless-devs.com/serverless-devs/development-manual/plugin#%E6%8F%92%E4%BB%B6%E6%A8%A1%E5%9E%8B%E5%85%83%E6%95%B0%E6%8D%AE
+  Application dev: https://docs.serverless-devs.com/serverless-devs/development-manual/readme
+  Component dev: https://docs.serverless-devs.com/serverless-devs/development-manual/component
+  Plugin dev: https://docs.serverless-devs.com/serverless-devs/development-manual/plugin
   `  
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(publishSchema);
