@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/**.md'
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [16.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: npm run install:all
+
+      - name: Build
+        run: npm run build
+
+      - name: export env
+        if: matrix.os != 'windows-latest' 
+        run: |
+          export AccountID=123
+          export AccessKeyID=123
+          export AccessKeySecret=123
+          export region=cn-chengdu
+          export desc=this_is_a_desc
+
+      - name: export env windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:AccountID=123
+          $env:AccessKeyID=123
+          $env:AccessKeySecret=123
+          $env:region="cn-chengdu"
+          $env:desc="this_is_a_desc"  
+  
+      - name: Run tests
+        run: npm run ci
