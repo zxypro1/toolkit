@@ -1,4 +1,4 @@
-import { includes, map, split, set, sortBy, isEmpty, get, cloneDeep, unset } from 'lodash';
+import { includes, map, split, set, sortBy, isEmpty, get, cloneDeep, unset, isObject } from 'lodash';
 import { REGXG } from './contants';
 import { IStep } from './types';
 const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
@@ -67,7 +67,7 @@ class Order {
               }
             }
           }
-          result[i] = typeof val === 'object' ? deepCopy(val) : val;
+          result[i] = isObject(val) ? deepCopy(val) : val;
         }
       } else {
         result = obj;

@@ -47,7 +47,7 @@ npm run test #测试
 ### 本地beta发布测试
 
 - 修改package.json中的版本号，格式为`x.x.x-beta.x(如0.0.1-beta.1)`
-- 使用`npm publish --tag=beta`发布到npm。
+- 使用`pnpm publish --tag=beta`发布到npm。
 
 ### 发布到npm
 
