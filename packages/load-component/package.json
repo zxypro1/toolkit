@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-component",
-  "version": "0.0.6",
+  "version": "0.0.7-beta.1",
   "description": "request for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
