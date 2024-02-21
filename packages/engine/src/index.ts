@@ -13,6 +13,7 @@ import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAg
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
 export * from './types';
+export { verify, preview } from './utils';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 

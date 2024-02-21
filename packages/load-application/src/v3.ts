@@ -376,7 +376,10 @@ class LoadApplication {
       dest: this.tempPath,
       logger,
       extract: true,
-      headers: registry.getSignHeaders(),
+      headers: {
+        ...registry.getSignHeaders(),
+        devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
+      },
       filename: this.name,
     });
   }
