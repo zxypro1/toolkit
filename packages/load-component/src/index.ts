@@ -20,6 +20,10 @@ export class Component {
   }
   async update() {
     const [componentName, componentVersion] = getProvider(this.name);
+    if(componentVersion === 'CUSTOM') {
+      this.params.logger(`Skip outside component's update. You could use 's clean --component <component_name>' before deploy to update your custom component cache manually.`);
+      return;
+    }
     debug(`componentName: ${componentName}, componentVersion: ${componentVersion}`);
     const componentCachePath = getComponentCachePath(componentName, componentVersion);
     debug(`componentCachePath: ${componentCachePath}`);
@@ -42,18 +46,18 @@ export class Component {
   private async getDevComponent() {
     const [componentName, componentVersion] = getProvider(this.name);
     debug(`componentName: ${componentName}, componentVersion: ${componentVersion}`);
-    const componentCachePath = getComponentCachePath(componentName, componentVersion);
+    const componentCachePath = getComponentCachePath(componentName, componentVersion === 'CUSTOM' ? '' : componentVersion);
     debug(`componentCachePath: ${componentCachePath}`);
     const lockPath = getLockFile(componentCachePath);
     if (fs.existsSync(lockPath)) {
       return await buildComponentInstance(componentCachePath, this.params);
     }
-    const { zipballUrl, version } = await getZipballUrl(componentName, componentVersion);
+    const { zipballUrl = componentName, version = componentVersion } = await getZipballUrl(componentName, componentVersion);
     debug(`zipballUrl: ${zipballUrl}`);
     await download(zipballUrl, {
       logger: get(this.params, 'engineLogger', get(this.params, 'logger')),
       dest: componentCachePath,
-      filename: `${componentName}${componentVersion ? `@${componentVersion}` : ''}`,
+      filename: componentVersion === 'CUSTOM' ? componentName.split('/').pop()?.split('.')[0] : `${componentName}${componentVersion ? `@${componentVersion}` : ''}`,
       extract: true,
       headers: registry.getSignHeaders(),
     });

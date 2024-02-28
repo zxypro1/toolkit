@@ -63,6 +63,9 @@ export const buildComponentInstance = async (componentPath: string, params?: any
 };
 
 export function getProvider(name: string) {
+  if (isValidUrl(name)) {
+    return [name, 'CUSTOM'];
+  }
   assert(!includes(name, '/'), `The component name ${name} cannot contain /`);
   const [componentName, componentVersion] = split(name, '@');
   const { core_load_serverless_devs_component } = process.env;
@@ -84,6 +87,9 @@ export function getProvider(name: string) {
 }
 
 export const getZipballUrl = async (componentName: string, componentVersion?: string) => {
+  if(componentVersion === 'CUSTOM') {
+    return {};
+  }
   const url = componentVersion ? getUrlWithVersion(componentName, componentVersion) : getUrlWithLatest(componentName);
   debug(`url: ${url}`);
   try {
@@ -102,5 +108,15 @@ export const getZipballUrl = async (componentName: string, componentVersion?: st
 };
 
 export const getComponentCachePath = (componentName: string, componentVersion?: string) => {
+  componentName = isValidUrl(componentName) ? componentName.split('/').pop()?.split('.')[0] || '' : componentName;
   return path.join(getRootHome(), 'components', 'devsapp.cn', 'v3', componentVersion ? `${componentName}@${componentVersion}` : componentName);
 };
+
+export function isValidUrl(s: string) {
+  try {
+    new URL(s);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}

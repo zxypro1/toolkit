@@ -85,7 +85,7 @@ describe('not specify --env', () => {
   });
   test('env name was not found', async () => {
     fs.ensureFileSync(ENVIRONMENT_FILE_PATH);
-    fs.writeJSONSync(ENVIRONMENT_FILE_PATH, [{ 'project': 'demo', 'default': 'testing11' }], { spaces: 2 })
+    fs.writeJSONSync(ENVIRONMENT_FILE_PATH, [{ 'project': 'web-framework-app', 'default': 'testing11' }], { spaces: 2 })
     const template = 's.yaml'
     const engine = new Engine({
       template,
@@ -98,7 +98,7 @@ describe('not specify --env', () => {
   });
   test('basic', async () => {
     fs.ensureFileSync(ENVIRONMENT_FILE_PATH);
-    fs.writeJSONSync(ENVIRONMENT_FILE_PATH, [{ 'project': 'demo', 'default': 'testing' }], { spaces: 2 })
+    fs.writeJSONSync(ENVIRONMENT_FILE_PATH, [{ 'project': 'web-framework-app', 'default': 'testing' }], { spaces: 2 })
     const template = 's.yaml'
     const engine = new Engine({
       template,

@@ -77,6 +77,7 @@ export async function writeData(content: Record<string, Record<string, string>>)
     fs.writeFileSync(getYamlPath(), yaml.dump(content));
   } catch (ex: any) {
     Logger.logger.debug(`write data error: ${ex.message}`);
-    throw new Error('Configuration failed');
+    if (ex.message.includes('EACCES')) throw new Error(`Configuration failed. Please check the permission.`);;
+    throw new Error('Configuration failed.');
   }
 }
