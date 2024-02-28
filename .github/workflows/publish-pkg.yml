@@ -39,12 +39,6 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install s
-      run: npm install -g @serverless-devs/s
-    
-    - name: s config
-      run: s config add --AccessKeyID abcd1234 --AccessKeySecret abcd1234 --AccountID abcd1234 --SecurityToken abcd1234 -a default
-
     - name: Install pnpm
       run: npm install -g pnpm
 

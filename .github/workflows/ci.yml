@@ -32,6 +32,12 @@ jobs:
 
       - name: Build
         run: npm run build
+      
+      - name: Install s
+        run: npm install -g @serverless-devs/s
+      
+      - name: s config
+        run: s config add --AccessKeyID 123 --AccessKeySecret 123 --AccountID 123 --SecurityToken 123 -a default
 
       - name: export env
         if: matrix.os != 'windows-latest' 
