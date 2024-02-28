@@ -217,6 +217,13 @@ class ParseSpec {
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
     const { steps, content, originSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
+    const services = get(this.yaml.content, 'services', {});
+    if (isEmpty(steps) && !isEmpty(services)) {
+      this.options.logger.tips('Check https://docs.serverless-devs.com/serverless-devs/yaml for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
+      throw new DevsError(`Keyword 'services' has been replaced by 'resources' in 3.0.0 YAML.`, {
+        trackerType: ETrackerType.parseException,
+      });
+    }
     // steps 存放每个FC组件/函数的 yaml 配置 ([content.resource] => steps)
     // content 为 yaml 已解析的整体完整信息
     // originSteps 为 steps 的未解析版
