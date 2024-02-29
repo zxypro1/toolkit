@@ -52,14 +52,12 @@ jobs:
       run: |
         PACKAGE_DIR=packages/${{ matrix.package }}
         PACKAGE_JSON="${PACKAGE_DIR}/package.json"
+        ls
 
         # 检查 package.json 是否被修改
         if git diff HEAD^ HEAD --name-only | grep -q "${PACKAGE_JSON}"; then
           echo "Publishing ${{ matrix.package }}..."
           cd $PACKAGE_DIR
-          npm run pub
         else
           echo "No changes in ${{ matrix.package }}/package.json"
         fi
-      env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
